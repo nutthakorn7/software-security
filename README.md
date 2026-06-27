@@ -58,8 +58,10 @@ software-security/
 ├── ETHICS.md                 ← authorized-use policy (read first)
 ├── slides/                   ← lecture slides (see slides/README.md)
 ├── labs/
-│   ├── week01-threat-modeling/ … week19-final-ctf-capstone/   (each: README + materials)
+│   ├── week01-threat-modeling/ … week19-final-ctf-capstone/   (each: README + worksheet + materials)
 │   │   (teaching: 1–6, 10–16 · review: 7, 17 · exams: 8–9 midterm, 18–19 final)
+├── worksheets/               ← worksheet template (per-week sheets live in each lab dir)
+├── quizzes/                  ← Quiz 1 (Wk 1–6) & Quiz 2 (Wk 10–15) + answer keys
 ├── project/                  ← term project brief & rubric
 ├── scripts/                  ← shared helper scripts
 └── .github/workflows/        ← security CI pipeline (also the Week 14 demo)
