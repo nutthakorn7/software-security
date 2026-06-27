@@ -1,0 +1,24 @@
+services:
+  vulnerable-api:
+    image: python:3.12-slim
+    working_dir: /lab
+    volumes:
+      - ./:/lab
+    ports:
+      - "5000:5000"
+    command: >
+      bash -c "pip install --no-cache-dir flask &&
+               echo '--- INSECURE API on :5000 — see attack.md ---' &&
+               python vulnerable_api.py"
+
+  solution-api:
+    image: python:3.12-slim
+    working_dir: /lab
+    volumes:
+      - ./:/lab
+    ports:
+      - "5001:5001"
+    command: >
+      bash -c "pip install --no-cache-dir flask &&
+               echo '--- SECURE API on :5001 ---' &&
+               python solution_api.py"

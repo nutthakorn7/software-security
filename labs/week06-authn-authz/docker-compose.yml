@@ -1,0 +1,12 @@
+services:
+  authz-lab:
+    image: python:3.12-slim
+    working_dir: /lab
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/lab
+    command: >
+      bash -c "pip install --no-cache-dir flask pyjwt &&
+               echo '--- vulnerable app on :5000 (use solution_app.py for the fixed version) ---' &&
+               python vulnerable_app.py"
