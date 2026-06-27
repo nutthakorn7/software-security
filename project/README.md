@@ -34,4 +34,8 @@ Take a small web/API application (provided starter, or your own with instructor 
 | CI pipeline (works, fails build appropriately) | 10 |
 | Presentation & report clarity | 5 |
 
+## Report
+
+Write up the project using the fill-in [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) — it maps section-by-section to the rubric above and includes an AI-tool usage disclosure.
+
 All work stays within the [ethics policy](../ETHICS.md).
