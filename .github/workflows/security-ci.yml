@@ -1,0 +1,56 @@
+name: security-ci
+
+# Demo pipeline for Week 14 (DevSecOps). Runs SAST, SCA, and secret
+# scanning, and fails the build on high-severity findings.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write   # to upload SARIF to the Security tab
+
+jobs:
+  sast:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep
+        run: semgrep ci --config p/default
+        env:
+          SEMGREP_RULES: p/owasp-top-ten
+
+  secrets:
+    name: Secret scanning (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+  sca:
+    name: SCA + image scan (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy filesystem scan (deps + misconfig)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: '1'      # fail the build on HIGH/CRITICAL
+          format: sarif
+          output: trivy-results.sarif
+      - name: Upload results to Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
