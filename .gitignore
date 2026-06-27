@@ -36,3 +36,6 @@ sbom.xml
 *.pem
 *.key
 secrets/
+
+# Instructor-only — answer keys, CTF flags, exam keys (never publish)
+instructor/
