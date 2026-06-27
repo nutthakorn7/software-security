@@ -98,3 +98,14 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 | Part 3 — Defense (Task 5: fixes proven, lines cited) | 25 |
 | Part 4 — Reflection (CWE/OWASP mapping, breach, mitigation) | 15 |
 | **Total** | **100** |
+
+---
+
+## Evidence & Integrity (required)
+
+- **Identity proof:** every screenshot/diagram must show your **`whoami` / login email / student ID** and a **timestamp**. Generic or borrowed evidence is not accepted.
+- **Personalized flag (if this lab issues one):** ____________________
+  *Flags are unique per student — submitting another student's flag is a violation. See [SUBMISSION.md](../../SUBMISSION.md).*
+- **Explain in your own words** *(graded on your reasoning, not copied text):*
+  1. What did you do, and **why did the vulnerability work**?
+  2. **Why does your fix actually stop it** — and what could still break it?

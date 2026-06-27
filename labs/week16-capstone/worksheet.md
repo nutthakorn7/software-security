@@ -88,3 +88,14 @@ Answer as a team (2–4 sentences each).
 | SBOM & signing | 15 | Complete SBOM + verifiable signed artifact |
 | CI pipeline | 15 | Security gate fails closed on HIGH/CRITICAL; run linked |
 | Demo & Q&A | 15 | Clear 10-min demo, handles 5-min Q&A; CWE/OWASP mapping throughout |
+
+---
+
+## Evidence & Integrity (required)
+
+- **Identity proof:** every screenshot/diagram must show your **`whoami` / login email / student ID** and a **timestamp**. Generic or borrowed evidence is not accepted.
+- **Personalized flag (if this lab issues one):** ____________________
+  *Flags are unique per student — submitting another student's flag is a violation. See [SUBMISSION.md](../../SUBMISSION.md).*
+- **Explain in your own words** *(graded on your reasoning, not copied text):*
+  1. What did you do, and **why did the vulnerability work**?
+  2. **Why does your fix actually stop it** — and what could still break it?

@@ -57,3 +57,14 @@ Source to model lives in `sample-app/app.py`. Template to fill: `THREAT-MODEL-TE
 | Exploitation + evidence (DFD + STRIDE table + EoP findings + screenshots) | 40 |
 | Defense (top-5 ranking + mitigations) | 25 |
 | Reflection (CWE/OWASP mapping + breach + best mitigation) | 15 |
+
+---
+
+## Evidence & Integrity (required)
+
+- **Identity proof:** every screenshot/diagram must show your **`whoami` / login email / student ID** and a **timestamp**. Generic or borrowed evidence is not accepted.
+- **Personalized flag (if this lab issues one):** ____________________
+  *Flags are unique per student — submitting another student's flag is a violation. See [SUBMISSION.md](../../SUBMISSION.md).*
+- **Explain in your own words** *(graded on your reasoning, not copied text):*
+  1. What did you do, and **why did the vulnerability work**?
+  2. **Why does your fix actually stop it** — and what could still break it?

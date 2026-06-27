@@ -59,3 +59,14 @@ Targets: `vulnerable_crypto.py` (the misuses), `hashes.txt` (four unsalted MD5s)
 | Exploitation + evidence (cracked hashes + ECB/token/key proof + screenshots) | 40 |
 | Defense (working `solution_skeleton.py` + before/after mapping) | 25 |
 | Reflection (CWE/OWASP mapping + breach + biggest-risk fix) | 15 |
+
+---
+
+## Evidence & Integrity (required)
+
+- **Identity proof:** every screenshot/diagram must show your **`whoami` / login email / student ID** and a **timestamp**. Generic or borrowed evidence is not accepted.
+- **Personalized flag (if this lab issues one):** ____________________
+  *Flags are unique per student — submitting another student's flag is a violation. See [SUBMISSION.md](../../SUBMISSION.md).*
+- **Explain in your own words** *(graded on your reasoning, not copied text):*
+  1. What did you do, and **why did the vulnerability work**?
+  2. **Why does your fix actually stop it** — and what could still break it?

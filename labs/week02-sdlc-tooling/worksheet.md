@@ -57,3 +57,14 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 | Exploitation + evidence (scan output + triage table + screenshots) | 40 |
 | Defense (remediated `app.py` with before/after diffs) | 25 |
 | Reflection (CWE/OWASP mapping + breach + tool value) | 15 |
+
+---
+
+## Evidence & Integrity (required)
+
+- **Identity proof:** every screenshot/diagram must show your **`whoami` / login email / student ID** and a **timestamp**. Generic or borrowed evidence is not accepted.
+- **Personalized flag (if this lab issues one):** ____________________
+  *Flags are unique per student — submitting another student's flag is a violation. See [SUBMISSION.md](../../SUBMISSION.md).*
+- **Explain in your own words** *(graded on your reasoning, not copied text):*
+  1. What did you do, and **why did the vulnerability work**?
+  2. **Why does your fix actually stop it** — and what could still break it?

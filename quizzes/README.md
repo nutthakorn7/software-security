@@ -4,8 +4,8 @@ Short in-class quizzes (counted under *Participation / quizzes*, 10%).
 
 | Quiz | Covers | Suggested timing |
 |------|--------|------------------|
-| [quiz1.md](quiz1.md) | Weeks 1–6 (foundations + web) | end of Week 6 or in the Week 7 review |
-| [quiz2.md](quiz2.md) | Weeks 10–15 (modern stack) | end of Week 15 or in the Week 17 review |
+| [quiz1.md](quiz1.md) | Weeks 1–6 (foundations + web) | last 30 min of Week 6 |
+| [quiz2.md](quiz2.md) | Weeks 10–15 (modern stack) | last 30 min of Week 15 |
 
 Answer keys are kept **out of the public repo** in the git-ignored `instructor/` directory (`instructor/quizzes/`) — never distribute to students. Exam keys live in `instructor/exams/`.
 
