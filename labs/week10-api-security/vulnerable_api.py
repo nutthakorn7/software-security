@@ -7,9 +7,13 @@ Flaws (OWASP API Security Top 10:2023):
 
 Run:  flask --app vulnerable_api run --port 5000   (or use docker-compose.yml)
 """
+import os
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+
+FLAG_BOLA = os.environ.get("FLAG_BOLA", "FLAG{bola_demo}")
+FLAG_MASSASSIGN = os.environ.get("FLAG_MASSASSIGN", "FLAG{massassign_demo}")
 
 # --- In-memory "database" -----------------------------------------------------
 # Seed users. Note: balance + is_admin are SERVER-controlled fields a client
@@ -25,7 +29,8 @@ USERS = {
 ORDERS = {
     1: [{"order_id": "A-1", "item": "Keyboard", "total": 30}],
     2: [{"order_id": "B-1", "item": "Mouse", "total": 15}],
-    3: [{"order_id": "C-1", "item": "Server rack", "total": 5000}],
+    3: [{"order_id": "C-1", "item": "Server rack", "total": 5000},
+        {"order_id": "C-FLAG", "item": FLAG_BOLA, "total": 0}],
 }
 _next_id = 4
 
@@ -55,6 +60,8 @@ def create_user():
     body = request.get_json(force=True) or {}
     user = {"id": _next_id}
     user.update(body)            # <-- mass assignment: trusts every key
+    if user.get("is_admin"):     # smuggling is_admin=true grants the flag
+        user["flag"] = FLAG_MASSASSIGN
     USERS[_next_id] = user
     _next_id += 1
     return jsonify(user), 201

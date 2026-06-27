@@ -12,13 +12,15 @@ we filter the output, and ideally the secret would not be in the prompt at all.
 
 Run:  flask --app guarded_chatbot run --port 6001   (or use docker-compose.yml)
 """
+import os
 import re
 from html import escape
 from flask import Flask, request
 
 app = Flask(__name__)
 
-SECRET = "FLAG{pr0mpt_1nj3ction_l34ks_s3cr3ts}"
+# Same env var as vulnerable_chatbot.py so redaction matches the per-student flag.
+SECRET = os.environ.get("FLAG_PROMPTINJ", "FLAG{pr0mpt_1nj3ction_l34ks_s3cr3ts}")
 # System content is kept SEPARATE from user content (never concatenated raw).
 SYSTEM_PROMPT = "You are HelpBot, a friendly assistant. Answer general questions only."
 

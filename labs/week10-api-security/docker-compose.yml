@@ -6,6 +6,10 @@ services:
       - ./:/lab
     ports:
       - "5000:5000"
+    # Per-student flags: python3 ../../instructor/seed_flags.py env <STUDENT_ID> > .env
+    environment:
+      - FLAG_BOLA
+      - FLAG_MASSASSIGN
     command: >
       bash -c "pip install --no-cache-dir flask &&
                echo '--- INSECURE API on :5000 — see attack.md ---' &&

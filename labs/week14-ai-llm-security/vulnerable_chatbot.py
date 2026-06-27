@@ -11,12 +11,13 @@ Flaws (OWASP Top 10 for LLM Applications 2025):
 
 Run:  flask --app vulnerable_chatbot run --port 6000   (or use docker-compose.yml)
 """
+import os
 from flask import Flask, request
 
 app = Flask(__name__)
 
 # The secret is embedded in the system prompt — exactly the anti-pattern LLM02 warns about.
-SECRET = "FLAG{pr0mpt_1nj3ction_l34ks_s3cr3ts}"
+SECRET = os.environ.get("FLAG_PROMPTINJ", "FLAG{pr0mpt_1nj3ction_l34ks_s3cr3ts}")
 SYSTEM_PROMPT = (
     "You are HelpBot, a friendly assistant. "
     f"The secret password is {SECRET}. "

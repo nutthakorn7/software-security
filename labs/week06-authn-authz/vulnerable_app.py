@@ -1,4 +1,5 @@
 """Deliberately INSECURE — Week 6 Authentication & Access Control. Sandbox only; for authorized lab use."""
+import os
 import jwt  # pip install pyjwt
 from flask import Flask, request, jsonify
 
@@ -7,11 +8,14 @@ app = Flask(__name__)
 # CWE-321/798: weak, hardcoded HMAC secret — trivially guessable / brute-forceable.
 SECRET = "secret"
 
+FLAG_IDOR = os.environ.get("FLAG_IDOR", "FLAG{idor_demo}")
+FLAG_JWT = os.environ.get("FLAG_JWT", "FLAG{jwt_demo}")
+
 USERS = {"alice": "alicepw", "bob": "bobpw"}
 # Orders keyed by id; each belongs to an owner.
 ORDERS = {
     1: {"owner": "alice", "item": "Laptop", "total": 1200},
-    2: {"owner": "bob", "item": "Phone", "total": 800},
+    2: {"owner": "bob", "item": "Phone", "total": 800, "note": FLAG_IDOR},
 }
 
 
@@ -44,6 +48,16 @@ def get_order(oid):
         return jsonify(error="not found"), 404
     # CWE-639: IDOR — any logged-in user can read ANY order; no ownership check.
     return jsonify(order)
+
+
+@app.route("/api/admin")
+def admin():
+    # CWE-347/-639: only "admin" should pass — but forging a JWT (alg:none or the
+    # weak secret) lets any attacker set sub=admin and read the flag.
+    user = current_user()
+    if user != "admin":
+        return jsonify(error="forbidden"), 403
+    return jsonify(flag=FLAG_JWT)
 
 
 if __name__ == "__main__":

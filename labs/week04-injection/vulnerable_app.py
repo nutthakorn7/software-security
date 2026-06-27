@@ -7,6 +7,8 @@ from flask import Flask, request, g
 app = Flask(__name__)
 DB = "/tmp/week04.db"
 UPLOAD_DIR = "/tmp/uploads"
+FLAG_SQLI = os.environ.get("FLAG_SQLI", "FLAG{sqli_demo}")
+FLAG_CMDI = os.environ.get("FLAG_CMDI", "FLAG{cmdi_demo}")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
@@ -28,9 +30,14 @@ def seed():
     con.execute("DROP TABLE IF EXISTS users")
     con.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)")
     con.executemany("INSERT INTO users (username, password) VALUES (?, ?)",
-                    [("alice", "alicepw"), ("bob", "bobpw")])
+                    [("alice", "alicepw"), ("bob", "bobpw"), ("admin", FLAG_SQLI)])
     con.commit()
     con.close()
+    # Per-student command-injection flag on disk -> reachable via /ping?host=;cat /flag.txt
+    try:
+        open("/flag.txt", "w").write(FLAG_CMDI + "\n")
+    except Exception:
+        pass
 
 
 @app.route("/login")
