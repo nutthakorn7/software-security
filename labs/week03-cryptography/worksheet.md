@@ -19,7 +19,7 @@ Answer in your own words (2–4 sentences each).
 4. Why does AES-ECB leak structure, and what does an authenticated mode like AES-GCM add?
 5. What's the difference between `random` and a CSPRNG (e.g. `secrets`), and where does it matter?
 
-## Part 3 — Hands-on Lab (95 min)
+## Part 3 — Hands-on Lab (180 min)
 **Learning goals:** exploit four crypto misuses, then remediate them with a vetted KDF, authenticated encryption, and a CSPRNG.
 **Prerequisites:** Docker (or local Python 3.12); `hashcat` or `john`; the `rockyou.txt` wordlist.
 
@@ -44,6 +44,14 @@ Targets: `vulnerable_crypto.py` (the misuses), `hashes.txt` (four unsalted MD5s)
 **Task 3 — Predictable token (15 min)** · *Goal:* show the reset token is guessable. *Steps:* call `reset_token()` repeatedly; argue why a 6-digit `random` token (10^6 space, non-CSPRNG) is brute-forceable (CWE-330). *Deliverable:* sample tokens + a one-line attack estimate.
 
 **Task 4 — Hardcoded key (5 min)** · *Goal:* identify the key-management flaw. *Steps:* find `HARDCODED_KEY` in `vulnerable_crypto.py`; explain why shipping a key in source is CWE-798. *Deliverable:* the line + a 2-sentence mitigation.
+
+**Task 6 — Crack the project target's hashes (25 min)** · *Goal:* apply cracking to your term project. *Steps:* **NoteVault** stores unsalted MD5 password hashes; obtain them (via the app's `/admin` once you can reach it, or from its `seed()`), and crack them with `hashcat -m 0`. *Deliverable:* the recovered password(s) + note the CWE — record this finding for your [project report](../../project/REPORT-TEMPLATE.md).
+
+**Task 7 — Password storage migration (25 min)** · *Goal:* fix it the way real apps do. *Steps:* write `store_password`/`verify_password` with **argon2id**, and a **rehash-on-login** path that upgrades a legacy MD5 record to argon2id the next time the user logs in. *Deliverable:* the code + a short note on why migration matters.
+
+**Task 8 — Authenticated encryption round-trip (20 min)** · *Goal:* use AEAD correctly. *Steps:* encrypt+decrypt a message with **AES-GCM** using a random 12-byte nonce and a key from an env var; then flip one ciphertext byte and show decryption **fails** (tag check). *Deliverable:* the round-trip output + the tampered-fails proof.
+
+**Task 9 — TLS in practice (15 min)** · *Goal:* read a real cert. *Steps:* `openssl s_client -connect example.com:443 </dev/null | openssl x509 -noout -issuer -subject -dates`; identify issuer, validity, and the negotiated TLS version. *Deliverable:* the cert summary + one line on what TLS protects that hashing/at-rest encryption does not.
 
 **Task 5 — Defend / fix it (20 min)** · *Goal:* remediate using `solution_skeleton.py`. *Steps:* run `python solution_skeleton.py`; confirm `store_password`/`verify_password` use argon2id (auto-salted), `encrypt_gcm` uses a random 12-byte nonce + auth tag with a key from `ENC_KEY_HEX` env, and `reset_token` uses `secrets`. Map each fix to the CWE it closes. *Deliverable:* before/after table (misuse → fix → CWE closed) + screenshot of the fixed script running.
 

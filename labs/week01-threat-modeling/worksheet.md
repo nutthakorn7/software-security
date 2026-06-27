@@ -19,7 +19,7 @@ Answer in your own words (2–4 sentences each).
 4. What does each STRIDE letter map to, and which security property does each threat violate?
 5. What does "Secure by Design" (CISA) mean, and how does it differ from bolting security on after release?
 
-## Part 3 — Hands-on Lab (90 min)
+## Part 3 — Hands-on Lab (180 min)
 **Learning goals:** build a data-flow diagram (DFD), apply STRIDE to a real Flask app, rank risks, and propose mitigations.
 **Prerequisites:** Docker + Docker Compose in your VM; a drawing tool (draw.io / paper + photo); the Elevation of Privilege deck (print or virtual).
 
@@ -42,6 +42,14 @@ Source to model lives in `sample-app/app.py`. Template to fill: `THREAT-MODEL-TE
 **Task 2 — STRIDE the elements (30 min)** · *Goal:* enumerate threats per element. *Steps:* for each element fill the S/T/R/I/D/E grid. Ground it in real code: `/notes` accepts a client-supplied `owner` with no auth (Spoofing); `/upload` saves raw `f.filename` and `/files/<name>` serves it back (Tampering + path-traversal Info disclosure); no logging anywhere (Repudiation). *Deliverable:* completed STRIDE table.
 
 **Task 3 — Elevation of Privilege game (20 min)** · *Goal:* find threats you missed. *Steps:* play the EoP deck against your DFD; each card you can tie to a real element/flow scores a point; record every valid threat. *Deliverable:* list of carded threats + score.
+
+**Task 5 — Abuse cases & attacker personas (20 min)** · *Goal:* think like specific adversaries. *Steps:* define 2 personas (e.g. a curious logged-in user; an anonymous internet attacker) and write 2 abuse cases each against the sample app, tied to DFD elements. *Deliverable:* 4 abuse cases.
+
+**Task 6 — Path-traversal deep-dive (25 min)** · *Goal:* analyze the riskiest flow. *Steps:* trace `/upload` → `/files/<name>`; explain how `../` in a filename escapes `uploads/`; sketch the secure design (`secure_filename`, store outside web root, allow-list extensions). *Deliverable:* the data flow + secure-design note.
+
+**Task 7 — Threat-model the project target (30 min)** · *Goal:* kick off your term project. *Steps:* run **NoteVault** (`cd ../../project/starter-app && docker compose up`), draw a quick DFD, and list the top 3 STRIDE threats you'd investigate. *Deliverable:* NoteVault DFD + top-3 threats (reuse these in your [project report](../../project/REPORT-TEMPLATE.md)).
+
+**Task 8 — Security requirements (15 min)** · *Goal:* turn threats into testable requirements. *Steps:* write 3 security requirements as acceptance criteria ("the system must … so that …"), each mapped to a threat from Task 2 or 7. *Deliverable:* 3 testable security requirements.
 
 **Task 4 — Defend / fix it: rank & mitigate (10 min)** · *Goal:* turn threats into action. *Steps:* rank the top 5 threats by likelihood × impact; propose one concrete mitigation each (e.g., auth on `/notes`, `secure_filename()` + allowlist for `/upload`, request logging for Repudiation, size/rate limits for DoS). *Deliverable:* the top-5 table with mitigations in your template copy.
 

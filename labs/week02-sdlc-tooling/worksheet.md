@@ -19,7 +19,7 @@ Answer in your own words (2–4 sentences each).
 4. Why is coverage-guided fuzzing considered the dominant modern bug-finding technique?
 5. Define true positive vs. false positive in scanner triage, and why misclassifying both directions is costly.
 
-## Part 3 — Hands-on Lab (95 min)
+## Part 3 — Hands-on Lab (180 min)
 **Learning goals:** run a SAST tool and a secret scanner, triage findings by CWE/severity, and remediate real flaws.
 **Prerequisites:** Docker installed; internet to pull the Semgrep/Gitleaks images.
 
@@ -42,6 +42,12 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 **Task 3 — Bug Triage Race (30 min)** · *Goal:* triage accurately. *Steps:* build a table with columns *Tool | File:Line | CWE | Severity | TP/FP | Fix idea*; mark at least 3 true positives and 1 likely false positive and justify each. (Score = TP − misclassified.) *Deliverable:* the completed triage table.
 
 **Task 4 — Fuzzing intro (10 min)** · *Goal:* understand coverage-guided fuzzing conceptually. *Steps:* read the libFuzzer reference in the README; if the instructor provides a `harness.c`, build and run `clang -fsanitize=address,fuzzer harness.c -o fuzz && ./fuzz` and capture one crash. (No local harness ships with this lab; the deep fuzzing lab is Week 11.) *Deliverable:* a 2-sentence note on why fuzzing finds bugs SAST misses, plus a crash screenshot if a harness was provided.
+
+**Task 6 — Scan the project target (40 min)** · *Goal:* apply the tools to your term project. *Steps:* run Semgrep + Gitleaks against **NoteVault** (`../../project/starter-app`); also run an SCA scan: `docker run --rm -v "$PWD/../../project/starter-app:/src" aquasec/trivy fs /src`. *Deliverable:* a findings list (tool, file:line/CVE, CWE) — reuse it in your project vuln report.
+
+**Task 7 — Build a security CI gate (25 min)** · *Goal:* automate the scan (previews Week 15). *Steps:* adapt `../week15-devsecops-pipeline/security-ci.yml` into a workflow that runs Semgrep + Trivy + Gitleaks and **fails on HIGH/CRITICAL**; run it locally (`act`) or commit to your fork and read the Actions log. *Deliverable:* the workflow file + a screenshot of a failing run.
+
+**Task 8 — SAST blind spots (20 min)** · *Goal:* see what scanners miss. *Steps:* find one real bug in `vulnerable-repo/app.py` (or NoteVault) that Semgrep did **not** flag, and explain why a pattern-based tool missed it. *Deliverable:* the bug + a 2-sentence explanation.
 
 **Task 5 — Defend / fix it (10 min)** · *Goal:* remediate the planted flaws in `vulnerable-repo/app.py`. *Steps:* rewrite `/user` to use a parameterized query (`?` placeholder); remove `shell=True` and pass an argument list in `/ping`; move both secrets to environment variables; replace `md5` with bcrypt/argon2; set `debug=False`. *Deliverable:* a before/after diff for each fix mapped to its CWE.
 
