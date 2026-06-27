@@ -25,25 +25,27 @@ docker compose up        # (where a target is provided)
 
 ## Course at a glance
 
-| Wk | Topic | OWASP 2025 | Lab target |
+| Wk | Topic | OWASP 2025 | 🎮 Signature game / activity |
 |----|-------|-----------|------------|
-| 1  | Security mindset & threat modeling | A06 | STRIDE model of a sample app |
-| 2  | Secure SDLC & tooling | — | Semgrep + Gitleaks on flawed repo |
-| 3  | Cryptography used correctly | A04 | Crack weak hashes / ECB oracle |
-| 4  | Injection & input handling | A05 | DVWA / Juice Shop |
-| 5  | XSS & client-side risks | A05 | Juice Shop (stored/DOM XSS, CSP) |
-| 6  | Authn, sessions & access control | A01, A07 | IDOR + weak JWT |
-| 7  | API security | A01 | crAPI (BOLA, mass assignment) |
-| 8  | Memory-safety vulnerabilities | — | Stack overflow (sandbox binary) |
-| 9  | RE & exploitation mitigations | — | gdb / Ghidra format-string |
-| 10 | Supply chain I: dependencies | A03 | SCA scan + dependency confusion |
-| 11 | Supply chain II: integrity & provenance | A03, A08 | SBOM + Cosign signing (SLSA) |
-| 12 | Cloud & container security | A02 | IAM / bucket / Dockerfile hardening |
-| 13 | AI / LLM application security | LLM Top 10 | Prompt injection on sandbox chatbot |
-| 14 | DevSecOps: putting it together | A09, A10 | Security CI/CD pipeline |
-| 15 | Capstone presentations & review | — | Final project + CTF review |
+| 1  | Security mindset & threat modeling | A06 | "Elevation of Privilege" STRIDE card game |
+| 2  | Secure SDLC, tooling & fuzzing | — | "Bug Triage Race" + "Fuzzing Race" |
+| 3  | Cryptography used correctly | A04 | "Capture the Hash" speedrun + ECB oracle |
+| 4  | Injection & input handling | A05 | "SQLi Boss Fight" (DVWA / Juice Shop) |
+| 5  | XSS & client-side risks | A05 | "XSS Golf" (shortest payload wins) |
+| 6  | Authn, sessions & access control | A01, A07 | "IDOR Treasure Hunt + JWT Forgery" |
+| **7**  | **🔁 Reflection & Review (pre-midterm)** | — | "Security Jeopardy" + mock CTF |
+| **8–9** | **📝 Midterm** (Wk8 written · Wk9 CTF practical) | — | covers Weeks 1–6 |
+| 10 | API security | API Top 10 | "crAPI Raid" (BOLA, mass assignment) |
+| 11 | Memory-safety & exploitation | — | "Fuzzing Race → Pwn the Binary" + Rust rewrite |
+| 12 | Software supply chain (deps + integrity) | A03, A08 | "Dependency Confusion Heist" + Cosign signing |
+| 13 | Cloud & container security | A02 | "Misconfig Hunt" (CloudGoat-style) |
+| 14 | AI / LLM + agentic security | LLM Top 10 | "Gandalf Challenge" (prompt injection) |
+| 15 | DevSecOps: putting it together | A09, A10 | "Break the Build" (Red vs Blue) |
+| 16 | Capstone studio & CTF warm-up | — | Practice CTF + peer review |
+| **17** | **🔁 Reflection & Review (pre-final)** | — | "Jeopardy: Champions Edition" + mock final |
+| **18–19** | **📝 Final** (Wk18 written · Wk19 capstone CTF) | — | cumulative, emphasis Wk 10–16 |
 
-Full details: [syllabus.md](syllabus.md).
+Full details: [syllabus.md](syllabus.md). Expanded design rationale: [course-plan-19weeks.md](course-plan-19weeks.md) · curriculum benchmark vs. top universities: [curriculum-review.md](curriculum-review.md).
 
 ---
 
@@ -56,7 +58,8 @@ software-security/
 ├── ETHICS.md                 ← authorized-use policy (read first)
 ├── slides/                   ← lecture slides (see slides/README.md)
 ├── labs/
-│   ├── week01-threat-modeling/ … week15-capstone/   (each: README + materials)
+│   ├── week01-threat-modeling/ … week19-final-ctf-capstone/   (each: README + materials)
+│   │   (teaching: 1–6, 10–16 · review: 7, 17 · exams: 8–9 midterm, 18–19 final)
 ├── project/                  ← term project brief & rubric
 ├── scripts/                  ← shared helper scripts
 └── .github/workflows/        ← security CI pipeline (also the Week 14 demo)
@@ -68,11 +71,11 @@ software-security/
 
 | Component | Weight |
 |---|---|
-| Weekly labs (13 graded) | 35% |
-| Two practical CTF-style exams (Wk 7 & 13) | 20% |
-| Term project | 25% |
-| Capstone presentation | 10% |
-| Participation / quizzes | 10% |
+| Weekly labs/games (13 graded) | 30% |
+| Midterm (Wk 8 written + Wk 9 CTF practical) | 20% |
+| Final (Wk 18 written + Wk 19 capstone CTF) | 25% |
+| Term project | 15% |
+| Participation / leaderboard / quizzes | 10% |
 
 ---
 

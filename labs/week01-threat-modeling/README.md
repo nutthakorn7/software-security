@@ -6,6 +6,10 @@
 - Explain the CIA triad, trust boundaries, and attack surface.
 - Build a data-flow diagram (DFD) and apply STRIDE to a real app.
 - Navigate the OWASP Top 10, MITRE CWE, and ATT&CK.
+- Frame the course with **"Secure by Design"** (CISA) and the industry shift to memory-safe languages.
+
+## 🎲 Signature game — "Elevation of Privilege"
+Play Microsoft's free STRIDE threat-modeling card deck against the sample app's DFD — each valid threat scores a point.
 
 ## Lab 0 — Environment setup (do once)
 1. Install VirtualBox/UTM + a Kali or Ubuntu VM.

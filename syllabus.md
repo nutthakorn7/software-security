@@ -67,79 +67,90 @@ A one-page **"Lab 0" setup guide** is provided in Week 1 so the whole environmen
 
 ---
 
-## 5. Weekly Outline (15 weeks)
+## 5. Weekly Outline (19 weeks)
 
-> Each week: **Lecture** (concepts) → **Lab** (hands-on) → optional reading.
+> Each teaching week: **Lecture** (concepts) → **signature game/lab** (hands-on, leaderboard-scored) → optional reading. The course runs **13 teaching weeks** (1–6, 10–16), **2 reflection/review weeks** (7, 17), and **2 exam blocks** (8–9 midterm, 18–19 final).
+
+| Block | Weeks |
+|---|---|
+| Unit A — Foundations | 1–3 |
+| Unit B — Web App Security | 4–6 |
+| 🔁 Reflection & Review (pre-midterm) | **7** |
+| 📝 Midterm | **8–9** |
+| Unit C — Systems & Modern Stack | 10–16 |
+| 🔁 Reflection & Review (pre-final) | **17** |
+| 📝 Final exam | **18–19** |
 
 ### Unit A — Foundations (Weeks 1–3)
 
 **Week 1 — Security Mindset & Threat Modeling**
-*Lecture:* What "secure" means; CIA triad; attacker vs. defender mindset; trust boundaries; attack surface; introduction to STRIDE and the OWASP/MITRE landscape (Top 10, CWE, ATT&CK).
-*Lab 0 + Lab 1:* Stand up the VM/Docker environment. Build a STRIDE threat model and data-flow diagram for a small provided web app; enumerate its attack surface.
+*Lecture:* CIA triad; attacker vs. defender mindset; trust boundaries; attack surface; STRIDE; the OWASP/MITRE landscape (Top 10, CWE, ATT&CK); **"Secure by Design" (CISA)** framing. Maps to **A06:2025 Insecure Design**.
+*🎲 Game — "Elevation of Privilege":* play Microsoft's STRIDE card deck against a provided app's DFD; build a STRIDE threat model + attack-surface map. Lab 0 environment setup.
 
-**Week 2 — Secure Software Development Lifecycle (SDLC) & Tooling**
-*Lecture:* Where security fits in the SDLC; security requirements; SAST vs. DAST vs. SCA vs. IAST; secret scanning; "shift left" and DevSecOps overview.
-*Lab:* Run a SAST tool (Semgrep) and a secret scanner (Gitleaks) on a deliberately flawed repo; triage and categorize findings by CWE.
+**Week 2 — Secure SDLC & Tooling**
+*Lecture:* Where security fits in the SDLC; SAST vs. DAST vs. SCA vs. **fuzzing**; secret scanning; "shift left" and DevSecOps overview.
+*🏁 Game — "Bug Triage Race" + "Fuzzing Race":* run Semgrep + Gitleaks on a flawed repo and triage by CWE (scored); intro coverage-guided fuzzing (first crash wins).
 
 **Week 3 — Cryptography Used Correctly (and Misused)**
-*Lecture:* Hashing vs. encryption vs. encoding; symmetric/asymmetric basics; password storage (bcrypt/argon2); TLS at a high level; common crypto failures (ECB, hardcoded keys, weak randomness, MD5/SHA-1). Maps to **A04:2025 Cryptographic Failures**.
-*Lab:* Break weak crypto — crack unsalted/MD5 hashes, exploit an ECB-mode oracle, then remediate the code to use a vetted KDF and authenticated encryption.
+*Lecture:* Hashing vs. encryption vs. encoding; symmetric/asymmetric basics; password storage (bcrypt/argon2); TLS overview; common failures (ECB, hardcoded keys, weak randomness, MD5/SHA-1). Maps to **A04:2025 Cryptographic Failures**.
+*🔓 Game — "Capture the Hash":* crack weak hashes + break an ECB oracle (speedrun), then remediate with a vetted KDF and authenticated encryption.
 
-### Unit B — Web & API Security (Weeks 4–7)
+### Unit B — Web Application Security (Weeks 4–6)
 
 **Week 4 — Injection & Input Handling**
-*Lecture:* SQL injection, command injection, and the general injection pattern; parameterized queries; output encoding. Maps to **A05:2025 Injection**.
-*Lab:* Exploit SQLi and command injection in DVWA / Juice Shop; rewrite the vulnerable endpoints using prepared statements and validation.
+*Lecture:* SQL injection, command injection, the general injection pattern; parameterized queries; output encoding. Maps to **A05:2025 Injection**.
+*⚔️ Game — "SQLi Boss Fight":* tiered injection challenges in DVWA / Juice Shop; rewrite endpoints with prepared statements + validation.
 
 **Week 5 — Cross-Site Scripting (XSS) & Client-Side Risks**
-*Lecture:* Reflected/stored/DOM XSS; CSRF; SameSite cookies; Content Security Policy; the browser security model and same-origin policy.
-*Lab:* Build and fire stored + DOM XSS payloads in Juice Shop; deploy a CSP and proper escaping to block them; demonstrate a CSRF attack and its defense.
+*Lecture:* Reflected/stored/DOM XSS; CSRF; SameSite cookies; Content Security Policy; same-origin policy.
+*⛳ Game — "XSS Golf":* shortest payload that pops `alert(1)` / steals a cookie wins; then deploy a CSP + escaping that blocks every payload; demo CSRF + defense.
 
 **Week 6 — Authentication, Sessions & Access Control**
-*Lecture:* Authn vs. authz; session management; JWT pitfalls; OAuth 2.0 / OIDC at a high level; IDOR and privilege escalation. Maps to **A01:2025 Broken Access Control** and **A07:2025 Authentication Failures**.
-*Lab:* Exploit IDOR and broken access control to reach other users' data; forge a weak JWT; implement role-based access checks and fix the token handling.
+*Lecture:* Authn vs. authz; session management; JWT pitfalls; OAuth 2.0 / OIDC overview; IDOR and privilege escalation. Maps to **A01:2025 Broken Access Control** and **A07:2025 Authentication Failures**.
+*🗺️ Game — "IDOR Treasure Hunt + JWT Forgery":* reach other users' data via object-id tampering, forge a weak JWT; implement RBAC + fix token handling.
 
-**Week 7 — API Security**
-*Lecture:* REST/GraphQL attack surface; the **OWASP API Security Top 10** (BOLA, broken authentication, excessive data exposure, mass assignment, rate-limiting/resource consumption).
-*Lab:* Attack the **crAPI** target — exploit BOLA and mass assignment, then add authorization checks, schema validation, and rate limiting.
+### 🔁 Week 7 — Reflection & Review (pre-Midterm)
+No new content. Consolidate Weeks 1–6. *🎯 "Security Jeopardy" team quiz-show + a mock CTF in the midterm format.* Deliverable: a one-page cheat sheet.
 
-### Unit C — Systems & Memory Safety (Weeks 8–9)
+### 📝 Weeks 8–9 — Midterm (covers Weeks 1–6)
+- **Week 8 — Written/concept exam:** threat modeling, CWE/OWASP mapping, "spot the vuln," secure-design short answers.
+- **Week 9 — Hands-on CTF practical:** graded challenges across injection, XSS, auth/IDOR, and crypto in the sandbox.
 
-**Week 8 — Memory-Safety Vulnerabilities**
-*Lecture:* The C/C++ memory model; stack buffer overflows; integer overflow; use-after-free; why memory-safe languages (Rust, Go) matter; modern mitigations (ASLR, stack canaries, NX/DEP).
-*Lab:* Exploit a classic stack overflow to hijack control flow in a provided binary (sandbox); observe how a canary and ASLR change the attack; rewrite the routine safely.
+### Unit C — Systems & Modern Stack (Weeks 10–16)
 
-**Week 9 — Exploitation Mitigations & Reverse Engineering Basics**
-*Lecture:* How modern defenses raise the bar; intro to disassembly/decompilation; format-string bugs; defense-in-depth thinking.
-*Lab:* Use `gdb`/Ghidra to analyze a small binary, find a format-string or off-by-one bug, and write a proof-of-concept; then patch it.
+**Week 10 — API Security**
+*Lecture:* REST/GraphQL attack surface; the **OWASP API Security Top 10** (BOLA, broken authentication, excessive data exposure, mass assignment, resource consumption).
+*🥷 Game — "crAPI Raid":* exploit BOLA + mass assignment, then add authorization, schema validation, and rate limiting.
 
-### Unit D — Modern Stack: Supply Chain, Cloud & AI (Weeks 10–13)
+**Week 11 — Memory-Safety & Exploitation** *(merges former memory-safety + RE weeks)*
+*Lecture:* C/C++ memory model; stack buffer overflows; integer overflow; use-after-free; format-string bugs; mitigations (ASLR, canaries, NX/DEP); intro to `gdb`/Ghidra; **the global shift to memory-safe languages (CISA/ONCD roadmaps).**
+*💥 Game — "Fuzzing Race → Pwn the Binary":* fuzz to find the bug (AFL++/libFuzzer), exploit a stack overflow / format string, watch canaries+ASLR break it, then **rewrite the routine in Rust** and explain why the bug class disappears.
 
-**Week 10 — Software Supply-Chain Security I: Dependencies**
-*Lecture:* Why the supply chain is now a top-tier risk (**A03:2025 Software Supply Chain Failures**); dependency confusion, typosquatting, malicious packages; transitive dependency risk; SCA tooling.
-*Lab:* Run an SCA scan (OWASP Dependency-Check / `npm audit` / Trivy) on a project with known-vulnerable dependencies; reproduce a dependency-confusion scenario in a controlled registry.
+**Week 12 — Software Supply-Chain Security** *(merges former dependencies + integrity weeks)*
+*Lecture:* Why the supply chain is now top-tier (**A03:2025**); dependency confusion, typosquatting, malicious/transitive packages; SBOMs (CycloneDX/SPDX); **SLSA** provenance; **Sigstore/Cosign** signing (**A08:2025**).
+*📦 Game — "Dependency Confusion Heist":* plant/identify a typosquatted package in a controlled registry; then generate an SBOM, sign & verify with Cosign, and add a provenance gate.
 
-**Week 11 — Software Supply-Chain Security II: Integrity & Provenance**
-*Lecture:* SBOMs (CycloneDX/SPDX); the **SLSA** framework and build provenance; artifact signing with **Sigstore/Cosign**; **A08:2025 Software or Data Integrity Failures**.
-*Lab:* Generate an SBOM for a container image; sign and verify an artifact with Cosign (keyless/OIDC); add a provenance/attestation step and verify it before "deploying."
+**Week 13 — Cloud & Container Security**
+*Lecture:* Shared-responsibility model; IAM least privilege; secrets management; container image hardening; Kubernetes basics; **A02:2025 Security Misconfiguration**.
+*🔍 Game — "Misconfig Hunt" (CloudGoat-style):* find & fix an over-permissive IAM policy, an exposed bucket, env-var secrets, and a vulnerable Dockerfile (scan + harden with Trivy).
 
-**Week 12 — Cloud & Container Security**
-*Lecture:* Shared-responsibility model; IAM and least privilege; secrets management; container image hardening; Kubernetes basics; **A02:2025 Security Misconfiguration**.
-*Lab:* Find and fix misconfigurations — over-permissive IAM policy, exposed storage bucket, secrets in environment variables, and a vulnerable Dockerfile (scan with Trivy, harden the image).
+**Week 14 — Security of AI / LLM-Powered Applications**
+*Lecture:* **OWASP Top 10 for LLM Applications (2025)** — prompt injection (LLM01), sensitive info disclosure, insecure output handling, excessive agency, RAG/vector weaknesses, unbounded consumption; **agentic-AI / MCP risks (MITRE ATLAS, post-Oct 2025)**.
+*🧙 Game — "Gandalf Challenge":* direct + indirect prompt injection to exfiltrate a secret; demo tool poisoning / excessive agency in an agent; add guardrails, output validation, and **least-privilege tool access**, then re-test.
 
-**Week 13 — Security of AI / LLM-Powered Applications**
-*Lecture:* The **OWASP Top 10 for LLM Applications (2025)** — prompt injection (LLM01), sensitive information disclosure, insecure output handling, excessive agency, RAG/vector & embedding weaknesses, and unbounded consumption; defenses for AI features in real products.
-*Lab:* Perform direct and indirect **prompt-injection** attacks against a sandboxed chatbot to exfiltrate a hidden secret/system prompt; then add input/output guardrails, output validation, and least-privilege tool access, and re-test.
+**Week 15 — DevSecOps: Putting It Together**
+*Lecture:* Logging, monitoring & alerting (**A09:2025**); failing safely (**A10:2025**); secure CI/CD; vulnerability management; coordinated disclosure & bug bounties; **Secure by Design**.
+*🔴🔵 Game — "Break the Build" (Red vs Blue):* Blue builds a GitHub Actions gate (Semgrep + Trivy + Gitleaks) that **fails on high-severity findings**; Red submits PRs trying to sneak vulns past it.
 
-### Unit E — Defense in Practice & Assessment (Weeks 14–15)
+**Week 16 — Capstone Studio & CTF Warm-up**
+*Studio:* Work-in-progress capstone demos (attack → root cause → fix) + a practice CTF tournament previewing the final; cross-team peer review.
 
-**Week 14 — DevSecOps: Putting It Together**
-*Lecture:* Logging, monitoring & alerting (**A09:2025**); failing safely / **A10:2025 Mishandling of Exceptional Conditions**; building a secure CI/CD pipeline; vulnerability management and responsible disclosure / coordinated disclosure & bug bounties.
-*Lab:* Build a GitHub Actions pipeline that runs SAST (Semgrep), SCA (Trivy/Dependency-Check), and secret scanning (Gitleaks), and **fails the build** on high-severity findings.
+### 🔁 Week 17 — Reflection & Review (pre-Final)
+Consolidate Weeks 10–16 (+ first-half callbacks). *🎯 "Security Jeopardy: Champions Edition" + a mock final CTF in the Week-19 format.*
 
-**Week 15 — Capstone Presentations & Review**
-*Lecture/Studio:* Team capstone presentations; live walkthrough of attack → root cause → fix; course-wide review and the security landscape ahead.
-*No new lab* — final project demos and a capture-the-flag style review challenge.
+### 📝 Weeks 18–19 — Final Exam
+- **Week 18 — Written exam:** cumulative, with emphasis on Weeks 10–16 (API, memory safety, supply chain, cloud, AI/LLM, DevSecOps).
+- **Week 19 — Capstone CTF tournament + final project demos:** a full term-spanning CTF plus each team's secured-build presentation (threat model → vulns → remediation → SBOM/signing → CI pipeline).
 
 ---
 
@@ -147,11 +158,11 @@ A one-page **"Lab 0" setup guide** is provided in Week 1 so the whole environmen
 
 | Component | Weight |
 |---|---|
-| Weekly labs (13 graded) | 35% |
-| Two practical exams (CTF-style, hands-on) — Week 7 & Week 13 | 20% |
-| Term project (secure build + threat model + remediation report) | 25% |
-| Capstone presentation | 10% |
-| Participation / quizzes | 10% |
+| Weekly labs/games (13 graded) | 30% |
+| Midterm — Week 8 (written) + Week 9 (CTF practical) | 20% |
+| Final — Week 18 (written) + Week 19 (capstone CTF) | 25% |
+| Term project (secure build + threat model + remediation report) | 15% |
+| Participation / leaderboard / quizzes | 10% |
 
 **Term project.** In teams of 2–3, students take a small web/API application, threat-model it, find and document its vulnerabilities, remediate them, generate an SBOM, sign the release artifact, and wire up a security CI pipeline. Deliverables: a threat model, a vulnerability report mapped to CWE/OWASP, the fixed code, and a short demo.
 
@@ -197,14 +208,14 @@ Violations are treated as serious academic-integrity and conduct breaches. Stude
 | OWASP 2025 Category | Where covered |
 |---|---|
 | A01 Broken Access Control | Week 6 |
-| A02 Security Misconfiguration | Week 12 |
-| A03 Software Supply Chain Failures | Weeks 10–11 |
+| A02 Security Misconfiguration | Week 13 |
+| A03 Software Supply Chain Failures | Week 12 |
 | A04 Cryptographic Failures | Week 3 |
 | A05 Injection | Weeks 4–5 |
-| A06 Insecure Design | Weeks 1, 14 |
+| A06 Insecure Design | Weeks 1, 15 |
 | A07 Authentication Failures | Week 6 |
-| A08 Software or Data Integrity Failures | Week 11 |
-| A09 Security Logging & Alerting Failures | Week 14 |
-| A10 Mishandling of Exceptional Conditions | Week 14 |
+| A08 Software or Data Integrity Failures | Week 12 |
+| A09 Security Logging & Alerting Failures | Week 15 |
+| A10 Mishandling of Exceptional Conditions | Week 15 |
 
-*Plus dedicated modern coverage beyond the core Top 10: API Security (Week 7), memory safety/exploitation (Weeks 8–9), and AI/LLM security (Week 13).*
+*Plus dedicated modern coverage beyond the core Top 10: API Security (Week 10), memory safety/exploitation + fuzzing (Week 11), and AI/LLM + agentic security (Week 14).*
