@@ -29,14 +29,16 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
-## LLM Top 10 — the big ones
+## OWASP LLM Top 10 (2025)
 
-- **LLM01** Prompt injection
-- **LLM02** Sensitive info disclosure
-- **LLM05** Improper output handling
-- **LLM06** Excessive agency
-- **LLM08** Vector/embedding weaknesses
-- **LLM10** Unbounded consumption
+| | | |
+|---|---|---|
+| LLM01 Prompt Injection | LLM02 Sensitive Info Disclosure | LLM03 Supply Chain |
+| LLM04 Data/Model Poisoning | LLM05 Improper Output Handling | LLM06 Excessive Agency |
+| **LLM07 System Prompt Leakage** | LLM08 Vector/Embedding | LLM09 Misinformation |
+| LLM10 Unbounded Consumption | | |
+
+> **New in 2025:** LLM07 System Prompt Leakage · LLM08 promoted (RAG everywhere) · LLM10 replaces "DoS" with runaway *cost*.
 
 ---
 
@@ -57,11 +59,33 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
+## Real-world incidents
+
+- **Bing Chat "Sydney" (2023):** hidden page text overrode system rules
+- **EchoLeak (2025):** *zero-click* indirect injection in M365 Copilot → data exfil (CVE-2025-32711)
+- **Auto-GPT wallet theft (2024):** injected web/email content made an agent move crypto
+- **Résumé injection:** hidden white text inflated an AI screening score
+
+> Injection needs no exploit code — just text the model trusts.
+
+---
+
 ## Agentic-AI / MCP risks (2025+)
 
 - Agents call tools (e.g. via **MCP**) → real-world actions
 - **Tool poisoning**, **excessive agency**, RCE via tools
 - MITRE ATLAS added agent techniques (Oct 2025)
+- Research: **43%** of public MCP servers had command-injection flaws
+
+---
+
+## Real MCP/agent incidents (2025)
+
+- **Supabase × Cursor:** privileged agent read a support ticket with injected SQL → leaked integration tokens (privileged access + untrusted input + exfil channel)
+- **Invariant Labs:** a malicious trivia MCP server's *tool description* hijacked a trusted WhatsApp MCP → exfiltrated chats
+- **MCPoison (CVE-2025-54136):** approved-then-swapped MCP config in Cursor → silent RCE on every session
+
+> The danger pattern: **privilege + untrusted input + an outbound channel.**
 
 ---
 
