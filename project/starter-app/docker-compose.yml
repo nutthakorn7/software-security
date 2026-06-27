@@ -1,0 +1,8 @@
+services:
+  notevault:
+    build: .
+    ports:
+      - "8080:8080"
+    # For quick iteration you can mount the source:
+    # volumes:
+    #   - ./:/app

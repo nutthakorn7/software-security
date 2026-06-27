@@ -4,6 +4,8 @@
 
 Take a small web/API application (provided starter, or your own with instructor approval), assess it like an attacker, fix it like a defender, and harden its build/release pipeline.
 
+**Default target:** [`starter-app/`](starter-app/README.md) — *NoteVault*, an intentionally weak note-sharing app spanning the course's vulnerability classes. `cd project/starter-app && docker compose up`.
+
 ## Deliverables
 
 1. **Threat model** — data-flow diagram + STRIDE analysis identifying trust boundaries and the top risks.
