@@ -9,7 +9,7 @@ Team quiz-show across all six topics with point values and a final wager:
 |---|---|---|---|---|---|
 
 ## 🧪 Mock CTF
-A short mixed mini-CTF in the **exact format of Week 9** so there are no surprises — injection, XSS, auth/IDOR, crypto.
+A short mixed mini-CTF in the **exact format of Week 9** so there are no surprises — injection, XSS, auth/IDOR, crypto. → **[mock-ctf.md](mock-ctf.md)** (with hints).
 
 ## Deliverable
 Each student submits a one-page **cheat sheet** (eligible as an open-note aid in the exam, if the instructor allows).

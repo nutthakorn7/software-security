@@ -11,7 +11,7 @@
 - A 10-minute demo + 5-minute Q&A.
 
 ## Practice CTF
-A short capture-the-flag mixing web, API, supply-chain, and LLM challenges from Weeks 1–15. Cross-team scrimmage.
+A short capture-the-flag mixing web, API, supply-chain, and LLM challenges from Weeks 1–15. Cross-team scrimmage. → **[scrimmage.md](scrimmage.md)**.
 
 ## References
 - All prior weeks + https://owasp.org/Top10/2025/
