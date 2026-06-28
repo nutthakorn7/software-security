@@ -44,8 +44,8 @@ function parseDeck(md) {
 function parseBlock(block) {
   const lines = block.split("\n");
   let title = "", h1 = "", sub = "", author = "";
-  const body = [];
-  let inCode = false, code = [];
+  const body = [], notes = [];
+  let inCode = false, code = [], inComment = false;
   for (let raw of lines) {
     const line = raw.replace(/\s+$/, "");
     if (line.startsWith("```")) {
@@ -54,13 +54,25 @@ function parseBlock(block) {
       continue;
     }
     if (inCode) { code.push(raw); continue; }
+    // HTML comments (<!-- ... -->) become PowerPoint speaker notes
+    if (inComment) {
+      if (line.includes("-->")) { notes.push(line.replace("-->", "").trim()); inComment = false; }
+      else notes.push(line.trim());
+      continue;
+    }
+    if (line.trim().startsWith("<!--")) {
+      let c = line.trim().slice(4);
+      if (c.includes("-->")) notes.push(c.replace("-->", "").trim());
+      else { notes.push(c.trim()); inComment = true; }
+      continue;
+    }
     if (line.startsWith("# ")) { h1 = strip(line.slice(2)); continue; }
     if (line.startsWith("## ")) { title = strip(line.slice(3)); continue; }
     if (!line.trim()) continue;
     body.push({ t: "raw", v: line });
   }
   if (inCode && code.length) body.push({ t: "code", v: code.join("\n") });
-  return { h1, title, body };
+  return { h1, title, body, notes: notes.filter(Boolean).join(" ").trim() };
 }
 
 // classify body into renderables: bullets[], numbered[], table[][], quote, paras[], code
@@ -154,6 +166,7 @@ function organize(body) {
     s.addText(t0.title || deckLabel, { x: 0.66, y: 2.45, w: 8.7, h: 1.5, fontSize: 40, bold: true, color: TEXT, fontFace: HEAD, lineSpacingMultiple: 0.98, margin: 0 });
     const authorLine = (t0.body.find((b) => b.t === "raw") || {}).v || "Software Security";
     s.addText(strip(authorLine), { x: 0.7, y: 4.2, w: 8.5, h: 0.4, fontSize: 14, color: MUTED, fontFace: BODY, margin: 0 });
+    if (t0.notes) s.addNotes(t0.notes);
 
     // ---- content slides ----
     for (let bi = 1; bi < blocks.length; bi++) {
@@ -168,6 +181,7 @@ function organize(body) {
         if (items[0]) s.addText(items[0].text || (items[0].items && items[0].items.map(x=>x.text).join("  ·  ")) || "", { x: 0.72, y: 3.1, w: 8.6, h: 0.8, fontSize: 18, color: ORANGE, fontFace: BODY, margin: 0 });
         s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.5, y: 5.02, w: 1.06, h: 0.52, rectRadius: 0.06, fill: { color: "FFFFFF" }, shadow: shadow() });
         s.addImage({ path: LOGO, x: 8.61, y: 5.12, w: 0.84, h: 0.39 });
+        if (blk.notes) s.addNotes(blk.notes);
         continue;
       }
 
@@ -220,6 +234,7 @@ function organize(body) {
         }
       }
       foot(s, "");
+      if (blk.notes) s.addNotes(blk.notes);
     }
 
     const outFile = path.join(OUT, `week${ww}.pptx`);
