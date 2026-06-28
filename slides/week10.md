@@ -9,6 +9,8 @@ header: "Software Security · Week 10"
 ## API Security
 Software Security · Nutthakorn Chalaemwongwan
 
+<!-- Welcome back after midterm. Hook: change one number in an API URL and read a stranger's car location — that's the #1 API bug, and it's everywhere. Today: the OWASP API Top 10, hands-on. ~2 min. -->
+
 ---
 
 ## Today
@@ -19,12 +21,16 @@ Software Security · Nutthakorn Chalaemwongwan
 - Rate limiting & resource consumption
 - 🎮 Game: **crAPI Raid**
 
+<!-- Roadmap, 1 min. Frame: APIs are where the web bugs (IDOR, injection) reappear without a browser to hide behind. Lab = raid the deliberately vulnerable crAPI app, then fix it. -->
+
 ---
 
 ## Recap — Web half
 
 - Injection, XSS, auth/IDOR
 - APIs concentrate all of these — and add their own
+
+<!-- 1-min bridge from the web unit. The midterm tested W1-6; APIs reuse all of it. Ask: "what was IDOR?" — because BOLA (the #1 API risk) is literally IDOR at API scale. -->
 
 ---
 
@@ -34,6 +40,8 @@ Software Security · Nutthakorn Chalaemwongwan
 - Object IDs everywhere → ripe for IDOR/BOLA
 - Clients can send any field → mass assignment
 - Maps to the **OWASP API Security Top 10**
+
+<!-- Key framing. No browser = no SameSite/CSP safety net; the API is the raw attack surface. APIs expose object ids by design (REST). Mobile/SPA clients are fully attacker-controlled — never trust what they send. ~5 min. -->
 
 ---
 
@@ -47,6 +55,8 @@ GET /api/vehicle/1002/location   → someone else's
 - Broken Object Level Authorization
 - = IDOR, at API scale
 
+<!-- The worked example — this is the crAPI BOLA challenge. Same root cause as W6 IDOR: authenticated, but no per-object ownership check. Ask: "the server knows who I am — why does it still leak 1002?" (it never checks the object belongs to me). ~6 min. -->
+
 ---
 
 ## Mass assignment (API3)
@@ -58,6 +68,8 @@ POST /api/user  { "name":"x", "role":"admin", "credit":9999 }
 - Client sets fields the server blindly binds
 - Privilege/credit escalation
 
+<!-- Walk it: the server takes the JSON and binds every field to the model, including ones the UI never exposes (role, credit, is_verified). This is the crAPI mass-assignment challenge and the weekly quiz Q6. Fix = allow-list the bindable fields. ~5 min. -->
+
 ---
 
 ## More of the Top 10
@@ -66,6 +78,8 @@ POST /api/user  { "name":"x", "role":"admin", "credit":9999 }
 - API4 — unrestricted resource consumption (no rate limit)
 - API6 — unrestricted access to sensitive business flows
 - Excessive data exposure (over-returning fields)
+
+<!-- Round out the list. API4 = no rate limit → brute force / cost blowup. Excessive data exposure = API returns the whole user object and the UI just hides fields — attacker reads the raw JSON. ~4 min. -->
 
 ---
 
@@ -76,6 +90,8 @@ POST /api/user  { "name":"x", "role":"admin", "credit":9999 }
 - Rate limiting / quotas
 - Return only needed fields (DTOs)
 - Schema validation (OpenAPI / GraphQL types)
+
+<!-- The payoff. #1: ownership check on every object access (kills BOLA). DTO/allow-list binding kills mass assignment AND excessive exposure in one move. Schema validation at the edge rejects junk early. ~5 min. -->
 
 ---
 
@@ -92,6 +108,8 @@ wpscan --url http://target  # if WordPress
 hydra ... http-post-form    # password attack
 ```
 
+<!-- Practical recon for the CTF/midterm-style tasks: enumerate before you exploit. Emphasize ethics + scope: only against provided sandbox targets. This is the "map the attack surface" muscle from W1, applied live. ~4 min. -->
+
 ---
 
 ## Real-world: feature abused as backdoor
@@ -105,6 +123,8 @@ nc -lvp 34567 -e /bin/bash   # attacker gets a shell
 ```
 
 > Legitimate admin features become RCE without strict authz + integrity checks.
+
+<!-- Shows that "a feature" + missing authz = RCE. A legit admin editor, abused once an attacker has access. Ties to least-privilege: even admins shouldn't be able to inject executable code. ~3 min. -->
 
 ---
 
@@ -120,6 +140,8 @@ cd crAPI/deploy/docker && docker compose up -d
 3. **Resource consumption:** hit an unthrottled endpoint
 4. **Round 2:** add authz + schema validation + rate limiting
 
+<!-- Explain before lab. crAPI is OWASP's intentionally vulnerable API. Round 2 (fix) is graded. Note crAPI is heavier (compose stack) — start the pull early. Q6 of the quiz asks for the mass-assignment field + fix + flag. ~3 min. -->
+
 ---
 
 ## Deliverable
@@ -127,6 +149,9 @@ cd crAPI/deploy/docker && docker compose up -d
 - Findings mapped to the API Top 10
 - Fixes (authz checks, schemas, limits)
 - Proof exploits now fail
+- **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
+
+<!-- Before/after + API-Top-10 mapping. AI-resilient tasks count. Also the NoteVault project API task. -->
 
 ---
 
@@ -136,7 +161,11 @@ cd crAPI/deploy/docker && docker compose up -d
 - Bind only fields you intend
 - Validate and throttle everything
 
+<!-- Recap. Cold-call: "what one check stops BOLA?" (per-object ownership authorization). ~2 min. -->
+
 ---
 
 # Questions?
 Next week: Memory-safety & exploitation
+
+<!-- Cliffhanger: "Next week we leave the web — crash a C binary with a fuzzer and hijack its execution, then rewrite it in Rust." Remind crAPI pulled before next session. -->
