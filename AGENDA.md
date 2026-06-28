@@ -21,15 +21,21 @@
 | Time | Block |
 |------|-------|
 | 0:00–0:15 | Onboarding: stand up target (`docker compose up`), confirm it runs |
-| 0:15–2:00 | Exploitation tasks (the signature game) — ~4–5 tasks |
-| 2:00–2:45 | Defend / fix task (apply the secure version, prove exploit fails) |
-| 2:45–3:00 | Submit worksheet + wrap-up |
+| 0:15–1:45 | Exploitation tasks (the signature game) — ~4–5 tasks |
+| 1:45–2:25 | Defend / fix task (apply the secure version, prove exploit fails) |
+| 2:25–2:50 | **AI-resilient tasks:** Audit-the-AI + EiPE + Prompt Problem (start in class, finish as homework) |
+| 2:50–3:00 | Submit worksheet (PDF → Classroom) + push fix (GitHub) + wrap-up |
+
+> **Every teaching week's worksheet** now has four graded parts beyond the lab tasks:
+> **Evidence & Integrity** (identity-stamped proof), **Audit the AI** (critique an AI answer),
+> **Explain-in-Plain-English** + **Prompt Problem**. Random **viva** spot-checks 2–3 students.
+> The live **CTFd scoreboard** (if running) is shown at the start/end of class.
 
 ### Quiz weeks (Weeks 6 & 15) — lab shortened to 150 min + 30-min quiz
 | Time | Block |
 |------|-------|
 | 0:00–0:15 | Onboarding |
-| 0:15–2:30 | Exploitation + defend tasks (compressed) |
+| 0:15–2:30 | Exploitation + defend tasks (AI-resilient parts move to homework this week) |
 | 2:30–3:00 | **Quiz** (Quiz 1 / Quiz 2 — 25 pts, 30 min) |
 
 ---

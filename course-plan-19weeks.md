@@ -22,6 +22,23 @@
 
 ---
 
+## What every teaching week includes
+
+Beyond the signature game, each teaching week's worksheet carries the same evidence-based,
+AI-resilient structure (see [AGENDA.md](AGENDA.md) for time-boxing and `instructor/PEDAGOGY-EVIDENCE.md` for the research basis):
+
+- **Lecture (120 min)** → **lab (180 min)** = a signature game (break) + a defend/fix task.
+- **Evidence & Integrity** — identity-stamped screenshots; **per-student flags** make copying traceable.
+- **🤖 Audit the AI** — students critique an AI-generated exploit/fix (find the insecure/hallucinated parts).
+- **🧠 Explain-in-Plain-English + Prompt Problem** — comprehension + AI-literacy (Denny et al. 2024).
+- **Viva spot-checks** — 2–3 students reproduce/explain live (graded on understanding).
+- **Engagement layer** — points feed a season-long **CTFd scoreboard**, Houses/XP, and a weekly Hall of Fame.
+
+> Quizzes run in the last 30 min of **Wk 6 & 15**. These mechanics double as the data
+> sources for the planned study (`instructor/RESEARCH-PLAN.md`).
+
+---
+
 ## UNIT A — Foundations
 
 ### Week 1 — Security Mindset & Threat Modeling
