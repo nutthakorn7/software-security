@@ -12,6 +12,11 @@ Lecture slides live here, one Marp deck per week (`week01.md` … `week19.md`).
 
 > Status: skeletons exist for **all 19 weeks** and follow the standard. Weeks 1–3 have been expanded and synced with their updated labs (Elevation of Privilege + Secure by Design in Wk1; fuzzing + Bug/Fuzzing Race in Wk2; Capture the Hash in Wk3).
 
+## Rendered decks (PowerPoint)
+
+Presentable, **KOSEN-KMITL-branded** `.pptx` for all 19 weeks live in **[`pptx/`](pptx/)**
+(generated from these `.md` files). See [pptx/README.md](pptx/README.md) to regenerate.
+
 ## Workflows — two options (pick one or mix)
 
 ## Option A — Markdown slides with Marp (version-controlled, recommended)
