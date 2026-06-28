@@ -35,6 +35,7 @@ cd labs/week05-xss-client-side
 docker compose up            # python:3.12-slim + flask, runs vulnerable_app.py
 # vulnerable app -> http://localhost:5000   (service name: xss-lab, port 5000)
 ```
+> 💡 **macOS:** if this fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 Optional secondary target (for DOM XSS, which our app does not expose):
 ```bash
 docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3000

@@ -31,6 +31,8 @@ curl -s -X POST localhost:5000/notes -H 'Content-Type: application/json' \
      -d '{"owner":"alice","body":"hello"}'   # observe behavior, do not attack
 curl -s localhost:5000/notes
 ```
+> 💡 **macOS:** if startup fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
+
 Source to model lives in `sample-app/app.py`. Template to fill: `THREAT-MODEL-TEMPLATE.md` (copy it, do not edit the original).
 
 **What to submit per task:** the threat/element identified + a screenshot (DFD, table, or running app) + a 2–3 sentence mitigation.

@@ -32,6 +32,7 @@ cd labs/week10-api-security
 docker compose up         # INSECURE API on :5000, SECURE API on :5001
 # Seeded users: alice(id 1) bob(id 2) carol(id 3, admin, balance 9999)
 ```
+> 💡 **macOS:** if this fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 
 **What to submit per task:** the exact command(s) + raw response/HTTP status, a screenshot, and a 2–3 sentence mitigation note mapping the bug to its OWASP API id.
 

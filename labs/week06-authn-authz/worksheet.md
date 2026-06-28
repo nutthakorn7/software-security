@@ -35,6 +35,7 @@ cd labs/week06-authn-authz
 docker compose up            # python:3.12-slim + flask + pyjwt, runs vulnerable_app.py
 # vulnerable app -> http://localhost:5000   (service name: authz-lab, port 5000)
 ```
+> 💡 **macOS:** if this fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 Optional secondary target / proxy:
 ```bash
 docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3000
