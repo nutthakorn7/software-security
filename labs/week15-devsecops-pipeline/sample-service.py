@@ -36,6 +36,14 @@ def _client_ip() -> str:
     return request.headers.get("X-Forwarded-For", request.remote_addr or "?")
 
 
+@app.route("/")
+def index():
+    return jsonify(
+        service="week15-devsecops demo",
+        endpoints={"POST /login": "JSON {token}", "GET /admin": "needs alice-token"},
+    )
+
+
 @app.route("/login", methods=["POST"])
 def login():
     """Authenticate. Log both success and failure (A09)."""

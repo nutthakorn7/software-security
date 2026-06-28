@@ -9,9 +9,10 @@
 # Build stage: install deps in a full image we will THROW AWAY.
 # ------------------------------------------------------------------
 # FIX: pin to an immutable digest, not :latest, for reproducible builds.
-# The digest below is an EXAMPLE — replace with the current one from:
-#   docker buildx imagetools inspect python:3.12-slim
-FROM python:3.12-slim@sha256:0000000000000000000000000000000000000000000000000000000000000000 AS build
+# Use python 3.11 to match the distroless runtime below (debian12 = Python 3.11)
+# so the copied venv works. Refresh the digest with:
+#   docker buildx imagetools inspect python:3.11-slim
+FROM python:3.11-slim@sha256:cdbd05fb6f457ca275ff51ce00d93d865ca0b6a25f5ffb08262d94f6835771e5 AS build
 
 WORKDIR /app
 
@@ -40,7 +41,10 @@ COPY --from=build /app/app.py /app/app.py
 
 # FIX: no secrets in ENV. Inject at runtime via a secrets manager / mounted
 # file / orchestrator secret — never baked into a layer. (fixes CWE-798/200)
-ENV PATH="/venv/bin:$PATH"
+# PYTHONPATH points the distroless interpreter at the copied venv's packages
+# (build stage is python:3.11-slim to match distroless debian12 = Python 3.11).
+ENV PATH="/venv/bin:$PATH" \
+    PYTHONPATH="/venv/lib/python3.11/site-packages"
 
 # FIX: run as a non-root user. distroless ships uid 65532 ("nonroot").
 # Fixes CWE-250 (unnecessary privileges) and limits CWE-732 blast radius.
