@@ -17,4 +17,4 @@
    a) is rate-limited  b) leaks secrets/PII present in its context  c) refuses a task  d) returns JSON
 
 ## Short answer — 🔒 your own work (1 × 3)
-6. Paste the **prompt-injection input** that captured the flag in this week's lab and explain why the **guardrail failed**.
+6. Paste the **prompt-injection input** that captured the flag in this week's lab and explain why the **guardrail failed**. Then paste your **personal flag** (`FLAG{...}`) captured from the challenge.

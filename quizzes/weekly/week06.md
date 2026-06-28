@@ -17,4 +17,4 @@
    a) the user's email  b) sequential  c) random, single-use, and expiring  d) the username reversed
 
 ## Short answer — 🔒 your own work (1 × 3)
-6. From the **IDOR Treasure Hunt**, which **object id** let you reach another user's data, and what **server-side check** would stop it?
+6. From the **IDOR Treasure Hunt**, which **object id** let you reach another user's data, and what **server-side check** would stop it? Then paste your **personal flag** (`FLAG{...}`) captured from the challenge.

@@ -17,4 +17,4 @@
    a) Gitleaks  b) AddressSanitizer (ASan)  c) Prettier  d) curl
 
 ## Short answer — 🔒 your own work (1 × 3)
-6. In the fuzzing/exploit lab, what **input** (size or shape) crashed the target, and which **memory-safety defense** would have prevented it?
+6. In the fuzzing/exploit lab, what **input** (size or shape) crashed the target, and which **memory-safety defense** would have prevented it? Then paste your **personal flag** (`FLAG{...}`) captured from the challenge.

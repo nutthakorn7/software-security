@@ -17,4 +17,4 @@
    a) prepared statements  b) parameter binding  c) an ORM with bound params  d) HTML output encoding
 
 ## Short answer — 🔒 your own work (1 × 3)
-6. From this week's **SQLi Boss Fight**, paste the **exact payload** you used to log in as admin and explain in one sentence **why** it worked.
+6. From this week's **SQLi Boss Fight**, paste the **exact payload** you used to log in as admin and explain in one sentence **why** it worked. Then paste your **personal flag** (`FLAG{...}`) captured from the challenge.

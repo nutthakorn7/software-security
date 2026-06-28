@@ -17,4 +17,4 @@
    a) field  b) function  c) file  d) frame
 
 ## Short answer — 🔒 your own work (1 × 3)
-6. In this week's API lab, which **endpoint** allowed **mass assignment** of a privileged field? Name the **field** and the **fix**.
+6. In this week's API lab, which **endpoint** allowed **mass assignment** of a privileged field? Name the **field** and the **fix**. Then paste your **personal flag** (`FLAG{...}`) captured from the challenge.
