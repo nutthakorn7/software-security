@@ -12,13 +12,14 @@ const REPO = path.join(SLIDES, "..");        // repo root
 const LOGO = path.join(OUT, "assets", "logo-small.png");
 
 // ---- KOSEN-KMITL CI ----
-const BG = "0E1726", PANEL = "18243A", PANEL2 = "1E2B45";
-const TEXT = "E6EDF3", MUTED = "94A3B8";
+// Light theme — white background, dark text, KMITL orange + KOSEN blue accents.
+const BG = "FFFFFF", PANEL = "F1F5F9", PANEL2 = "E8EDF3";
+const TEXT = "1F2937", MUTED = "64748B";
 const ORANGE = "E35205";   // KMITL main (Pantone 166c)
 const BLUE = "017BC4";     // KOSEN
-const RED = "F87171";
+const RED = "DC2626";      // danger/attacker (strong red for white bg)
 const HEAD = "Arial", BODY = "Calibri";
-const shadow = () => ({ type: "outer", color: "000000", blur: 8, offset: 3, angle: 90, opacity: 0.35 });
+const shadow = () => ({ type: "outer", color: "000000", blur: 6, offset: 2, angle: 90, opacity: 0.12 });
 
 async function iconPng(Comp, color) {
   const svg = ReactDOMServer.renderToStaticMarkup(React.createElement(Comp, { color, size: "256" }));
@@ -148,8 +149,7 @@ function organize(body) {
     const base = () => { const s = pres.addSlide(); s.background = { color: BG }; return s; };
     const foot = (s, label) => {
       s.addText(deckLabel + (label ? " · " + label : ""), { x: 0.5, y: 5.25, w: 7.6, h: 0.3, fontSize: 9, color: MUTED, fontFace: BODY, margin: 0 });
-      s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.5, y: 5.02, w: 1.06, h: 0.52, rectRadius: 0.06, fill: { color: "FFFFFF" }, shadow: shadow() });
-      s.addImage({ path: LOGO, x: 8.61, y: 5.12, w: 0.84, h: 0.39 });
+      s.addImage({ path: LOGO, x: 8.62, y: 5.14, w: 0.84, h: 0.39 });
     };
     const header = (s, title) => {
       s.addShape(pres.shapes.OVAL, { x: 0.5, y: 0.42, w: 0.58, h: 0.58, fill: { color: ORANGE }, shadow: shadow() });
@@ -160,8 +160,7 @@ function organize(body) {
     // ---- title slide (block 0) ----
     const t0 = blocks[0];
     let s = base();
-    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.66, y: 0.45, w: 2.05, h: 1.02, rectRadius: 0.08, fill: { color: "FFFFFF" }, shadow: shadow() });
-    s.addImage({ path: LOGO, x: 0.83, y: 0.62, w: 1.71, h: 0.68 });
+    s.addImage({ path: LOGO, x: 0.7, y: 0.55, w: 1.85, h: 0.74 });
     s.addText((t0.h1 || `Week ${n}`).toUpperCase(), { x: 0.7, y: 1.95, w: 8.5, h: 0.5, fontSize: 18, bold: true, color: ORANGE, fontFace: HEAD, charSpacing: 3, margin: 0 });
     s.addText(t0.title || deckLabel, { x: 0.66, y: 2.45, w: 8.7, h: 1.5, fontSize: 40, bold: true, color: TEXT, fontFace: HEAD, lineSpacingMultiple: 0.98, margin: 0 });
     const authorLine = (t0.body.find((b) => b.t === "raw") || {}).v || "Software Security";
@@ -179,8 +178,7 @@ function organize(body) {
       if (!blk.title && blk.h1 && items.length <= 1) {
         s.addText(blk.h1, { x: 0.7, y: 1.9, w: 8.6, h: 1.2, fontSize: 46, bold: true, color: TEXT, fontFace: HEAD, margin: 0 });
         if (items[0]) s.addText(items[0].text || (items[0].items && items[0].items.map(x=>x.text).join("  ·  ")) || "", { x: 0.72, y: 3.1, w: 8.6, h: 0.8, fontSize: 18, color: ORANGE, fontFace: BODY, margin: 0 });
-        s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.5, y: 5.02, w: 1.06, h: 0.52, rectRadius: 0.06, fill: { color: "FFFFFF" }, shadow: shadow() });
-        s.addImage({ path: LOGO, x: 8.61, y: 5.12, w: 0.84, h: 0.39 });
+        s.addImage({ path: LOGO, x: 8.62, y: 5.14, w: 0.84, h: 0.39 });
         if (blk.notes) s.addNotes(blk.notes);
         continue;
       }
