@@ -1,7 +1,9 @@
 # Weekly Agenda & Time Plan (DRAFT for review)
 
 **Standard contact time:** 5 hrs/week = **120 min lecture + 180 min lab** (per syllabus: 2 lecture + 3 lab hrs).
-**Quizzes:** 30 min each — Quiz 1 at the **end of Week 6**, Quiz 2 at the **end of Week 15** (last 30 min of those weeks' lab block).
+**Quizzes:** a short **weekly quiz (~10 min) at the start of every teaching week** (retrieval
+practice, low-stakes, drop lowest 1–2). Two **cumulative review quizzes** (25 pts) run in the
+review weeks (W7 pre-midterm, W17 pre-final).
 
 ---
 
@@ -10,7 +12,7 @@
 ### Lecture — 120 min
 | Time | Block |
 |------|-------|
-| 0:00–0:10 | Recap last week + today's agenda |
+| 0:00–0:10 | **Weekly quiz** (retrieval) + recap + today's agenda |
 | 0:10–0:55 | Core concepts |
 | 0:55–1:05 | Break |
 | 1:05–1:35 | Vulnerability deep-dive + real-world cases |
@@ -31,12 +33,8 @@
 > **Explain-in-Plain-English** + **Prompt Problem**. Random **viva** spot-checks 2–3 students.
 > The live **CTFd scoreboard** (if running) is shown at the start/end of class.
 
-### Quiz weeks (Weeks 6 & 15) — lab shortened to 150 min + 30-min quiz
-| Time | Block |
-|------|-------|
-| 0:00–0:15 | Onboarding |
-| 0:15–2:30 | Exploitation + defend tasks (AI-resilient parts move to homework this week) |
-| 2:30–3:00 | **Quiz** (Quiz 1 / Quiz 2 — 25 pts, 30 min) |
+> The **weekly quiz** is the first ~10 min of the lecture block (every teaching week) — no
+> separate session needed. The two **cumulative review quizzes** run in the review weeks (7, 17).
 
 ---
 
@@ -44,39 +42,41 @@
 
 | Wk | Type | Lecture | Lab | Quiz | Exam | Total |
 |----|------|:---:|:---:|:---:|:---:|:---:|
-| 1 | Teach — Threat Modeling | 120 | 180* | — | — | 300 |
-| 2 | Teach — SDLC + Fuzzing | 120 | 180 | — | — | 300 |
-| 3 | Teach — Cryptography | 120 | 180 | — | — | 300 |
-| 4 | Teach — Injection | 120 | 180 | — | — | 300 |
-| 5 | Teach — XSS | 120 | 180 | — | — | 300 |
-| 6 | Teach — Auth & Access | 120 | 150 | **30** | — | 300 |
-| 7 | 🔁 Review (pre-midterm) | — | — | — | — | 300 |
+| 1 | Teach — Threat Modeling | 120 | 180* | 10† | — | 300 |
+| 2 | Teach — SDLC + Fuzzing | 120 | 180 | 10† | — | 300 |
+| 3 | Teach — Cryptography | 120 | 180 | 10† | — | 300 |
+| 4 | Teach — Injection | 120 | 180 | 10† | — | 300 |
+| 5 | Teach — XSS | 120 | 180 | 10† | — | 300 |
+| 6 | Teach — Auth & Access | 120 | 180 | 10† | — | 300 |
+| 7 | 🔁 Review (pre-midterm) | — | — | 25‡ | — | 300 |
 | 8 | 📝 Midterm — Written | — | — | — | 120 | 120 |
 | 9 | 📝 Midterm — CTF | — | — | — | 150 | 150 |
-| 10 | Teach — API Security | 120 | 180 | — | — | 300 |
-| 11 | Teach — Memory Safety | 120 | 180 | — | — | 300 |
-| 12 | Teach — Supply Chain | 120 | 180 | — | — | 300 |
-| 13 | Teach — Cloud/Container | 120 | 180 | — | — | 300 |
-| 14 | Teach — AI/LLM | 120 | 180 | — | — | 300 |
-| 15 | Teach — DevSecOps | 120 | 150 | **30** | — | 300 |
+| 10 | Teach — API Security | 120 | 180 | 10† | — | 300 |
+| 11 | Teach — Memory Safety | 120 | 180 | 10† | — | 300 |
+| 12 | Teach — Supply Chain | 120 | 180 | 10† | — | 300 |
+| 13 | Teach — Cloud/Container | 120 | 180 | 10† | — | 300 |
+| 14 | Teach — AI/LLM | 120 | 180 | 10† | — | 300 |
+| 15 | Teach — DevSecOps | 120 | 180 | 10† | — | 300 |
 | 16 | Capstone Studio | — | 300 | — | — | 300 |
-| 17 | 🔁 Review (pre-final) | — | — | — | — | 300 |
+| 17 | 🔁 Review (pre-final) | — | — | 25‡ | — | 300 |
 | 18 | 📝 Final — Written | — | — | — | 150 | 150 |
 | 19 | 📝 Final — CTF + Demos | — | — | — | 240 | 240 |
 
 *W1 lab includes Lab 0 environment setup (~45 min) — onboarding block is longer.
+†Weekly quiz (~10 min) is the first part of the 120-min lecture block — not extra time.
+‡Cumulative review quiz (25 pts) used to prep for the exam.
 
 ---
 
 ## Special-week agendas
 
 ### Week 7 & 17 — Review (300 min)
-*(Quiz already taken at the end of Week 6 / 15.)*
 | Time | Block |
 |------|-------|
-| 0:00–1:30 | Security Jeopardy team review |
-| 1:30–1:45 | Break |
-| 1:45–4:30 | Mock CTF (exact format of the upcoming exam) |
+| 0:00–0:30 | **Cumulative review quiz** (quiz1 / quiz2 — 25 pts) |
+| 0:30–1:45 | Security Jeopardy team review |
+| 1:45–2:00 | Break |
+| 2:00–4:30 | Mock CTF (exact format of the upcoming exam) |
 | 4:30–5:00 | Debrief: common mistakes + exam logistics |
 
 ### Week 8 / 18 — Written exam

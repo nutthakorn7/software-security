@@ -1,15 +1,31 @@
 # Quizzes
 
-Short in-class quizzes (counted under *Participation / quizzes*, 10%).
+Two layers, both under the *Participation / quizzes* slice (10%):
 
-| Quiz | Covers | Suggested timing |
-|------|--------|------------------|
-| [quiz1.md](quiz1.md) | Weeks 1–6 (foundations + web) | last 30 min of Week 6 |
-| [quiz2.md](quiz2.md) | Weeks 10–15 (modern stack) | last 30 min of Week 15 |
+## 1. Weekly quizzes (graded, low-stakes) — `weekly/`
+A short **~10-min quiz every teaching week** (start of class) for retrieval practice.
+- **6 questions** (5 MCQ auto-graded + 1 short answer).
+- **Drop the lowest 1–2** scores across the term (reduces anxiety; rewards consistency).
+- Files: `weekly/week01.md … weekly/week16.md` (teaching weeks 1–6, 10–16).
 
-Answer keys are kept **out of the public repo** in the git-ignored `instructor/` directory (`instructor/quizzes/`) — never distribute to students. Exam keys live in `instructor/exams/`.
+| Quiz | Covers |
+|------|--------|
+| `weekly/weekNN.md` | that week's lecture material |
 
-Each quiz: 25 pts, ~30 min — 10 MCQ + 3 short answer + 2 applied/spot-the-vuln.
+## 2. Cumulative review quizzes (pre-exam) — `quiz1.md`, `quiz2.md`
+Bigger 25-pt review quizzes used **in the review weeks** to prep for the exams.
+| Quiz | Covers | When |
+|------|--------|------|
+| [quiz1.md](quiz1.md) | Weeks 1–6 | Week 7 review (pre-midterm) |
+| [quiz2.md](quiz2.md) | Weeks 10–15 | Week 17 review (pre-final) |
+
+---
+
+Answer keys are kept **out of the public repo** in the git-ignored `instructor/` directory
+(`instructor/quizzes/` and `instructor/quizzes/weekly/`) — never distribute to students.
+Exam keys live in `instructor/exams/`.
+
+Build any of these as a Google Form with `instructor/make_quiz_forms.gs`.
 
 > Worksheets (the longer, graded hands-on lab sheets) live with each lab in
 > `labs/weekNN…/worksheet.md`. Template: [worksheets/TEMPLATE.md](../worksheets/TEMPLATE.md).

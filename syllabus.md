@@ -162,7 +162,7 @@ Consolidate Weeks 10–16 (+ first-half callbacks). *🎯 "Security Jeopardy: Ch
 | Midterm — Week 8 (written) + Week 9 (CTF practical) | 20% |
 | Final — Week 18 (written) + Week 19 (capstone CTF) | 25% |
 | Term project (secure build + threat model + remediation report) | 15% |
-| Participation / leaderboard / quizzes | 10% |
+| Weekly quizzes (every teaching week, drop lowest 1–2) + participation / leaderboard | 10% |
 
 **Term project.** In teams of 2–3, students take a small web/API application, threat-model it, find and document its vulnerabilities, remediate them, generate an SBOM, sign the release artifact, and wire up a security CI pipeline. Deliverables: a threat model, a vulnerability report mapped to CWE/OWASP, the fixed code, and a short demo.
 
