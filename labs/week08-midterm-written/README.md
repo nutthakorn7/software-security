@@ -2,6 +2,13 @@
 
 Covers **Weeks 1–6**.
 
+## ✅ This week — what to do
+1. **Before** — study **Weeks 1–6**.
+2. **In class** — **written midterm** (`exam.md`); bring what the format allows (closed/open-note — instructor's choice).
+3. **After** — answers reviewed in the next session.
+
+*Time breakdown: [AGENDA.md](../../AGENDA.md).*
+
 ## Format
 Closed/open-note (instructor's choice). Question types:
 - Threat modeling: build/critique a STRIDE model and identify trust boundaries.

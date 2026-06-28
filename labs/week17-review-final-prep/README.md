@@ -2,6 +2,13 @@
 
 No new content. Consolidate **Weeks 10–16** (with a quick callback to first-half core concepts) and prepare for the final (Weeks 18–19).
 
+## ✅ This week — what to do
+1. **Before class** — review **Weeks 10–16** (+ first-half callbacks).
+2. **In class (300 min)** — cumulative review quiz (`../../quizzes/quiz2.md`) → **Security Jeopardy: Champions** → **mock CTF** (`mock-ctf.md`) → debrief.
+3. **Prepare** — the **final is Weeks 18–19**.
+
+*Time breakdown: [AGENDA.md](../../AGENDA.md).*
+
 ## 🎯 Signature activity — "Security Jeopardy: Champions Edition"
 Whole-course quiz-show: API · memory safety · supply chain · cloud/container · AI/LLM · DevSecOps (plus first-half callbacks).
 

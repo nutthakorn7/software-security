@@ -4,6 +4,15 @@
 
 **OWASP 2025:** A03 Software Supply Chain Failures, A08 Software or Data Integrity Failures · **CWE:** CWE-1104, CWE-829
 
+## ✅ This week — what to do
+1. **Before class** — VM + Docker working (Week 1 *Lab 0*); skim last week's recap.
+2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week12.md`.
+3. **Lab (180 min)** — play this week's game, then complete **Worksheet 12** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `bash sca_scan.sh`.
+4. **Submit** — worksheet PDF → Classroom · code → GitHub · weekly quiz → Google Form. (How: [SUBMISSION.md](../../SUBMISSION.md).)
+5. **Project** — apply this week's lesson to your [NoteVault project](../../project/README.md) where it fits.
+
+*Time breakdown: [AGENDA.md](../../AGENDA.md). Grading: see the worksheet rubric.*
+
 ## Objectives
 - Explain why the supply chain is now a top-tier risk; recognize dependency confusion, typosquatting, malicious packages, transitive risk.
 - Run SCA tooling and interpret results.

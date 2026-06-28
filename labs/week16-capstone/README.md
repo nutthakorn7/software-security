@@ -1,5 +1,13 @@
 # Week 16 — Capstone Studio & CTF Warm-up
 
+## ✅ This week — what to do
+1. **Before class** — bring your [term project](../../project/README.md) runnable (work-in-progress).
+2. **In class (300 min)** — present WIP live (attack → root cause → fix) + peer review; play the **practice CTF** (`scrimmage.md`) that previews the final.
+3. **Worksheet 16** — project checklist (`worksheet.md`).
+4. **After** — finish the project for the **Week 19** demo.
+
+*Time breakdown: [AGENDA.md](../../AGENDA.md).*
+
 ## Format
 - **Work-in-progress** team presentations of the [term project](../../project/README.md): attack → root cause → fix, demoed live.
 - A **practice CTF tournament** that previews the Week 19 final, plus cross-team peer review of projects.

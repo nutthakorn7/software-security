@@ -2,6 +2,13 @@
 
 Covers **Weeks 1–6**. Individual, in the sandbox. Flags = points.
 
+## ✅ This week — what to do
+1. **Before** — VM + tools ready; warm up on the Week 7 mock CTF.
+2. **In class** — **hands-on CTF** (`ctf.md`); submit flags for points (your flags are per-student).
+3. **Rules** — sandbox targets only; individual.
+
+*Time breakdown: [AGENDA.md](../../AGENDA.md).*
+
 ## Format
 A timed capture-the-flag with graded challenges across:
 - **Injection** (SQLi / command injection) — DVWA / Juice Shop.

@@ -2,6 +2,15 @@
 
 **OWASP 2025:** A01 Broken Access Control, A07 Authentication Failures · **CWE:** CWE-639 (IDOR), CWE-287
 
+## ✅ This week — what to do
+1. **Before class** — VM + Docker working (Week 1 *Lab 0*); skim last week's recap.
+2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week06.md`.
+3. **Lab (180 min)** — play this week's game, then complete **Worksheet 6** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → http://localhost:5000`.
+4. **Submit** — worksheet PDF → Classroom · code → GitHub · weekly quiz → Google Form. (How: [SUBMISSION.md](../../SUBMISSION.md).)
+5. **Project** — apply this week's lesson to your [NoteVault project](../../project/README.md) where it fits.
+
+*Time breakdown: [AGENDA.md](../../AGENDA.md). Grading: see the worksheet rubric.*
+
 ## Objectives
 - Distinguish authentication vs authorization.
 - Exploit IDOR and broken access control.

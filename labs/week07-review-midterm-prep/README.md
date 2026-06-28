@@ -2,6 +2,13 @@
 
 No new content. Consolidate **Weeks 1–6** and prepare for the midterm (Weeks 8–9).
 
+## ✅ This week — what to do
+1. **Before class** — review **Weeks 1–6** (slides, your worksheets, the CWE/OWASP list).
+2. **In class (300 min)** — cumulative review quiz (`../../quizzes/quiz1.md`) → **Security Jeopardy** → **mock CTF** in the exam format (`mock-ctf.md`) → debrief.
+3. **Prepare** — note weak areas; the **midterm is Weeks 8–9**.
+
+*Time breakdown: [AGENDA.md](../../AGENDA.md).*
+
 ## 🎯 Signature activity — "Security Jeopardy"
 Team quiz-show across all six topics with point values and a final wager:
 
