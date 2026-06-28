@@ -7,7 +7,7 @@
 - Understand the same-origin policy, cookies (SameSite), and CSP.
 - Build a CSRF PoC and defend against it.
 
-## Lab — Juice Shop
+## ⛳ Signature game — "XSS Golf" (Juice Shop)
 1. Land a **stored** XSS and a **DOM** XSS payload.
 2. Steal/abuse a session via the XSS (sandbox only).
 3. Build a CSRF page that performs a state-changing request.

@@ -7,7 +7,7 @@
 - Explain why parameterized queries defeat injection.
 - Apply input validation and output handling correctly.
 
-## Lab — DVWA / Juice Shop
+## ⚔️ Signature game — "SQLi Boss Fight" (DVWA / Juice Shop)
 ```bash
 # DVWA
 docker run --rm -it -p 80:80 vulnerables/web-dvwa

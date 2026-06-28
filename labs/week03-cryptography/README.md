@@ -7,7 +7,7 @@
 - Store passwords with a vetted KDF (bcrypt/argon2).
 - Recognize crypto misuse: ECB, hardcoded keys, weak RNG, MD5/SHA-1.
 
-## Lab — Break it, then fix it
+## 🔓 Signature game — "Capture the Hash"
 1. **Crack weak hashes:** given unsalted MD5 hashes, recover passwords (e.g. `hashcat`/`john` with a wordlist).
 2. **ECB oracle:** observe identical plaintext blocks → identical ciphertext; exploit to leak structure.
 3. **Remediate:** rewrite the sample service to use argon2id for passwords and AES-GCM (authenticated) for data, with keys from a secrets manager / env (never hardcoded).

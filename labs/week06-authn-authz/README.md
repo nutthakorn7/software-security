@@ -7,7 +7,7 @@
 - Exploit IDOR and broken access control.
 - Identify JWT pitfalls (alg=none, weak secret) and fix token handling.
 
-## Lab
+## 🗺️ Signature game — "IDOR Treasure Hunt + JWT Forgery"
 Target: provided app with user objects and JWT auth (or Juice Shop).
 1. **IDOR:** change an object/user id in a request to read another user's data.
 2. **Privilege escalation:** reach an admin-only function as a normal user.
