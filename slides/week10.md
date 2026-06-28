@@ -146,6 +146,8 @@ cd crAPI/deploy/docker && docker compose up -d
 
 ## Deliverable
 
+> 📋 **Worksheet 10** — `labs/week10-api-security/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → :5000 (insecure) / :5001 (secure)
+
 - Findings mapped to the API Top 10
 - Fixes (authz checks, schemas, limits)
 - Proof exploits now fail

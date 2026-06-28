@@ -130,6 +130,8 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ## Deliverable
 
+> 📋 **Worksheet 14** — `labs/week14-ai-llm-security/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → :6000 (insecure) / :6001 (guarded)
+
 - Attack log (which injection beat which level)
 - Mitigations + re-test results
 - Least-privilege agent/MCP tool design

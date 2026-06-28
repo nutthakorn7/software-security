@@ -143,6 +143,8 @@ hashcat -m 0 hashes.txt rockyou.txt
 
 ## Lab 3 — deliverable
 
+> 📋 **Worksheet 3** — `labs/week03-cryptography/worksheet.md` (Part 3) · **kickoff:** `docker compose up` (runs the crypto scripts)
+
 - Cracked hashes + method · ECB-leak proof · predictable-token note
 - **Before/after** code (misuse → fix → CWE closed)
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)

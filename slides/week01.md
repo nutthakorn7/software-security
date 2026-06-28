@@ -160,6 +160,8 @@ Browser  --(file)-->  [Flask app]  --save f.filename-->  uploads/
 
 ## Lab 1 — Threat-model a sample app
 
+> 📋 **Worksheet 1** — `labs/week01-threat-modeling/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:5000
+
 1. Run the provided app (`docker compose up`)
 2. Draw a **DFD**: processes, stores, external entities, trust boundaries
 3. Apply **STRIDE** to each element

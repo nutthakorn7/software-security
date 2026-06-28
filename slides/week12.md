@@ -135,6 +135,8 @@ cosign verify myapp:lab                                 # verify
 
 ## Deliverable
 
+> 📋 **Worksheet 12** — `labs/week12-supply-chain/worksheet.md` (Part 3) · **kickoff:** `bash sca_scan.sh` (trivy fs + pip-audit)
+
 - SCA report + remediation plan
 - SBOM file + sign/verify transcript
 - One-paragraph SLSA self-assessment (which level + why)

@@ -151,6 +151,8 @@ docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect -s /repo -v
 
 ## Lab 2 — deliverable
 
+> 📋 **Worksheet 2** — `labs/week02-sdlc-tooling/worksheet.md` (Part 3) · **kickoff:** `bash scan.sh` (Semgrep + Gitleaks on `./vulnerable-repo`)
+
 - A findings **triage table**: tool, CWE, severity, TP/FP, fix idea
 - 3 true positives + 1 false positive (justified)
 - 1 fuzzing crash with a one-line root cause

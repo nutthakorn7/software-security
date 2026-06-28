@@ -182,8 +182,10 @@ Tiered challenges in **DVWA / Juice Shop** — easy → "boss" (stacked filters)
 
 ## Lab steps
 
+> 📋 **Worksheet 4** — `labs/week04-injection/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:5000
+
 ```bash
-docker run --rm -p 80:80 vulnerables/web-dvwa   # or Juice Shop
+docker run --rm -p 80:80 vulnerables/web-dvwa   # optional extra target (or Juice Shop)
 ```
 
 1. Find an injectable parameter

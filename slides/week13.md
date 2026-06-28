@@ -117,6 +117,8 @@ Each misconfiguration **found + fixed** = a flag:
 
 ## Deliverable
 
+> 📋 **Worksheet 13** — `labs/week13-cloud-container/worksheet.md` (Part 3) · **kickoff:** `bash scan.sh` (trivy config over Dockerfiles + IAM JSON)
+
 - Before/after IAM policy + Dockerfile
 - Trivy reports showing reduced risk
 - Note on secrets remediation

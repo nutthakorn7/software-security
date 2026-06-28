@@ -117,6 +117,8 @@ afl-fuzz -i seeds -o out -- ./vuln @@                          # AFL++
 
 ## Deliverable
 
+> 📋 **Worksheet 11** — `labs/week11-memory-safety-exploitation/worksheet.md` (Part 3) · **kickoff:** `clang -fsanitize=address,fuzzer fuzz_harness.c -o fuzz && ./fuzz` (in the Linux VM)
+
 - Fuzzing crash + exploit script
 - Annotated Ghidra/gdb analysis
 - Memory-safe (Rust) rewrite + why the bug is now impossible

@@ -142,6 +142,8 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ## Deliverable
 
+> 📋 **Worksheet 15** — `labs/week15-devsecops-pipeline/worksheet.md` (Part 3) · **kickoff:** push `security-ci.yml` → GitHub Actions (· `python sample-service.py`)
+
 - A passing PR that adds the pipeline
 - Screenshot: build **failing** on an injected vulnerable dependency
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
