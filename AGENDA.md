@@ -25,13 +25,19 @@ review weeks (W7 pre-midterm, W17 pre-final).
 | 0:00–0:15 | Onboarding: stand up target (`docker compose up`), confirm it runs |
 | 0:15–1:45 | Exploitation tasks (the signature game) — ~4–5 tasks |
 | 1:45–2:25 | Defend / fix task (apply the secure version, prove exploit fails) |
-| 2:25–2:50 | **AI-resilient tasks:** Audit-the-AI + EiPE + Prompt Problem (start in class, finish as homework) |
-| 2:50–3:00 | Submit worksheet (PDF → Classroom) + push fix (GitHub) + wrap-up |
+| 2:25–2:45 | **AI-resilient tasks:** Audit-the-AI + EiPE + Prompt Problem (start in class, finish as homework) |
+| 2:45–2:55 | **Rotating micro-demo:** 2–3 students give a 2–3 min "show your exploit/fix" (different students each week → everyone presents ~1–2× per term) |
+| 2:55–3:00 | Submit worksheet (PDF → Classroom) + push fix (GitHub) + wrap-up |
 
-> **Every teaching week's worksheet** now has four graded parts beyond the lab tasks:
+> **No formal weekly presentation** (impossible for N≈80–120 in the time budget). Instead,
+> "explain it live" is delivered by the **rotating micro-demo** above + random **viva spot-checks**
+> (2–3 students reproduce/explain their own work) — which also double as anti-AI controls.
+> Full presentations are reserved for the **capstone** (W16 WIP + W19 demo).
+>
+> **Every teaching week's worksheet** has four graded parts beyond the lab tasks:
 > **Evidence & Integrity** (identity-stamped proof), **Audit the AI** (critique an AI answer),
-> **Explain-in-Plain-English** + **Prompt Problem**. Random **viva** spot-checks 2–3 students.
-> The live **CTFd scoreboard** (if running) is shown at the start/end of class.
+> **Explain-in-Plain-English** + **Prompt Problem**. The live **CTFd / Houses scoreboard**
+> (if running) is shown at the start/end of class.
 
 > The **weekly quiz** is the first ~10 min of the lecture block (every teaching week) — no
 > separate session needed. The two **cumulative review quizzes** run in the review weeks (7, 17).

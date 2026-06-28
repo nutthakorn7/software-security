@@ -156,15 +156,25 @@ Consolidate Weeks 10–16 (+ first-half callbacks). *🎯 "Security Jeopardy: Ch
 
 ## 6. Assessment
 
-| Component | Weight |
-|---|---|
-| Weekly labs/games (13 graded) | 30% |
-| Midterm — Week 8 (written) + Week 9 (CTF practical) | 20% |
-| Final — Week 18 (written) + Week 19 (capstone CTF) | 25% |
-| Term project (secure build + threat model + remediation report) | 15% |
-| Weekly quizzes (every teaching week, drop lowest 1–2) + participation / leaderboard | 10% |
+| Component | Weight | Graded |
+|---|---|---|
+| Weekly lab worksheets — 13 graded | 30% | **Individual** |
+| Midterm — Week 8 (written) + Week 9 (CTF practical) | 20% | **Individual** |
+| Final — Week 18 written *(individual)* + Week 19 capstone CTF *(team)* | 25% | Mixed |
+| Term project (secure build + threat model + remediation report) | 15% | **Team of 2–3** |
+| Weekly quizzes (drop lowest 1–2) + participation / **Houses** leaderboard | 10% | Individual + Houses |
 
-**Term project.** In teams of 2–3, students take a small web/API application, threat-model it, find and document its vulnerabilities, remediate them, generate an SBOM, sign the release artifact, and wire up a security CI pipeline. Deliverables: a threat model, a vulnerability report mapped to CWE/OWASP, the fixed code, and a short demo.
+> **Individual vs team.** Your grade is dominated by **individual mastery** (worksheets,
+> quizzes, exams = ~75%). **Team** work is bounded (project 15% + the Week 19 capstone CTF).
+> The fun **weekly games** (Bug Triage Race, XSS Golf, the CTFs, …) score toward the **Houses
+> leaderboard under participation** — they drive engagement, **not** the 30% worksheet grade,
+> so a quiet teammate can't pull your mark down.
+
+**Term project.** In teams of 2–3, students take a small web/API application, threat-model it, find and document its vulnerabilities, remediate them, generate an SBOM, sign the release artifact, and wire up a security CI pipeline. Deliverables: a threat model, a vulnerability report mapped to CWE/OWASP, the fixed code, and a short demo. Each member's mark is scaled by a short **peer-contribution evaluation** (see `project/README.md`).
+
+**Teams & Houses.** Two layers, one structure:
+- **Houses** — large, persistent, **mixed-ability** groups for the whole term. They drive the season-long **CTFd leaderboard**, Hall of Fame, and the weekly games. **Houses are not graded** (pure engagement — free-riding can't affect anyone's grade).
+- **Project teams of 2–3** **nest inside** a House. This is the only *graded* group unit, protected by per-student flags + the peer-contribution evaluation.
 
 ---
 

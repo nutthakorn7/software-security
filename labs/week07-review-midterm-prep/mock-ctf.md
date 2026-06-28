@@ -24,5 +24,5 @@
 - Draw a 3-element STRIDE table for any one target above.
 - Name the CWE for each challenge you solved.
 
-> Then take the **[Quiz 1](../../quizzes/quiz1.md)** (you took it end of Week 6) self-review,
+> Then take the **[cumulative review quiz (Quiz 1)](../../quizzes/quiz1.md)** this week,
 > and review weak spots before the Week 8/9 midterm.

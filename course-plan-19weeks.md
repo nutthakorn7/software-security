@@ -32,9 +32,9 @@ AI-resilient structure (see [AGENDA.md](AGENDA.md) for time-boxing):
 - **🤖 Audit the AI** — students critique an AI-generated exploit/fix (find the insecure/hallucinated parts).
 - **🧠 Explain-in-Plain-English + Prompt Problem** — comprehension + AI-literacy (Denny et al. 2024).
 - **Viva spot-checks** — 2–3 students reproduce/explain live (graded on understanding).
-- **Engagement layer** — points feed a season-long **CTFd scoreboard**, Houses/XP, and a weekly Hall of Fame.
+- **Engagement layer** — points feed a season-long **CTFd scoreboard**, **Houses**/XP, and a weekly Hall of Fame. Houses are persistent, mixed-ability, and **non-graded**; the graded project teams (2–3) nest inside them (see the syllabus *Teams & Houses*).
 
-> Quizzes run in the last 30 min of **Wk 6 & 15**.
+> A short **weekly quiz** opens each teaching week (drop lowest 1–2); the two cumulative review quizzes run in the **W7/W17** review weeks.
 
 ---
 

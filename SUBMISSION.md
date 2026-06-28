@@ -34,8 +34,8 @@ All offensive work is on the provided sandbox targets only — see [ETHICS.md](E
 
 ## QUIZ — how it works
 - **Online via Google Form** (link posted in Classroom at quiz time).
-- **When:** last 30 min of **Week 6** (Quiz 1) and **Week 15** (Quiz 2).
-- **Format:** 15 questions — 10 MCQ (auto-graded) + 3 short answer + 2 applied (instructor-graded). 25 pts, 30 min, **individual, closed book**.
+- **Weekly quiz:** a short **~10-min quiz at the start of every teaching week** (6 Q: 5 MCQ + 1 short, **individual**). Low-stakes — the **lowest 1–2 are dropped**.
+- **Cumulative review quizzes:** two bigger 25-pt quizzes in the **review weeks** (W7 pre-midterm, W17 pre-final).
 - No separate file to submit — the Form **is** the submission.
 
 ---

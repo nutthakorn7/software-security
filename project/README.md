@@ -1,6 +1,6 @@
 # Term Project — Secure Build
 
-**Teams of 2–3. 25% of the final grade.**
+**Teams of 2–3 (nested in your House). 15% of the final grade.**
 
 Take a small web/API application (provided starter, or your own with instructor approval), assess it like an attacker, fix it like a defender, and harden its build/release pipeline.
 
@@ -35,6 +35,20 @@ Take a small web/API application (provided starter, or your own with instructor 
 | Supply-chain hardening (SBOM + signing + provenance) | 15 |
 | CI pipeline (works, fails build appropriately) | 10 |
 | Presentation & report clarity | 5 |
+
+## Peer-contribution evaluation (individual fairness)
+
+The project is the only *graded* team work, so each member's mark is adjusted for actual
+contribution:
+- At submission, **each member privately rates every teammate** (including themselves) on a
+  simple scale — e.g. *Full / Most / Some / Little* — with a one-line justification.
+- The team mark is **scaled per member** by the averaged rating (typically ×0.8–1.1; an
+  unjustified low score is discussed before it's applied).
+- Per-student lab flags + each member's own commit history (see Academic Integrity) corroborate
+  who did what. A "single paste-everything" contribution is a red flag.
+
+This protects diligent students and removes the "carry a free-rider" problem — the reason team
+weight is kept bounded (15%) while mastery is graded individually.
 
 ## Report
 
