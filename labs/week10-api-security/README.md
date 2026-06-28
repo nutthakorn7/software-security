@@ -18,6 +18,14 @@ cd crAPI/deploy/docker && docker compose -f docker-compose.yml up -d
 3. **Resource consumption:** trigger an unthrottled endpoint.
 4. **Fix (round 2):** object-level auth checks, explicit allow-listed request schemas, and rate limiting.
 
+## Run the local target
+```bash
+docker compose up        # vulnerable_api.py on http://localhost:5000 ; solution_api.py on :5001
+```
+**macOS:** port 5000 is used by AirPlay Receiver — if you see `address already in use`, disable
+*System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or (recommended) run the labs
+inside the course VM, where there is no conflict.
+
 ## Deliverable
 Findings report (API Top 10 mapping) + fixes.
 

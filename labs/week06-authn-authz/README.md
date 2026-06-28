@@ -14,6 +14,14 @@ Target: provided app with user objects and JWT auth (or Juice Shop).
 3. **JWT:** forge a token (none-alg or brute weak HMAC secret).
 4. **Fix:** enforce server-side authorization on every object access (RBAC/ABAC), validate JWT alg + signature with a strong secret/key, and add deny-by-default checks.
 
+## Run the local target
+```bash
+docker compose up        # vulnerable_app.py on http://localhost:5000  (the / page lists endpoints)
+```
+The fixed version is `solution_app.py`. **macOS:** port 5000 is used by AirPlay Receiver — if you
+see `address already in use`, disable *System Settings → General → AirDrop & Handoff → AirPlay
+Receiver*, or (recommended) run the labs inside the course VM, where there is no conflict.
+
 ## Deliverable
 Exploits + the access-control middleware/fixes + re-test results.
 

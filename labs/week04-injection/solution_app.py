@@ -34,6 +34,17 @@ def seed():
     con.close()
 
 
+@app.route("/")
+def index():
+    return (
+        "Week 4 — Injection lab (FIXED)\n"
+        "Endpoints:  /login?user=&pw=   /search?q=   /ping?host=   /upload\n"
+        "The same payloads from the vulnerable app should now fail.\n",
+        200,
+        {"Content-Type": "text/plain; charset=utf-8"},
+    )
+
+
 @app.route("/login")
 def login():
     user = request.args.get("user", "")

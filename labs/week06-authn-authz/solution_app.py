@@ -17,6 +17,16 @@ ORDERS = {
 }
 
 
+@app.route("/")
+def index():
+    return jsonify(
+        lab="Week 6 — Auth & Access Control (FIXED)",
+        endpoints={"POST /login": "JSON {user, pw} -> JWT",
+                   "GET /api/orders/<id>": "now enforces ownership"},
+        note="Cross-user access and forged tokens should now be rejected.",
+    )
+
+
 @app.route("/login", methods=["POST"])
 def login():
     user = request.json.get("user")

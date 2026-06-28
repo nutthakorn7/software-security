@@ -13,6 +13,14 @@
 3. Build a CSRF page that performs a state-changing request.
 4. **Fix:** add contextual output encoding, a strict Content-Security-Policy, `SameSite=Lax/Strict` cookies, and CSRF tokens; verify the attacks fail.
 
+## Run the local target
+```bash
+docker compose up        # vulnerable_app.py on http://localhost:5000  (try /hello?name=, /comments)
+```
+The fixed version is `fixed_app.py`. **macOS:** port 5000 is used by AirPlay Receiver — if you see
+`address already in use`, disable *System Settings → General → AirDrop & Handoff → AirPlay
+Receiver*, or (recommended) run the labs inside the course VM, where there is no conflict.
+
 ## Deliverable
 Working payloads + CSP/encoding/CSRF fixes + screenshots of blocked attacks.
 

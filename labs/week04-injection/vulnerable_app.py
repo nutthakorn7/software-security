@@ -40,6 +40,20 @@ def seed():
         pass
 
 
+@app.route("/")
+def index():
+    return (
+        "Week 4 — Injection lab (VULNERABLE; sandbox only)\n"
+        "Endpoints:\n"
+        "  /login?user=&pw=   SQLi auth bypass\n"
+        "  /search?q=         SQLi (try UNION)\n"
+        "  /ping?host=        OS command injection\n"
+        "  /upload            unrestricted file upload (GET form / POST field f)\n",
+        200,
+        {"Content-Type": "text/plain; charset=utf-8"},
+    )
+
+
 @app.route("/login")
 def login():
     user = request.args.get("user", "")

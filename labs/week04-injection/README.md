@@ -18,6 +18,14 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop
 2. Achieve command injection on a vulnerable endpoint.
 3. **Fix:** rewrite the endpoints with prepared statements / parameterized APIs and allow-list validation; re-test to confirm the payloads now fail.
 
+## Run the local target
+```bash
+docker compose up        # vulnerable_app.py on http://localhost:5000  (the / page lists endpoints)
+```
+The fixed version is `solution_app.py`. **macOS:** port 5000 is used by AirPlay Receiver — if you
+see `address already in use`, disable *System Settings → General → AirDrop & Handoff → AirPlay
+Receiver*, or (recommended) run the labs inside the course VM, where there is no conflict.
+
 ## Deliverable
 PoC payloads + the patched code + proof the fix blocks them.
 
