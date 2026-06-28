@@ -95,3 +95,15 @@ docker run --rm aquasec/trivy:latest image --severity HIGH,CRITICAL week13-harde
 - **Explain in your own words** *(graded on your reasoning, not copied text):*
   1. What did you do, and **why did the vulnerability work**?
   2. **Why does your fix actually stop it** — and what could still break it?
+
+---
+
+## 🤖 Audit the AI (required)
+
+AI is a power tool you must **distrust** — you are graded on your *critique*, not the AI's answer.
+
+1. Ask an AI assistant to exploit **or** fix this week's vulnerability. Paste its full answer.
+2. **Find what's wrong or risky** in it — insecure code, a subtly incomplete fix, a hallucinated API/function/CVE, a missed edge case, or wrong reasoning. Quote the exact line(s).
+3. Produce the **correct, verified** version yourself and explain in 2–3 sentences why the AI's output was insufficient.
+
+> Disclose your AI use in the Part 1 table. This task counts toward your **Defense + Reflection** score.

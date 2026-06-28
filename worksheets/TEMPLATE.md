@@ -73,3 +73,15 @@
 | Exploitation tasks complete + evidence | 40 |
 | Defense / fixes correct | 25 |
 | Reflection + mitigation quality | 15 |
+
+---
+
+## 🤖 Audit the AI (required)
+
+AI is a power tool you must **distrust** — you are graded on your *critique*, not the AI's answer.
+
+1. Ask an AI assistant to exploit **or** fix this week's vulnerability. Paste its full answer.
+2. **Find what's wrong or risky** in it — insecure code, a subtly incomplete fix, a hallucinated API/function/CVE, a missed edge case, or wrong reasoning. Quote the exact line(s).
+3. Produce the **correct, verified** version yourself and explain in 2–3 sentences why the AI's output was insufficient.
+
+> Disclose your AI use in the Part 1 table. This task counts toward your **Defense + Reflection** score.

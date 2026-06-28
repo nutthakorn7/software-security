@@ -124,6 +124,18 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
+## Using AI in this course
+
+- AI is allowed — and you must **disclose** how you used it
+- But AI **hallucinates** APIs/CVEs and writes **insecure code**
+- You're graded on understanding, not on the answer:
+  - random **live re-demos** — explain it or score zero
+  - your **flags are unique** to you — copying is traceable
+  - every lab has an **“Audit the AI”** task: find what its answer gets wrong
+- Use AI to **learn faster** — never to **skip the thinking**
+
+---
+
 ## Key takeaways
 
 - Design for security; don't bolt it on

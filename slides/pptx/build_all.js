@@ -26,7 +26,13 @@ async function iconPng(Comp, color) {
 }
 
 // ---- tiny markdown helpers ----
-const strip = (s) => s.replace(/\*\*/g, "").replace(/`/g, "").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").trim();
+const strip = (s) => s
+  .replace(/\*\*([^*]+)\*\*/g, "$1")      // **bold** -> bold
+  .replace(/\*([^*\s][^*]*?)\*/g, "$1")  // *italic* -> italic (leaves standalone * in code alone)
+  .replace(/\*\*/g, "")
+  .replace(/`/g, "")
+  .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+  .trim();
 
 function parseDeck(md) {
   // drop YAML front-matter
@@ -113,6 +119,8 @@ function organize(body) {
 
   for (let n = 1; n <= 19; n++) {
     const ww = String(n).padStart(2, "0");
+    // Optional: WEEK=01 (or WEEK=1) rebuilds just one deck; otherwise all 19.
+    if (process.env.WEEK && process.env.WEEK !== ww && process.env.WEEK !== String(n)) continue;
     const file = path.join(SLIDES, `week${ww}.md`);
     if (!fs.existsSync(file)) { console.log("skip", ww); continue; }
     const md = fs.readFileSync(file, "utf8");
