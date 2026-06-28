@@ -148,11 +148,13 @@ AI-resilient structure (see [AGENDA.md](AGENDA.md) for time-boxing):
 
 | Component | Weight |
 |---|---|
-| Weekly labs/games (13 graded) | 30% |
-| **Midterm (Wk 8–9: written + CTF practical)** | 20% |
-| **Final (Wk 18–19: written + capstone CTF)** | 25% |
-| Term project (secure build + threat model + remediation report) | 15% |
-| Participation / leaderboard / quizzes | 10% |
+| Weekly lab worksheets (13 graded) *(individual)* | 30% |
+| Midterm — Wk 8 written + Wk 9 CTF practical *(individual)* | 20% |
+| Final — Wk 18 written *(individual)* + Wk 19 capstone CTF *(team)* | 25% |
+| Term project — secure build + threat model + remediation report *(team of 2–3)* | 15% |
+| Weekly quizzes (drop lowest 1–2) + participation / **Houses** leaderboard | 10% |
+
+*See the syllabus **Assessment** + **Teams & Houses** for the individual-vs-team split and the non-graded Houses engagement layer.*
 
 ---
 
