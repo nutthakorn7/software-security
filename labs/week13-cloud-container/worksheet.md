@@ -107,3 +107,12 @@ AI is a power tool you must **distrust** — you are graded on your *critique*, 
 3. Produce the **correct, verified** version yourself and explain in 2–3 sentences why the AI's output was insufficient.
 
 > Disclose your AI use in the Part 1 table. This task counts toward your **Defense + Reflection** score.
+
+---
+
+## 🧠 Comprehension & Prompt (required)
+
+**A. Explain in Plain English (EiPE).** In 2–3 sentences, in your own words, describe what this week's vulnerable code/endpoint actually *does* and *why it is exploitable* — explain the mechanism, don't dump jargon.
+
+**B. Prompt Problem.** Write a **single prompt** that makes an AI produce a *correct, secure* fix for one finding. Run it: does the exploit now fail? If not, refine the prompt and try again. Submit the **final prompt + the verified result**.
+*Graded on the prompt's precision and your verification — this trains problem decomposition and AI literacy (Denny et al. 2024).*
