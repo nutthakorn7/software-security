@@ -5,14 +5,14 @@ services:
     volumes:
       - ./:/lab
     ports:
-      - "5000:5000"
+      - "8080:5000"
     # Per-student flags: python3 ../../instructor/seed_flags.py env <STUDENT_ID> > .env
     environment:
       - FLAG_BOLA
       - FLAG_MASSASSIGN
     command: >
       bash -c "pip install --no-cache-dir flask &&
-               echo '--- INSECURE API on :5000 — see attack.md ---' &&
+               echo '--- INSECURE API on :8080 — see attack.md ---' &&
                python vulnerable_api.py"
 
   solution-api:
@@ -21,8 +21,8 @@ services:
     volumes:
       - ./:/lab
     ports:
-      - "5001:5001"
+      - "8081:5001"
     command: >
       bash -c "pip install --no-cache-dir flask &&
-               echo '--- SECURE API on :5001 ---' &&
+               echo '--- SECURE API on :8081 ---' &&
                python solution_api.py"

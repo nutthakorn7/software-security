@@ -149,10 +149,11 @@ Browser  --(file)-->  [Flask app]  --save f.filename-->  uploads/
 
 ## Lab 0 — Environment setup (once)
 
-1. VirtualBox/UTM + Kali or Ubuntu VM
-2. Docker + Docker Compose inside the VM
-3. Browser proxy: Burp Suite Community **or** OWASP ZAP
-4. Verify: `docker run hello-world`, `git --version`
+1. **Docker Desktop** (Win/macOS/Linux) — runs every lab target
+2. Browser + proxy: Burp Suite Community **or** OWASP ZAP
+3. **Toolbox container** (for W11 + recon): `docker build -t softsec-toolbox labs/toolbox`
+4. *Optional fallback:* a Kali/Ubuntu VM if your host can't run Docker
+5. Verify: `docker run hello-world`, `git --version`
 
 <!-- Logistics — get everyone's environment working today; setup pain derails later weeks. Have TAs circulate. Tell them to fork the course repo now. This is graded only on "it runs." ~ start of lab. -->
 
@@ -160,7 +161,7 @@ Browser  --(file)-->  [Flask app]  --save f.filename-->  uploads/
 
 ## Lab 1 — Threat-model a sample app
 
-> 📋 **Worksheet 1** — `labs/week01-threat-modeling/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:5000
+> 📋 **Worksheet 1** — `labs/week01-threat-modeling/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:8080
 
 1. Run the provided app (`docker compose up`)
 2. Draw a **DFD**: processes, stores, external entities, trust boundaries

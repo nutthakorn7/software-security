@@ -26,12 +26,11 @@ Answer in your own words (2–4 sentences each).
 **Environment setup**
 ```bash
 cd labs/week01-threat-modeling
-docker compose up --build           # starts sample-app on http://localhost:5000
-curl -s -X POST localhost:5000/notes -H 'Content-Type: application/json' \
+docker compose up --build           # starts sample-app on http://localhost:8080
+curl -s -X POST localhost:8080/notes -H 'Content-Type: application/json' \
      -d '{"owner":"alice","body":"hello"}'   # observe behavior, do not attack
-curl -s localhost:5000/notes
+curl -s localhost:8080/notes
 ```
-> 💡 **macOS:** if startup fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 
 Source to model lives in `sample-app/app.py`. Template to fill: `THREAT-MODEL-TEMPLATE.md` (copy it, do not edit the original).
 

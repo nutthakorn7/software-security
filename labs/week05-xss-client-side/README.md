@@ -3,9 +3,9 @@
 **OWASP 2025:** A05 Injection · **CWE:** CWE-79 (XSS), CWE-352 (CSRF)
 
 ## ✅ This week — what to do
-1. **Before class** — VM + Docker working (Week 1 *Lab 0*); skim last week's recap.
+1. **Before class** — Docker Desktop working (Week 1 *Lab 0*); skim last week's recap.
 2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week05.md`.
-3. **Lab (180 min)** — play this week's game, then complete **Worksheet 5** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → http://localhost:5000`.
+3. **Lab (180 min)** — play this week's game, then complete **Worksheet 5** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → http://localhost:8080`.
 4. **Submit** — worksheet PDF → Classroom · code → GitHub · weekly quiz → Google Form. (How: [SUBMISSION.md](../../SUBMISSION.md).)
 5. **Project** — apply this week's lesson to your [NoteVault project](../../project/README.md) where it fits.
 
@@ -24,11 +24,9 @@
 
 ## Run the local target
 ```bash
-docker compose up        # vulnerable_app.py on http://localhost:5000  (try /hello?name=, /comments)
+docker compose up        # vulnerable_app.py on http://localhost:8080  (try /hello?name=, /comments)
 ```
-The fixed version is `fixed_app.py`. **macOS:** port 5000 is used by AirPlay Receiver — if you see
-`address already in use`, disable *System Settings → General → AirDrop & Handoff → AirPlay
-Receiver*, or (recommended) run the labs inside the course VM, where there is no conflict.
+The fixed version is `fixed_app.py`.
 
 ## Deliverable
 Working payloads + CSP/encoding/CSRF fixes + screenshots of blocked attacks.

@@ -33,9 +33,8 @@ Answer in 2–4 sentences each.
 ```bash
 cd labs/week04-injection
 docker compose up            # builds python:3.12-slim, installs flask, runs vulnerable_app.py
-# vulnerable app -> http://localhost:5000   (service name: injection-lab, port 5000)
+# vulnerable app -> http://localhost:8080   (service name: injection-lab, port 8080)
 ```
-> 💡 **macOS:** if this fails with `port 5000 … address already in use`, turn off *System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or run inside the course VM (no conflict).
 Optional secondary targets:
 ```bash
 docker run --rm -it -p 80:80 vulnerables/web-dvwa        # DVWA  -> http://localhost
@@ -46,7 +45,7 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # Juice Shop -> http://
 
 ---
 
-**Task 0 — Onboarding (5 min).** Browse to `http://localhost:5000/login?user=alice&pw=alicepw` and confirm `Welcome alice`. Note the seeded users (`alice`, `bob`). Screenshot the working app. *Deliverable: screenshot.*
+**Task 0 — Onboarding (5 min).** Browse to `http://localhost:8080/login?user=alice&pw=alicepw` and confirm `Welcome alice`. Note the seeded users (`alice`, `bob`). Screenshot the working app. *Deliverable: screenshot.*
 
 **Task 1 — Auth bypass via SQLi (25 min) 🐉 Hit #1.**
 - *Goal:* log in as `alice` with **no valid password**.

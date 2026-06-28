@@ -19,7 +19,7 @@ cat README.md            # follow the lab guide
 docker compose up        # (where a target is provided)
 ```
 
-**Base requirements:** a Linux VM (Kali/Ubuntu), Docker + Docker Compose, Git, and a browser proxy (Burp Suite Community or OWASP ZAP). See [labs/week01-threat-modeling/README.md](labs/week01-threat-modeling/README.md) for the full "Lab 0" setup.
+**Base requirements (Docker-first):** **Docker Desktop**, Git, and a browser proxy (Burp Suite Community or OWASP ZAP) — every lab runs via `docker compose up`, no full VM needed. A few weeks (mainly W11) use the **`labs/toolbox`** container for Linux dev/attacker tools; a Kali/Ubuntu VM is an optional fallback. See [labs/week01-threat-modeling/README.md](labs/week01-threat-modeling/README.md) for the full "Lab 0" setup.
 
 ---
 

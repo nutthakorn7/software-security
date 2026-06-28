@@ -47,12 +47,13 @@ Traditional software-security courses stop at buffer overflows and SQL injection
 
 All offensive work is performed **only** against instructor-provided, intentionally vulnerable targets inside an isolated sandbox. Students never attack systems they do not own or lack written permission to test.
 
-**Required toolkit (all free / open source):**
+**Required toolkit (all free / open source) — Docker-first:**
 
-- **Kali Linux** or **Ubuntu** VM (VirtualBox/UTM) — base workstation.
-- **Docker + Docker Compose** — to run vulnerable targets locally and reproducibly.
+- **Docker Desktop** (Windows / macOS / Linux) — runs every lab target via `docker compose up`. *No full VM required.*
+- **Lab toolbox container** (`labs/toolbox`) — a small Linux image with `clang`+libFuzzer, `gdb`, `nmap`, `sqlmap` for the weeks that need Linux dev/attacker tools (mainly **Week 11**).
 - **Git + a GitHub account** — for labs, CI/CD, and the term project.
 - Browser with **Burp Suite Community** or **OWASP ZAP** — web/API testing proxy.
+- *Optional fallback:* a **Kali/Ubuntu VM** (VirtualBox/UTM) if your host can't run Docker.
 
 **Pre-built vulnerable targets used during the term:**
 

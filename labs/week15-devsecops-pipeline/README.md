@@ -3,7 +3,7 @@
 **OWASP 2025:** A09 Security Logging & Alerting Failures, A10 Mishandling of Exceptional Conditions
 
 ## ✅ This week — what to do
-1. **Before class** — VM + Docker working (Week 1 *Lab 0*); skim last week's recap.
+1. **Before class** — Docker Desktop working (Week 1 *Lab 0*); skim last week's recap.
 2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week15.md`.
 3. **Lab (180 min)** — play this week's game, then complete **Worksheet 15** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `push security-ci.yml → GitHub Actions`.
 4. **Submit** — worksheet PDF → Classroom · code → GitHub · weekly quiz → Google Form. (How: [SUBMISSION.md](../../SUBMISSION.md).)

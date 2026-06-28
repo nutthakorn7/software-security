@@ -3,9 +3,9 @@
 **OWASP 2025:** A05 Injection · **CWE:** CWE-89 (SQLi), CWE-78 (command injection)
 
 ## ✅ This week — what to do
-1. **Before class** — VM + Docker working (see Week 1 *Lab 0*); skim last week's recap.
+1. **Before class** — Docker Desktop working (see Week 1 *Lab 0*); skim last week's recap.
 2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week04.md`.
-3. **Lab (180 min)** — play the game below, then complete **Worksheet 4** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up` → http://localhost:5000.
+3. **Lab (180 min)** — play the game below, then complete **Worksheet 4** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up` → http://localhost:8080.
 4. **Submit** — worksheet PDF → Classroom · fixed code → GitHub · weekly quiz → Google Form. (How/where: [SUBMISSION.md](../../SUBMISSION.md).)
 5. **Project** — add this week's finding + fix to your NoteVault report.
 
@@ -29,11 +29,9 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop
 
 ## Run the local target
 ```bash
-docker compose up        # vulnerable_app.py on http://localhost:5000  (the / page lists endpoints)
+docker compose up        # vulnerable_app.py on http://localhost:8080  (the / page lists endpoints)
 ```
-The fixed version is `solution_app.py`. **macOS:** port 5000 is used by AirPlay Receiver — if you
-see `address already in use`, disable *System Settings → General → AirDrop & Handoff → AirPlay
-Receiver*, or (recommended) run the labs inside the course VM, where there is no conflict.
+The fixed version is `solution_app.py`.
 
 ## Deliverable
 PoC payloads + the patched code + proof the fix blocks them.

@@ -3,9 +3,9 @@
 **OWASP API Security Top 10:** API1 BOLA · API3 broken object property level auth (mass assignment) · API4 unrestricted resource consumption
 
 ## ✅ This week — what to do
-1. **Before class** — VM + Docker working (Week 1 *Lab 0*); skim last week's recap.
+1. **Before class** — Docker Desktop working (Week 1 *Lab 0*); skim last week's recap.
 2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week10.md`.
-3. **Lab (180 min)** — play this week's game, then complete **Worksheet 10** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → :5000 (insecure) / :5001 (secure)`.
+3. **Lab (180 min)** — play this week's game, then complete **Worksheet 10** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → :8080 (insecure) / :8081 (secure)`.
 4. **Submit** — worksheet PDF → Classroom · code → GitHub · weekly quiz → Google Form. (How: [SUBMISSION.md](../../SUBMISSION.md).)
 5. **Project** — apply this week's lesson to your [NoteVault project](../../project/README.md) where it fits.
 
@@ -29,11 +29,9 @@ cd crAPI/deploy/docker && docker compose -f docker-compose.yml up -d
 
 ## Run the local target
 ```bash
-docker compose up        # vulnerable_api.py on http://localhost:5000 ; solution_api.py on :5001
+docker compose up        # vulnerable_api.py on http://localhost:8080 ; solution_api.py on :8081
 ```
-**macOS:** port 5000 is used by AirPlay Receiver — if you see `address already in use`, disable
-*System Settings → General → AirDrop & Handoff → AirPlay Receiver*, or (recommended) run the labs
-inside the course VM, where there is no conflict.
+The secure API is `solution_api.py` (on :8081).
 
 ## Deliverable
 Findings report (API Top 10 mapping) + fixes.

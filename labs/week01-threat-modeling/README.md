@@ -3,9 +3,9 @@
 **OWASP 2025:** A06 Insecure Design · **CWE focus:** CWE-1059 (design)
 
 ## ✅ This week — what to do
-1. **Before class** — **Set up your environment** — install the VM + Docker + Burp/ZAP. This *is* **Lab 0**.
+1. **Before class** — **Set up your environment** — install **Docker Desktop** + Burp/ZAP (a Linux VM is an optional fallback). This *is* **Lab 0**.
 2. **Lecture (120 min)** — weekly quiz first (~10 min), then the lecture. Slides: `slides/week01.md`.
-3. **Lab (180 min)** — play this week's game, then complete **Worksheet 1** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → http://localhost:5000`.
+3. **Lab (180 min)** — play this week's game, then complete **Worksheet 1** (`worksheet.md`, Parts 1–4, incl. *Audit the AI* + *EiPE/Prompt*). Kickoff: `docker compose up → http://localhost:8080`.
 4. **Submit** — worksheet PDF → Classroom · code → GitHub · weekly quiz → Google Form. (How: [SUBMISSION.md](../../SUBMISSION.md).)
 5. **Project** — apply this week's lesson to your [NoteVault project](../../project/README.md) where it fits.
 

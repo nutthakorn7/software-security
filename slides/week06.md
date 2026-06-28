@@ -191,7 +191,7 @@ GET /uploads/backdoor.php?cmd=ls%20-l                200   ← RCE
 
 ## Lab steps
 
-> 📋 **Worksheet 6** — `labs/week06-authn-authz/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:5000
+> 📋 **Worksheet 6** — `labs/week06-authn-authz/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:8080
 
 1. Find IDOR endpoints; enumerate other users' objects
 2. Crack/forge a weak JWT (e.g. `alg:none` or weak secret)

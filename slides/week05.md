@@ -138,7 +138,7 @@ Craft the **shortest** payload that pops `alert(1)` / steals a cookie in Juice S
 
 ## Lab steps
 
-> 📋 **Worksheet 5** — `labs/week05-xss-client-side/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:5000
+> 📋 **Worksheet 5** — `labs/week05-xss-client-side/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → http://localhost:8080
 
 1. Find reflected + stored + DOM XSS in Juice Shop
 2. Demonstrate cookie theft (sandbox)
