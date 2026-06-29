@@ -45,7 +45,7 @@ docker compose up        # (where a target is provided)
 | **17** | **🔁 Reflection & Review (pre-final)** | — | "Jeopardy: Champions Edition" + mock final |
 | **18–19** | **📝 Final** (Wk18 written · Wk19 capstone CTF) | — | cumulative, emphasis Wk 10–16 |
 
-Full details: [syllabus.md](syllabus.md). Expanded design rationale: [course-plan-19weeks.md](course-plan-19weeks.md) · curriculum benchmark vs. top universities: [curriculum-review.md](curriculum-review.md).
+Full details: [syllabus.md](syllabus.md). Expanded design rationale: [course-plan-19weeks.md](course-plan-19weeks.md) · curriculum benchmark vs. top universities: [curriculum-review.md](curriculum-review.md) · per-week readings & resources: [readings.md](readings.md).
 
 ---
 
