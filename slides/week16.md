@@ -9,6 +9,8 @@ header: "Software Security · Week 16"
 ## Capstone Studio & CTF Warm-up
 Software Security · Nutthakorn Chalaemwongwan
 
+<!-- Studio day, not a lecture. Frame: this is the dress rehearsal for the graded Week 19. Goal = every team leaves knowing exactly what to fix. ~2 min. -->
+
 ---
 
 ## Today
@@ -16,6 +18,8 @@ Software Security · Nutthakorn Chalaemwongwan
 - Work-in-progress capstone demos
 - Cross-team peer review
 - 🏆 Practice CTF tournament (previews Week 19)
+
+<!-- Roadmap. Time-box: WIP demos + peer review first half, practice CTF second half (300-min block). Keep demos strictly timed so everyone presents. -->
 
 ---
 
@@ -26,6 +30,8 @@ Software Security · Nutthakorn Chalaemwongwan
 - Security CI pipeline that gates the build
 - Story: attack → root cause → fix
 
+<!-- Show the bar before demos so teams self-assess. This = the Week 19 graded rubric (project/README.md). Emphasize the narrative: attack → root cause → fix is what scores. ~4 min. -->
+
 ---
 
 ## Demo format (today, ungraded)
@@ -33,6 +39,8 @@ Software Security · Nutthakorn Chalaemwongwan
 - 10-min demo + 5-min Q&A
 - Show one full attack→fix walkthrough live
 - Get peer feedback before the graded Week 19
+
+<!-- Run on a timer (15 min/team). "Ungraded" lowers stakes so they expose weak spots now. Insist on a LIVE walkthrough, not slides about it. -->
 
 ---
 
@@ -43,6 +51,8 @@ Software Security · Nutthakorn Chalaemwongwan
 - Do the fixes actually close the bug?
 - Is the pipeline real (fails on findings)?
 
+<!-- Hand each team this as a checklist to score the team presenting (use scrimmage.md). Peer feedback in writing → the presenting team gets a punch-list. This is the main value of the session. -->
+
 ---
 
 ## 🏆 Practice CTF
@@ -50,6 +60,8 @@ Software Security · Nutthakorn Chalaemwongwan
 - Mixed web / API / supply-chain / LLM / binary
 - Cross-team scrimmage
 - Dry run for the Week 19 tournament
+
+<!-- Run the scrimmage (scrimmage.md / item-bank CTF pool) in the exact W19 team format so the final has no surprises. Leaderboard on CTFd. ~2.5 h. -->
 
 ---
 
@@ -59,7 +71,11 @@ Software Security · Nutthakorn Chalaemwongwan
 - Finalize SBOM + signing + pipeline
 - Rehearse the demo
 
+<!-- Send them off with a concrete punch-list (the peer feedback). Remind: W19 demo is graded + the final CTF tournament. -->
+
 ---
 
 # Next: pre-final review (Week 17)
 Then the final — Wk 18 written · Wk 19 capstone CTF
+
+<!-- Bridge to W17 review. Confirm project repos are runnable before the final. -->
