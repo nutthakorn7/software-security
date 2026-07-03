@@ -31,10 +31,12 @@ docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect -s /repo -v
 3. Mark 3 true positives and 1 likely false positive; justify.
 
 ## Mini-lab — "Fuzzing Race" (intro)
-First team to make the target crash wins. A deeper fuzzing+exploit lab follows in [Week 11](../week11-memory-safety-exploitation/).
+First team to make the target crash wins. `harness.c` (in this folder) has one planted
+memory-safety bug for libFuzzer to find. A deeper fuzzing+exploit lab follows in [Week 11](../week11-memory-safety-exploitation/).
 ```bash
-# coverage-guided fuzzing of a small provided harness
-clang -fsanitize=address,fuzzer harness.c -o fuzz && ./fuzz
+# run inside labs/toolbox (Apple clang has no libFuzzer runtime)
+clang -g -fsanitize=address,fuzzer harness.c -o fuzz && ./fuzz
+# expect an AddressSanitizer heap-buffer-overflow within seconds + a crash-* reproducer file
 ```
 
 ## Deliverable

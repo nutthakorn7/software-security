@@ -17,4 +17,4 @@
    a) UI bugs  b) misconfigurations in Terraform/IaC  c) memory leaks  d) typos in docs
 
 ## Short answer — 🔒 your own work (1 × 3)
-6. Describe **one security gate** you added to the pipeline this week and exactly what it **blocks**.
+6. Describe **one security gate** you added to the pipeline this week and exactly what it **blocks**. Then paste your personal flag (`FLAG{...}`) captured from the "Break the Build" fail-open challenge.

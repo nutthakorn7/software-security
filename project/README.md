@@ -13,7 +13,7 @@ Take a small web/API application (provided starter, or your own with instructor 
 3. **Remediated code** — the fixes, in a branch with clear commits referencing each finding.
 4. **Supply-chain hardening** — generate an **SBOM** (CycloneDX) and **sign the release artifact** with Cosign.
 5. **Security CI pipeline** — a GitHub Actions workflow running SAST + SCA + secret scanning that fails on high-severity findings.
-6. **Demo** — a short live walkthrough: attack → root cause → fix (Week 15).
+6. **Demo** — a short live walkthrough: attack → root cause → fix (WIP demo in the **Week 16** capstone studio; graded final demo in **Week 19**).
 
 ## Suggested timeline
 
@@ -23,7 +23,8 @@ Take a small web/API application (provided starter, or your own with instructor 
 | Threat model submitted | Week 7 |
 | Vulnerability report (draft) | Week 11 |
 | Remediation + SBOM + signed artifact | Week 14 |
-| Final demo & report | Week 15 |
+| Capstone studio — WIP demo & peer review | Week 16 |
+| Final demo & report (graded) | Week 19 |
 
 ## Rubric (100 pts)
 
