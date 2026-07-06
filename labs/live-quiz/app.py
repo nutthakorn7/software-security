@@ -137,7 +137,10 @@ def on_answer_submit(data):
     game = GAMES.get(data["pin"])
     if game is None:
         return
-    result = game.submit_answer(data["nickname"], data["choice"])
+    try:
+        result = game.submit_answer(data["nickname"], data["choice"])
+    except ValueError:
+        return
     if result is None:
         return
     emit("answer:feedback", result)

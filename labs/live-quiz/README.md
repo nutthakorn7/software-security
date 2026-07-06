@@ -66,3 +66,16 @@ the actual blocker, not a replacement.
   app currently degrades silently (empty topic dropdown, no error) rather than failing loudly.
   Resolve this — and consider adding a startup warning when the item-bank paths are missing —
   before relying on this in a real class session.
+- **Reconnecting mid-question doesn't re-show the in-progress question.** `GameSession.join()`
+  correctly resumes a rejoining player's score, but the server never re-emits `question:show` to
+  them on rejoin — if a player drops and reconnects while a question is active, their screen stays
+  blank (or shows the previous question) until the host advances to the next one, so they can't
+  answer the round they reconnected into. Only affects players who disconnect mid-question, not
+  general reconnection. Fix: have `on_player_join` also emit the current question state (from
+  `game.current_question()`) when one is active.
+- **Host endpoints (`/host`, `/host/create`, `host_next`, `/host/<pin>/export`) have no
+  authentication.** Anyone who reaches the host URL, or who knows/guesses a game's 6-digit PIN,
+  can advance someone else's game or download its results CSV. This mirrors Kahoot's own
+  PIN-based trust model and is low-stakes for pseudonymous classroom play, but is worth noting
+  since this deploys on a public-IP host for remote/hybrid access rather than staying on
+  localhost. Not fixed in this build.
