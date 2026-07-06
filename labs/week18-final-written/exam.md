@@ -58,7 +58,7 @@ C3. An LLM feature lets users ask questions over uploaded documents (RAG) and ca
 ## Section D — Design & DevSecOps (20 pts, 10 each)
 
 D1. Design a **GitHub Actions security pipeline**: which scanners, what each catches, where SARIF goes, and the gate condition. Why "fail closed"?
-D2. Pick one **2025 supply-chain incident** (e.g. XZ Utils, SolarWinds, Log4Shell) and explain the attack path and two controls that would have reduced impact.
+D2. Pick one **notable supply-chain incident** (e.g. XZ Utils, SolarWinds, Log4Shell) and explain the attack path and two controls that would have reduced impact.
 
 ---
 

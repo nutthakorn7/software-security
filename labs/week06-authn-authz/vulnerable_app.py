@@ -48,7 +48,13 @@ def current_user():
     # CWE-347: improper signature verification.
     #   - 'none' is in the allowed algorithms -> an attacker can submit an UNSIGNED token.
     #   - the secret is the weak string "secret".
-    data = jwt.decode(token, SECRET, algorithms=["HS256", "none"])
+    # PyJWT requires key=None when the token's own header says alg=none, so the
+    # two accepted algorithms can't share one decode() call.
+    header = jwt.get_unverified_header(token)
+    if header.get("alg") == "none":
+        data = jwt.decode(token, options={"verify_signature": False}, algorithms=["none"])
+    else:
+        data = jwt.decode(token, SECRET, algorithms=["HS256"])
     return data.get("sub")
 
 
