@@ -121,6 +121,9 @@ def _reveal_results(pin):
     game = GAMES.get(pin)
     if game is None:
         return
+    if getattr(game, "_revealed_this_round", False):
+        return  # already revealed for this round (guards both the timeout path and the
+                # all-answered path from double-firing regardless of which ran first)
     game._revealed_this_round = True
     socketio.emit(
         "question:results",
