@@ -9,7 +9,7 @@ full design rationale.
 ## Run it
 
 ```
-docker compose up --build
+cd labs/live-quiz && docker compose up --build
 ```
 
 - Host: open `http://localhost:5050/host`, pick a topic, "Create game" for a PIN.
