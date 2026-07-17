@@ -18,5 +18,5 @@ MarkupSafe==2.0.1      # pinned for Jinja2 2.11 compatibility
 itsdangerous==1.1.0    # old; pinned for Flask 1.1.x
 click==7.1.2           # old; pinned for Flask 1.1.x
 requests==2.25.1       # old HTTP client
-urllib3==1.26.4        # CVE-2021-33503 (ReDoS); CRLF/cert-era issues
+urllib3==2.7.0        # CVE-2021-33503 (ReDoS); CRLF/cert-era issues
 PyYAML==5.4.1          # old release
