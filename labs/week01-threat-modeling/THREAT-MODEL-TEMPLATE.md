@@ -61,3 +61,7 @@ Mitigation: Set MAX_CONTENT_LENGTH, limit upload frequency/number, and monitor a
 5.SQL Injection / Data Tampering in /notes — Medium × High
 If user input is directly concatenated into SQL queries, attackers may read or modify database contents.
 Mitigation: Use parameterized queries/ORM, validate input, and follow the principle of least privilege.
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
