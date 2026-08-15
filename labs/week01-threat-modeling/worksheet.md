@@ -8,16 +8,16 @@
 
 ## Part 1 — Student Information
 | Name | Student ID | Date | Group |
-|---|---|---|---|
+|Phuriphat Chantiuaong | 6631503034 | 15/8/2026 |---|
 | | | | |
 
 ## Part 2 — Lecture Questions
 Answer in your own words (2–4 sentences each).
-1. Define the CIA triad and give one concrete failure example for each of the three properties.
-2. What is a *trust boundary*, and why does data crossing one deserve extra scrutiny?
-3. Explain "attack surface." Name two things that increase it in a web app.
-4. What does each STRIDE letter map to, and which security property does each threat violate?
-5. What does "Secure by Design" (CISA) mean, and how does it differ from bolting security on after release?
+1. CIA Triad stands for Confidentiality, Integrity, and Availability. Confidentiality fails when unauthorized people can access private data, integrity fails when data is changed without permission, and availability fails when a service becomes unavailable, such as during a DDoS attack.
+2. A trust boundary is a point where data moves between areas with different levels of trust. Data crossing this boundary needs extra scrutiny because it may come from an untrusted source and could contain malicious or unexpected input.
+3. An attack surface is the total number of possible ways an attacker can interact with or attack a system. In a web application, the attack surface can increase by adding more public APIs, user input fields, or third-party services.
+4. STRIDE stands for Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege. Spoofing violates authentication, Tampering violates integrity, Repudiation violates accountability, Information Disclosure violates confidentiality, Denial of Service violates availability, and Elevation of Privilege violates authorization.
+5. Secure by Design means building security into a product from the beginning instead of treating it as an extra feature. CISA promotes designing systems that are secure by default, while bolting security on after release can leave weaknesses that are harder and more expensive to fix.
 
 ## Part 3 — Hands-on Lab (180 min)
 **Learning goals:** build a data-flow diagram (DFD), apply STRIDE to a real Flask app, rank risks, and propose mitigations.
@@ -41,15 +41,29 @@ Source to model lives in `sample-app/app.py`. Template to fill: `THREAT-MODEL-TE
 **What to submit per task:** the threat/element identified + a screenshot (DFD, table, or running app) + a 2–3 sentence mitigation.
 
 **Task 0 — Onboarding (5 min)** · *Goal:* prove the environment works. *Steps:* `docker compose up`, hit `/notes` and `/files/<name>`, read `sample-app/app.py`. *Deliverable:* screenshot of the running app + the JSON response.
+= ![alt text](image.png)
 
 **Task 1 — Draw the DFD (25 min)** · *Goal:* map the system. *Steps:* identify the external entity (web client), the process (Flask app), the data store (`notes.db` SQLite), the `uploads/` store, and the flows for `/notes`, `/upload`, `/files/<name>`; mark the Internet→app trust boundary with a dashed line. *Deliverable:* DFD image embedded in your copy of the template.
+= ![alt text](image-1.png)
 
 **Task 2 — STRIDE the elements (30 min)** · *Goal:* enumerate threats per element. *Steps:* for each element fill the S/T/R/I/D/E grid. Ground it in real code: `/notes` accepts a client-supplied `owner` with no auth (Spoofing); `/upload` saves raw `f.filename` — arbitrary-file-write (Tampering) — and echoes the resolved save path back in its response (Information disclosure); `/files/<name>` reads it back but is comparatively defended (see Task 5); no logging anywhere (Repudiation). *Deliverable:* completed STRIDE table.
+= 
 
 **Task 3 — Elevation of Privilege game (20 min)** · *Goal:* find threats you missed. *Steps:* play the EoP deck against your DFD; each card you can tie to a real element/flow scores a point; record every valid threat. No printer or scissors? Draw from the digital deck below instead — same 78 cards, same rule. *Deliverable:* list of carded threats + score.
-
 ```sim
 eop-deck
+| Carded threat                      | Element / flow         | Why it qualifies                                                              |
+| ---------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| Forged identity / impersonation    | `/notes` → `owner`     | Client controls `owner` without authentication.                               |
+| Authorization bypass               | `/notes`               | Application may treat attacker-selected `owner` as trusted identity.          |
+| Arbitrary file write               | `/upload` → `uploads/` | Raw filename controls the destination path.                                   |
+| Path traversal                     | `/upload`              | `../` can escape the intended directory.                                      |
+| Application-file overwrite         | `/upload` → filesystem | A writable application-controlled file could affect execution.                |
+| Sensitive filesystem access        | `/files/<name>`        | Incorrect path handling could expose files outside `uploads/`.                |
+| Privilege escalation through Flask | Flask process          | Filesystem/database access is determined by the process account's privileges. |
+| Resource exhaustion                | `/upload`              | Unlimited upload volume/size can consume disk or CPU.                         |
+| Identity/data confusion            | `/notes` → `notes.db`  | Forged ownership can cause data to be written under another user's identity.  |
+
 ```
 
 **Task 3b — Systems-level pass (25 min) 🔭** · *Goal:* find what the per-element grid cannot see. Tasks 2 and 3 enumerate threats **one element at a time**, and that is exactly where threat models are known to stop short — students taught STRIDE alone reliably identify component threats and *discount system-level ones* ([Joshi et al., ASEE 2024](https://arxiv.org/abs/2404.16632)). So do a second pass over the **whole** diagram:
@@ -69,14 +83,46 @@ trust-boundary
 *Deliverable:* the boundary list, two owned-element reachability notes, one written chain, and the system claim.
 
 **Task 4 — Abuse cases & attacker personas (20 min)** · *Goal:* think like specific adversaries. *Steps:* define 2 personas (e.g. a curious logged-in user; an anonymous internet attacker) and write 2 abuse cases each against the sample app, tied to DFD elements. *Deliverable:* 4 abuse cases.
+=Persona 1: Anonymous Internet Attacker (Unauthenticated)
+Abuse Case 1 (DFD Element: /notes): An unauthenticated remote attacker iterates through common usernames in the owner query parameter to dump and view internal user notes without credentials.
+
+Abuse Case 2 (DFD Element: /upload): An attacker submits a POST request containing ../ sequences in f.filename to overwrite critical configuration files or place malicious scripts into accessible directories.
+
+Persona 2: Malicious Internal User (Low-Privilege Logged-In User)
+Abuse Case 3 (DFD Element: /upload & Server Path Disclosure): A low-privilege user uploads a harmless file, extracts the server's absolute internal directory path from the response, and uses it to map out target files for path traversal attacks.
+
+Abuse Case 4 (DFD Element: notes.db via /notes): A registered user crafts HTTP requests targeting /notes with owner=admin to inject unauthorized records directly into the shared database context.
 
 **Task 5 — Path-traversal deep-dive (25 min)** · *Goal:* analyze the riskiest flow. *Steps:* trace `/upload` → `/files/<name>`; explain how `../` in a filename escapes `uploads/`; sketch the secure design (`secure_filename`, store outside web root, allow-list extensions). *Deliverable:* the data flow + secure-design note.
+=[Client POST /upload] 
+        │
+        ▼ (Raw f.filename received, e.g. "../../tmp/malicious.py")
+[Flask Endpoint /upload]
+        │
+        ▼ (Saves directly without sanitization & returns absolute path)
+[Filesystem Storage /uploads/../../tmp/malicious.py]
+        │
+        ▼ (Client requests file)
+[Flask Endpoint /files/<name>] ──► [Reads and returns target file]
 
 **Task 6 — Threat-model the project target (30 min)** · *Goal:* kick off your term project. *Steps:* stop the sample-app first (`docker compose down` — both apps bind host port 8080), then run **NoteVault** (`cd ../../project/starter-app && docker compose up`), draw a quick DFD, and list the top 3 STRIDE threats you'd investigate. *Deliverable:* NoteVault DFD + top-3 threats (reuse these in your project report — `project/REPORT-TEMPLATE.md` in the repo root).
+=[ Client Browser ]
+         │  (HTTP / Auth / Notes API)
+         ▼  [Trust Boundary 1: Public Internet]
+  [ NoteVault Flask App ]
+    │                │
+    ▼                ▼  [Trust Boundary 2: Data Tier]
+[ SQLite DB ]  [ Upload Store ]
 
 **Task 7 — Security requirements (15 min)** · *Goal:* turn threats into testable requirements. *Steps:* write 3 security requirements as acceptance criteria ("the system must … so that …"), each mapped to a threat from Task 2 or Task 6. *Deliverable:* 3 testable security requirements.
 
 **Task 8 — Defend / fix it: rank & mitigate (25 min) 🛡️** · *Goal:* turn threats into action you can prove. *Steps:* rank the top 5 threats by likelihood × impact; propose one concrete mitigation each (e.g., auth on `/notes`, `secure_filename()` + allowlist for `/upload`, request logging for Repudiation, size/rate limits for DoS). Then **pick one and actually implement it** in your fork.
+=Rank,Threat,Likelihood,Impact,Score,Proposed Mitigation
+1,Tampering / EoP: Arbitrary File Write via /upload path traversal,High,High,Critical,Enforce secure_filename() + extension allow-list + store outside web root.
+2,Spoofing / Elevation: Unauthenticated Note Access via /notes,High,High,Critical,Implement session-based authentication and strict owner-to-session validation.
+3,Information Disclosure: Server path leakage in /upload response,High,Medium,Medium,Remove absolute path details from API responses; return generic success payloads/UUIDs.
+4,Repudiation: Missing centralized application logs,Medium,Medium,Medium,"Integrate a logging middleware capturing user ID, endpoint, timestamp, and client IP."
+5,Denial of Service: Unrestricted upload file size,Medium,Medium,Medium,Implement MAX_CONTENT_LENGTH limits in Flask configuration.
 
 *Deliverable — the top-5 table, plus for the one you implemented:*
 1. the **diff** (commit hash on your `wk01` branch),
@@ -130,6 +176,7 @@ AI is a power tool you must **distrust** — you are graded on your *critique*, 
 3. Produce the **correct, verified** version yourself and explain in 2–3 sentences why the AI's output was insufficient.
 
 > Disclose your AI use in the Part 1 table. This task counts toward your **Defense + Reflection** score.
+=
 
 ---
 
