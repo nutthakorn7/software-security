@@ -36,12 +36,34 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 **What to submit per task:** the command/payload run + a screenshot of the finding + a 2–3 sentence mitigation.
 
 **Task 0 — Onboarding (5 min)** · *Goal:* confirm tooling. *Steps:* run `bash scan.sh`; confirm both Semgrep and Gitleaks sections produce output. *Deliverable:* screenshot showing both tools ran.
+![alt text](<Screenshot 2569-09-03 at 22.18.31.png>)
 
 **Task 1 — SAST sweep with Semgrep (25 min)** · *Goal:* find code flaws. *Steps:* read the Semgrep output; locate the SQL injection in `/user` (CWE-89, string-formatted query), the OS command injection in `/ping` (CWE-78, `shell=True`), the weak `md5` password hash (CWE-327), and `debug=True` (CWE-489). *Deliverable:* one screenshot per finding with the file:line.
+- CWE-89, string-formatted query
+![alt text](<Screenshot 2569-09-03 at 22.39.02.png>)
+- CWE-78, shell=True
+![alt text](<Screenshot 2569-09-03 at 22.40.07.png>)
+- CWE-327
+![alt text](<Screenshot 2569-09-03 at 22.40.36.png>)
+- CWE-489
+![alt text](<Screenshot 2569-09-03 at 22.41.18.png>)
 
 **Task 2 — Secret scan with Gitleaks (15 min)** · *Goal:* find leaked credentials. *Steps:* read the Gitleaks output; identify `AWS_SECRET_ACCESS_KEY` and `DB_PASSWORD` (CWE-798). *Deliverable:* screenshot + the rule that fired for each.
+![alt text](<Screenshot 2569-09-03 at 22.43.06.png>)
+- AWS_SECRET_ACCESS_KEY — CWE-798 — Rule: `generic-api-key`
+- DB_PASSWORD — CWE-798 — Rule: `generic-api-key`
 
 **Task 3 — Bug Triage Race (30 min)** · *Goal:* triage accurately. *Steps:* build a table with columns *Tool | File:Line | CWE | Severity | TP/FP | Fix idea*; mark at least 3 true positives and 1 likely false positive and justify each. (Score = TP − misclassified.) *Deliverable:* the completed triage table.
+
+| Tool | File:Line | CWE | Severity | TP/FP | Fix idea |
+|---|---|---|---|---|---|
+| Semgrep | app.py:19-20 | CWE-89 | High | TP — `sql-injection-db-cursor-execute` rule; user input directly formatted into SQL string, confirmed exploitable | Parameterized query with `?` placeholder |
+| Semgrep | app.py:19-20 | CWE-89 | Low | FP — `tainted-sql-string`, `formatted-sql-query`, and `sqlalchemy-execute-raw-query` rules all fired on this exact same line/bug already captured above; counting these as 4 additional distinct findings rather than 1 bug caught 4 times over-counts the real vulnerability count | N/A — already remediated by the single fix above; this is a triage/counting issue, not a separate code fix |
+| Semgrep | app.py:26 | CWE-78 | Critical | TP — `subprocess-shell-true` rule; `shell=True` + string concatenation of user input, confirmed exploitable | Pass args as list, remove `shell=True` |
+| Semgrep | app.py:30 | CWE-327 | Medium | TP — MD5 confirmed used for password hashing, no salt | Replace with argon2id/bcrypt |
+| Semgrep | app.py:33 | CWE-489 | Medium | TP — `debug=True` literally present, confirmed | Set `debug=False` before deploy |
+| Gitleaks | app.py:11 | CWE-798 | High | TP — real-format AWS key string hardcoded in source | Move to environment variable |
+| Gitleaks | app.py:12 | CWE-798 | High | TP — plaintext DB password hardcoded in source | Move to environment variable |
 
 **Task 4 — Fuzzing intro (10 min)** · *Goal:* see coverage-guided fuzzing find a bug SAST won't. *Steps:* in the `labs/toolbox` container (Apple clang has no libFuzzer runtime), build `clang -g -fsanitize=address,fuzzer harness.c -o fuzz`, then **seed the corpus** and run it:
 `mkdir -p corpus && printf 'FUZ' > corpus/seed && ./fuzz corpus`. It crashes almost immediately with an AddressSanitizer heap-buffer-overflow at `harness.c:23` (the `data[3]` read with no `size > 3` check). Seeding matters: an unseeded `./fuzz` has to rediscover the magic bytes by chance and often finds nothing for minutes — that unpredictability is itself worth a sentence in your write-up. (The deep fuzzing+exploit lab is Week 11.) *Deliverable:* the ASan crash output (or a screenshot) + a 2-sentence note on why fuzzing finds this bug when a linter/SAST pass over the same 4-line check would not.
