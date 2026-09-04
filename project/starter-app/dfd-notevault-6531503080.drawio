@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="NoteVault-DFD" id="notevault-dfd">
+    <mxGraphModel dx="900" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="620" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="browser" value="Browser&#10;(external entity)" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="220" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="flask" value="NoteVault (Flask)&#10;/login /register /notes&#10;/api/notes/&lt;id&gt; /search /admin /export&#10;(process)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;align=center;verticalAlign=middle;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="300" y="190" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="notesdb" value="notes.db&#10;users + notes tables" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="660" y="70" width="150" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="shell" value="OS shell&#10;(via subprocess)" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;align=center;verticalAlign=middle;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="660" y="400" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="boundary" value="TRUST BOUNDARY (Internet &#8594; Server)" style="endArrow=none;dashed=1;html=1;strokeColor=#B5601F;fontColor=#B5601F;labelBackgroundColor=#ffffff;verticalAlign=top;fontSize=11;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="40" as="sourcePoint" />
+            <mxPoint x="250" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e1" value="login/search/notes params" style="html=1;fontSize=10;endArrow=block;" edge="1" parent="1" source="browser" target="flask">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e2" value="SQL built via % string-format (SQLi)" style="html=1;fontSize=10;endArrow=block;strokeColor=#B5601F;fontColor=#B5601F;strokeWidth=2;" edge="1" parent="1" source="flask" target="notesdb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e3" value="/export runs shell with fmt param (cmd injection)" style="html=1;fontSize=10;endArrow=block;strokeColor=#B5601F;fontColor=#B5601F;strokeWidth=2;" edge="1" parent="1" source="flask" target="shell">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
