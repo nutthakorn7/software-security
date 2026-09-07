@@ -53,7 +53,9 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 
 **Task 0 — Onboarding (5 min)** · *Goal:* confirm tooling. *Steps:* run `bash scan.sh`; confirm both Semgrep and Gitleaks sections produce output. *Deliverable:* screenshot showing both tools ran.
 
-> Command run: `bash scan.sh` from `labs/week02-sdlc-tooling`. Output confirms both tools ran: Semgrep reported "Ran 322 rules on 2 files: 10 findings", then Gitleaks reported "leaks found: 2". Screenshot: `Screenshots/task0-scan-summary.png`.
+> Command run: `bash scan.sh` from `labs/week02-sdlc-tooling`. Output confirms both tools ran: Semgrep reported "Ran 322 rules on 2 files: 10 findings", then Gitleaks reported "leaks found: 2".
+>
+> ![Terminal showing scan.sh output: Semgrep scan summary followed by Gitleaks finding the AWS_SECRET_ACCESS_KEY and DB_PASSWORD secrets, with the identity stamp visible.](Screenshots/task0-scan-summary.png)
 
 **Task 1 — SAST sweep with Semgrep (25 min)** · *Goal:* find code flaws. *Steps:* read the Semgrep output; locate the SQL injection in `/user` (CWE-89, string-formatted query), the OS command injection in `/ping` (CWE-78, `shell=True`), the weak `md5` password hash (CWE-327), and `debug=True` (CWE-489). *Deliverable:* one screenshot per finding with the file:line.
 
@@ -63,7 +65,9 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 > - **CWE-327 weak hash**, `store_password`, line 30 — `hashlib.md5(pw.encode()).hexdigest()`. MD5 is fast and not collision-resistant, so it's unsuitable for password storage. *Mitigation:* use a slow, salted password hash like bcrypt or argon2, not a general-purpose hash.
 > - **CWE-489 debug mode in production**, line 33 — `app.run(debug=True)`. Flask's debugger, if reachable, allows remote code execution via its interactive console. *Mitigation:* set `debug=False` and read debug mode from an environment variable that's off by default.
 >
-> Screenshots: `Screenshots/task1-code-finding-19,20.png` (SQL injection), `Screenshots/task1-code-finding-26,30,33.png` (command injection, weak hash, debug mode).
+> ![Semgrep findings panel showing the SQL injection at app.py lines 19-20, with the source code on the left.](Screenshots/task1-code-finding-19,20.png)
+>
+> ![Semgrep findings panel showing the OS command injection (line 26), weak md5 hash (line 30), and debug=True (line 33) findings.](Screenshots/task1-code-finding-26,30,33.png)
 
 **Task 2 — Secret scan with Gitleaks (15 min)** · *Goal:* find leaked credentials. *Steps:* read the Gitleaks output; identify `AWS_SECRET_ACCESS_KEY` and `DB_PASSWORD` (CWE-798). *Deliverable:* screenshot + the rule that fired for each.
 
@@ -71,7 +75,7 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 > - `AWS_SECRET_ACCESS_KEY = "hK8pQ2mN5vX9wZ3rT6yU1sA4bC7dE0fG2hJ5kL8"` — line 11, entropy 5.08.
 > - `DB_PASSWORD = "xQ7mK2pL9wR4tY6u"` — line 12, entropy 4.00.
 >
-> *Mitigation:* move both values out of source code into environment variables (or a secrets manager) loaded at runtime, then rotate both keys since they're already exposed in git history. Screenshot: `Screenshots/task0-scan-summary.png` (Gitleaks section).
+> *Mitigation:* move both values out of source code into environment variables (or a secrets manager) loaded at runtime, then rotate both keys since they're already exposed in git history. (Same screenshot as Task 0 above — Gitleaks section.)
 
 **Task 3 — Bug Triage Race (30 min)** · *Goal:* triage accurately. *Steps:* build a table with columns *Tool | File:Line | CWE | Severity | TP/FP | Fix idea*; mark at least 3 true positives and 1 likely false positive and justify each. (Score = TP − misclassified.) *Deliverable:* the completed triage table.
 
@@ -90,7 +94,9 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 **Task 4 — Fuzzing intro (10 min)** · *Goal:* see coverage-guided fuzzing find a bug SAST won't. *Steps:* in the `labs/toolbox` container (Apple clang has no libFuzzer runtime), build `clang -g -fsanitize=address,fuzzer harness.c -o fuzz`, then **seed the corpus** and run it:
 `mkdir -p corpus && printf 'FUZ' > corpus/seed && ./fuzz corpus`. It crashes almost immediately with an AddressSanitizer heap-buffer-overflow at `harness.c:23` (the `data[3]` read with no `size > 3` check). Seeding matters: an unseeded `./fuzz` has to rediscover the magic bytes by chance and often finds nothing for minutes — that unpredictability is itself worth a sentence in your write-up. (The deep fuzzing+exploit lab is Week 11.) *Deliverable:* the ASan crash output (or a screenshot) + a 2-sentence note on why fuzzing finds this bug when a linter/SAST pass over the same 4-line check would not.
 
-> Built and ran in the `labs/toolbox` container: `clang -g -fsanitize=address,fuzzer harness.c -o fuzz`, seeded the corpus with `FUZ`, then `./fuzz corpus`. It crashed on the very first input (the seed itself) with `AddressSanitizer: heap-buffer-overflow ... harness.c:23:21`, and wrote a reproducer file `crash-0eb8e4ed029b774d80f2b66408203801cb982a60`. Screenshot: `Screenshots/task4-fuzz-crash.png`.
+> Built and ran in the `labs/toolbox` container: `clang -g -fsanitize=address,fuzzer harness.c -o fuzz`, seeded the corpus with `FUZ`, then `./fuzz corpus`. It crashed on the very first input (the seed itself) with `AddressSanitizer: heap-buffer-overflow ... harness.c:23:21`, and wrote a reproducer file `crash-0eb8e4ed029b774d80f2b66408203801cb982a60`.
+>
+> ![Terminal showing the AddressSanitizer heap-buffer-overflow crash at harness.c:23, with the identity stamp run in the same window.](Screenshots/task4-fuzz-crash.png)
 >
 > **Why fuzzing found it and SAST didn't:** SAST works by matching code text against known dangerous patterns without ever executing the program — and the missing `size > 3` check on line 23 of harness.c looks like completely ordinary code, so there's no recognizable "dangerous pattern" for a rule to match against. Fuzzing actually runs the program with crafted input, so it caught the out-of-bounds read the moment real execution tried to read `data[3]` from a 3-byte buffer — a bug that only reveals itself when the code actually runs, not by reading the source.
 
@@ -128,7 +134,7 @@ Target under scan: `vulnerable-repo/app.py` (plus `requirements.txt`). It contai
 >
 > Final run: **SAST (Semgrep) ❌ fail**, **Gitleaks ❌ fail**, **SCA (Trivy) ✅ pass** — overall run status: **failure**, as required. The Trivy pass is legitimate, not a bug: `vulnerable-repo/requirements.txt` specifies `flask>=3.1.3` (an unpinned range), and Trivy needs an exact installed version to check against the CVE database, so it correctly found nothing to flag here — unlike `project/starter-app` in Task 5, whose `requirements.txt` pins exact vulnerable versions and produced 32 real findings.
 >
-> Screenshot: `Screenshots/task6-ci-gate-failing.png`.
+> ![GitHub Actions run page for week02-security-gate showing the overall failed run, with SAST and Gitleaks jobs failed and SCA passed, terminal with identity stamp visible alongside the browser.](Screenshots/task6-ci-gate-failing.png)
 
 **Task 7 — SAST blind spots (20 min)** · *Goal:* see what scanners miss. *Steps:* find one real bug in `vulnerable-repo/app.py` (or NoteVault) that Semgrep did **not** flag, and explain why a pattern-based tool missed it. *Deliverable:* the bug + a 2-sentence explanation.
 
