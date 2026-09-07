@@ -1,0 +1,53 @@
+# Week 2 Task 6 — student exercise (worksheet.md), previews Week 15's real
+# DevSecOps gate. Adapted from labs/week15-devsecops-pipeline/security-ci.yml,
+# scoped to THIS week's own vulnerable-repo target so it fails on purpose.
+#
+# Does not touch or widen .github/workflows/security-ci.yml (the repo's real
+# CI), which deliberately does not gate labs/week*/ — that file stays as-is.
+
+name: week02-security-gate
+
+on:
+  push:
+    branches: [wk02]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gate — fail on Semgrep findings
+        run: semgrep scan --config p/default --config p/owasp-top-ten --error labs/week02-sdlc-tooling/vulnerable-repo
+
+  trivy:
+    name: SCA (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gate — fail on HIGH/CRITICAL (SCA)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: labs/week02-sdlc-tooling/vulnerable-repo
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+
+  gitleaks:
+    name: Secrets (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gate — fail if a secret is found
+        run: |
+          docker run --rm -v "$PWD/labs/week02-sdlc-tooling/vulnerable-repo:/repo" \
+            zricethezav/gitleaks:latest detect --no-git -s /repo --exit-code 1 -v
