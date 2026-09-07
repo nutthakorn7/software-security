@@ -24,8 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The repo's root .semgrepignore intentionally excludes labs/week*/ so the
+      # REAL production security-ci.yml doesn't gate on deliberately-vulnerable
+      # teaching code — but that also silently skips this lab's own gate demo if
+      # we scan in place. Copy the target outside the checkout so it's no longer
+      # under that ignore rule (same trick scan.sh uses via its Docker mount).
+      - name: Copy scan target outside the repo tree
+        run: cp -r labs/week02-sdlc-tooling/vulnerable-repo /tmp/scan-target
+
       - name: Gate — fail on Semgrep findings
-        run: semgrep scan --config p/default --config p/owasp-top-ten --error labs/week02-sdlc-tooling/vulnerable-repo
+        run: semgrep scan --config p/default --config p/owasp-top-ten --error /tmp/scan-target
 
   trivy:
     name: SCA (Trivy)
