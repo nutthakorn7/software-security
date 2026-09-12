@@ -79,6 +79,23 @@ One block per finding (copy as needed):
 
 ---
 
+### Finding F-03 — Stored XSS in Note Rendering and JavaScript-Readable Session Cookie
+| Field | Value |
+|---|---|
+| CWE | CWE-79; related CWE-1004 |
+| OWASP 2025 | A05 Injection |
+| Severity | High |
+| Location | Original rendering: `project/starter-app/app.py:43` and `104-107`; original cookie: `app.py:137`. Fixed rendering: `app.py:43-44`, `100-106`, and `185-190`; fixed cookie: `app.py:136-138`. |
+| Reproduction | Start NoteVault with `TEAM_ID='The Outsider' docker compose up --build`, sign in as the seeded Alice user, and create a note titled `XSS Test` with body `<script>alert(document.cookie)</script>`. Before the fix, loading the home page executed the stored payload and the alert displayed the JavaScript-readable NoteVault session cookie. |
+| Impact | A malicious note could execute script whenever its owner viewed the page. The script could alter the page or perform actions in the user's session, and the missing HttpOnly flag also allowed it to read the session cookie. |
+| Evidence | Genuine Week 5 NoteVault browser test shown below; the session value visible in the screenshot is not copied into this report text. |
+
+**Recommended mitigation:** Pass note records directly to Jinja and let autoescaping render titles and bodies as text on both the home and search pages. Set the session cookie to HttpOnly and SameSite; use Secure as well when NoteVault is deployed over HTTPS.
+
+![Genuine NoteVault stored-XSS test showing the payload executing in the authorized local project](../labs/week05-xss-client-side/image-project-stored-xss.png)
+
+---
+
 ## 5. Remediation  *(25 pts)*
 
 Per finding: the fix, **before/after** code, and the commit that implements it.
@@ -112,6 +129,32 @@ Per finding: the fix, **before/after** code, and the commit that implements it.
 - **Why this fixes it:** SQLite receives a fixed query structure and binds each value as data, so quotes, comments, and UNION text cannot become SQL syntax.
 - **Commit:** `<ADD AFTER THE NoteVault F-02 FIX IS IMPLEMENTED AND COMMITTED>`
 - **Proof the exploit now fails:** The actual NoteVault container preserved normal behavior: `alice` login returned HTTP 302 and the authenticated search for `milk` returned `groceries: milk, eggs`. The login SQLi returned HTTP 401 with `login failed`, while the authenticated UNION search returned HTTP 200 with no rows and did not expose the admin notes.
+
+### Fix for F-03
+```diff
+- <h3>Your notes</h3>{{ notes_html|safe }}
++ <h3>Your notes</h3>
++ {% for note in notes %}<li>#{{ note["id"] }} <b>{{ note["title"] }}</b>: {{ note["body"] }}</li>{% endfor %}
+
+- rows = con.execute("SELECT id,title,body FROM notes WHERE owner = ?", (user,)).fetchall()
+- notes_html = "".join(
+-     "<li>#%d <b>%s</b>: %s</li>" % (r["id"], r["title"], r["body"]) for r in rows)
+- return render_template_string(PAGE, user=user, is_admin=(user and role_of(user) == "admin"),
+-                               notes_html=notes_html)
++ notes = con.execute("SELECT id,title,body FROM notes WHERE owner = ?", (user,)).fetchall()
++ return render_template_string(PAGE, user=user, is_admin=(user and role_of(user) == "admin"),
++                               notes=notes)
+
+- resp.set_cookie("session", tok)
++ resp.set_cookie("session", tok, httponly=True, samesite="Lax")
+
+- "".join("<li>%s: %s</li>" % (r["title"], r["body"]) for r in rows)
++ "{% for row in rows %}<li>{{ row['title'] }}: {{ row['body'] }}</li>{% endfor %}"
+```
+- **Why this fixes it:** Jinja autoescaping converts the stored markup into text before it reaches the browser, including on the search-results page. HttpOnly prevents browser JavaScript from reading the session cookie, while SameSite=Lax reduces cross-site cookie attachment; Secure is intentionally reserved for an HTTPS deployment so the documented local HTTP login continues to work.
+- **Commit:** `<ADD AFTER THE NoteVault F-03 FIX IS COMMITTED>`
+- **Proof the exploit now fails:** The rebuilt NoteVault container returned HTTP 302 for normal login and note creation, and a normal note still appeared correctly. The stored payload appeared as escaped text on both home and search, with no executable payload element; an isolated browser check confirmed zero matching executable scripts and an empty `document.cookie` after login because the session cookie was HttpOnly.
+- **Fixed-state verification:** No fixed-state screenshot is claimed. Genuine runtime testing confirmed that normal login and notes still worked, the stored payload rendered only as text on home and search, no executable payload element remained, and the HttpOnly session cookie was absent from `document.cookie` with SameSite=Lax set.
 
 ---
 

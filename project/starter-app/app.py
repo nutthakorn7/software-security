@@ -40,7 +40,8 @@ PAGE = """
   {% if is_admin %}· <a href="/admin">admin</a>{% endif %}</p>
 <form method=post action="/notes"><input name=title placeholder=title>
   <input name=body placeholder=note><button>Add note</button></form>
-<h3>Your notes</h3>{{ notes_html|safe }}
+<h3>Your notes</h3>
+{% for note in notes %}<li>#{{ note["id"] }} <b>{{ note["title"] }}</b>: {{ note["body"] }}</li>{% endfor %}
 <form action="/search"><input name=q placeholder="search notes"><button>Search</button></form>
 {% else %}
 <form method=post action="/login">user <input name=username> pass <input name=password type=password>
@@ -96,15 +97,13 @@ def role_of(username):
 @app.route("/")
 def home():
     user = current_user()
-    notes_html = ""
+    notes = []
     if user:
         con = db()
-        rows = con.execute("SELECT id,title,body FROM notes WHERE owner = ?", (user,)).fetchall()
+        notes = con.execute("SELECT id,title,body FROM notes WHERE owner = ?", (user,)).fetchall()
         con.close()
-        notes_html = "".join(
-            "<li>#%d <b>%s</b>: %s</li>" % (r["id"], r["title"], r["body"]) for r in rows)
     return render_template_string(PAGE, user=user, is_admin=(user and role_of(user) == "admin"),
-                                  notes_html=notes_html)
+                                  notes=notes)
 
 
 @app.route("/register", methods=["POST"])
@@ -134,7 +133,9 @@ def login():
         return "login failed", 401
     tok = jwt.encode({"sub": username}, SECRET, algorithm="HS256")
     resp = make_response(redirect("/"))
-    resp.set_cookie("session", tok)
+    # HttpOnly blocks JavaScript access; SameSite limits cross-site cookie attachment.
+    # Set secure=True when the application is served over HTTPS in production.
+    resp.set_cookie("session", tok, httponly=True, samesite="Lax")
     return resp
 
 
@@ -181,8 +182,12 @@ def search():
         (user, "%" + term + "%"),
     ).fetchall()
     con.close()
-    return render_template_string("<a href=/>back</a><ul>" +
-        "".join("<li>%s: %s</li>" % (r["title"], r["body"]) for r in rows) + "</ul>")
+    return render_template_string(
+        "<a href=/>back</a><ul>"
+        "{% for row in rows %}<li>{{ row['title'] }}: {{ row['body'] }}</li>{% endfor %}"
+        "</ul>",
+        rows=rows,
+    )
 
 
 @app.route("/admin")
