@@ -64,6 +64,21 @@ One block per finding (copy as needed):
 
 ---
 
+### Finding F-02 — SQL Injection in Login and Note Search
+| Field | Value |
+|---|---|
+| CWE | CWE-89 |
+| OWASP 2025 | A05 Injection |
+| Severity | High |
+| Location | Original vulnerable queries: `project/starter-app/app.py:128-130` and `178-179`. Fixed queries: `128-131` and `179-182`. |
+| Reproduction | The original source formatted request values directly into the `/login` and `/search` SQL statements. The fixed local build was tested with username `alice'--` on `/login` and search term `' UNION SELECT id,title,body FROM notes--` on `/search`. |
+| Impact | An attacker may bypass authentication or read note data outside the intended search. Successful exploitation could expose user data and weaken the application's access controls. |
+| Evidence | Direct before/after code evidence at the locations above. Manual verification against the actual NoteVault container returned HTTP 401 and `login failed` for the login payload; the UNION search returned an empty list and exposed no other users' notes. No Week 4 lab screenshot is presented as NoteVault evidence. |
+
+**Recommended mitigation:** Replace both formatted SQL strings with SQLite parameterized queries. Bind the login values as `(username, password_hash)` and bind the search pattern as `(user, "%" + term + "%")` so request data cannot change the SQL structure.
+
+---
+
 ## 5. Remediation  *(25 pts)*
 
 Per finding: the fix, **before/after** code, and the commit that implements it.
@@ -76,6 +91,27 @@ Per finding: the fix, **before/after** code, and the commit that implements it.
 - **Why this fixes it:** …
 - **Commit:** `<hash>`
 - **Proof the exploit now fails:** (screenshot)
+
+### Fix for F-02
+```diff
+- q = "SELECT * FROM users WHERE username = '%s' AND password = '%s'" % (
+-     username, hashlib.md5((password or "").encode()).hexdigest())
+- row = con.execute(q).fetchone()
++ row = con.execute(
++     "SELECT * FROM users WHERE username = ? AND password = ?",
++     (username, hashlib.md5((password or "").encode()).hexdigest()),
++ ).fetchone()
+
+- q = "SELECT id,title,body FROM notes WHERE owner='%s' AND body LIKE '%%%s%%'" % (user, term)
+- rows = con.execute(q).fetchall()
++ rows = con.execute(
++     "SELECT id,title,body FROM notes WHERE owner = ? AND body LIKE ?",
++     (user, "%" + term + "%"),
++ ).fetchall()
+```
+- **Why this fixes it:** SQLite receives a fixed query structure and binds each value as data, so quotes, comments, and UNION text cannot become SQL syntax.
+- **Commit:** `<ADD AFTER THE NoteVault F-02 FIX IS IMPLEMENTED AND COMMITTED>`
+- **Proof the exploit now fails:** The actual NoteVault container preserved normal behavior: `alice` login returned HTTP 302 and the authenticated search for `milk` returned `groceries: milk, eggs`. The login SQLi returned HTTP 401 with `login failed`, while the authenticated UNION search returned HTTP 200 with no rows and did not expose the admin notes.
 
 ---
 
