@@ -152,7 +152,7 @@ Per finding: the fix, **before/after** code, and the commit that implements it.
 + "{% for row in rows %}<li>{{ row['title'] }}: {{ row['body'] }}</li>{% endfor %}"
 ```
 - **Why this fixes it:** Jinja autoescaping converts the stored markup into text before it reaches the browser, including on the search-results page. HttpOnly prevents browser JavaScript from reading the session cookie, while SameSite=Lax reduces cross-site cookie attachment; Secure is intentionally reserved for an HTTPS deployment so the documented local HTTP login continues to work.
-- **Commit:** `<ADD AFTER THE NoteVault F-03 FIX IS COMMITTED>`
+- **Commit:** https://github.com/6631503097/software-security/commit/2d43d97
 - **Proof the exploit now fails:** The rebuilt NoteVault container returned HTTP 302 for normal login and note creation, and a normal note still appeared correctly. The stored payload appeared as escaped text on both home and search, with no executable payload element; an isolated browser check confirmed zero matching executable scripts and an empty `document.cookie` after login because the session cookie was HttpOnly.
 - **Fixed-state verification:** No fixed-state screenshot is claimed. Genuine runtime testing confirmed that normal login and notes still worked, the stored payload rendered only as text on home and search, no executable payload element remained, and the HttpOnly session cookie was absent from `document.cookie` with SameSite=Lax set.
 
