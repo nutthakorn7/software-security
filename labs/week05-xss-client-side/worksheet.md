@@ -229,7 +229,7 @@ Escaping and Jinja autoescaping neutralize the XSS payloads, while CSP and HttpO
   1. I tested reflected and stored scripts, showed that JavaScript could read the sandbox cookie, and used a separate page to submit a forged comment. The XSS worked because user values were inserted into HTML without escaping, while the CSRF worked because the browser could submit a POST that the server accepted without a token check.
   2. The fixed app escapes user output, adds CSP, and hardens the cookie, so the tested XSS becomes harmless text and JavaScript cannot use the cookie in the same way. CSRF still works in this app because the POST endpoint has no authentication or CSRF-token validation, and a future unsafe HTML sink could reintroduce XSS.
 
-**FINAL WEEK 5 COMMIT LINK: `<ADD AFTER FINAL COMMIT>`**
+**FINAL WEEK 5 COMMIT LINK: https://github.com/6631503097/software-security/commit/2d43d97**
 
 ---
 
