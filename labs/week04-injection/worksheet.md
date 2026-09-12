@@ -228,7 +228,7 @@ All four attacks were blocked by `solution_app.py` in the genuine Task 5 retest.
   1. I tested normal login, two SQLi logins, a UNION credential dump, command injection, and a dangerous file upload against the provided local app. They worked because the app joined untrusted values directly into SQL, a shell command, or a filesystem path, so the values were treated as instructions instead of only data.
   2. The fixed app binds SQL values, removes shell interpretation, validates hosts, and restricts upload filenames and extensions. Residual risk remains if later code builds new queries or shell strings, or if upload checks trust only the extension without checking content and storage permissions.
 
-**FINAL WEEK 4 COMMIT LINK: `<ADD AFTER FINAL COMMIT>`**
+FINAL WEEK 4 COMMIT LINK: https://github.com/6631503097/software-security/commit/8c11f89
 
 ---
 
