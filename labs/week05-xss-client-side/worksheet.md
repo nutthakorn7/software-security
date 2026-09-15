@@ -10,7 +10,7 @@
 
 | Name | Student ID | Date | Group |
 |------|-----------|------|-------|
-|      |           |      |       |
+| Nararat Kritphet | 6631503110 | 14/9/2026 |       |
 
 ## Part 2 — Lecture Questions
 
@@ -48,20 +48,36 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 
 **Task 0 — Onboarding (5 min).** Browse `http://localhost:8080/`. Open DevTools → Application → Cookies and confirm `session=abc123` is set with **no HttpOnly / SameSite**. Screenshot it. *Deliverable: screenshot.*
 
+![Taks0](img/wk05-0.png)
+
 **Task 1 — Reflected XSS + XSS Golf (30 min) ⛳.**
 - *Goal:* execute JS via `/hello`, then minimize the payload.
 - *Steps:* visit `/hello?name=<script>alert(1)</script>`, then the alternate `/hello?name=<img src=x onerror=alert(1)>` (useful when `<script>` tags specifically are filtered — note it's actually 3 characters longer, not shorter). Record each payload's character count for your golf score.
 - *Deliverable:* both payloads + char counts + screenshot of `alert(1)` + your lowest score.
+
+![Task1](img/wk05-1.png)
+
+![Task1](img/wk05-1.2.png)
+
+![Task1](img/wk05-1.3.png)
 
 **Task 2 — Stored XSS (30 min) ⛳.**
 - *Goal:* persist a script that runs for every visitor of `/comments`.
 - *Steps:* POST a comment with body `<script>alert(document.cookie)</script>` (use the form or `curl -d 'body=...'`). Reload `/comments` and watch the cookie pop.
 - *Deliverable:* payload + screenshot of the alert showing `session=abc123` + why stored XSS is more dangerous than reflected.
 
+![Task2](img/wk05-2.png)
+
+Stored XSS is more dangerous because the malicious script is saved on the server and can run for every visitor who views the page. Output encoding and proper input handling should be used to prevent stored content from being executed as JavaScript.
+
 **Task 3 — Cookie theft via XSS (25 min).**
 - *Goal:* show the cookie is readable by injected JS because **HttpOnly is missing** (CWE-1004).
 - *Steps:* store `<script>new Image().src='http://localhost:8080/hello?name='+document.cookie</script>` (a beacon), or simply `<img src=x onerror=alert(document.cookie)>`. Observe the cookie value being exfiltrated/displayed.
 - *Deliverable:* payload + screenshot + 2–3 sentences on how HttpOnly would have stopped this.
+
+![Task3](img/wk05-3.png)
+
+HttpOnly prevents JavaScript from accessing the cookie through document.cookie. If HttpOnly had been enabled, the injected XSS script could still execute, but it could not directly read and steal the session cookie.
 
 **Task 4 — CSRF PoC (30 min).**
 - *Goal:* make a third-party page force a state-changing POST to `/comments`.
@@ -80,6 +96,10 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop       # -> http://localhost:3
 xss-context
 ```
 
+![Task4](img/wk05-4.png)
+
+SameSite=Strict stops the browser from sending the session cookie in cross-site requests. This prevents a third-party page from using the user's session to perform a forged POST request.
+
 **Task 5 — Defend / fix it (30 min) 🛡️.**
 - *Goal:* prove `fixed_app.py` blocks Tasks 1–3, then show that Task 4's CSRF PoC still gets through and explain why.
 - *Steps:* stop the vulnerable container (`Ctrl-C`), then:
@@ -88,6 +108,18 @@ xss-context
   ```
   Re-fire each payload. Expected: `/hello` renders the script **as text** (escape, L21), stored comments render literally (Jinja autoescape, L30–33), a strict CSP header is now present as defense-in-depth (`Content-Security-Policy: script-src 'self'`, L12 — check DevTools → Network → Response Headers; escaping already neutralizes these payloads, so no CSP *violation* fires in the console), and the cookie now has `HttpOnly; SameSite=Strict; Secure` (L42). Then re-run Task 4's `csrf.html` PoC against `fixed_app.py`: it **still posts the forged comment** — `/comments` (L25–28) never checks the `session` cookie or a CSRF token before accepting a POST, so hardening the cookie only stops the browser from *attaching* it cross-site; it doesn't stop the request itself from being processed.
 - *Deliverable:* screenshots of escaped output + the CSP response header + the hardened cookie flags + the still-successful Task 4 forgery against `fixed_app.py`, with 2–3 sentences on why cookie hardening alone doesn't close CSRF here (no server-side check tied to the cookie, and no CSRF token).
+
+![Task5](img/wk05-5.1.png)
+
+![Task5](img/wk05-5.2.png)
+
+![Task5](img/wk05-5.3.png)
+
+![Task5](img/wk05-5.4.png)
+
+![Task5](img/wk05-5.5.png)
+
+Cookie hardening alone does not fully prevent CSRF because the server does not check for a CSRF token before accepting the POST request. SameSite=Strict prevents the session cookie from being sent cross-site, but the request itself can still reach and be processed by the server.
 
 ## Part 4 — Reflection
 
