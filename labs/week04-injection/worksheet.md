@@ -214,3 +214,7 @@ I verified this exact code against the running fixed app: `/ping?host=127.0.0.1;
 
 **Verified result:** I ran the corrected code (identical to `solution_app.py` L69–78) and re-fired the exploit `/ping?host=127.0.0.1;id` → **`invalid host` (HTTP 400)**. The command-injection exploit now fails, so the prompt produced a correct, secure fix.
 *Graded on the prompt's precision and your verification — this trains problem decomposition and AI literacy (Denny et al. 2024).*
+
+
+Commit Link (PR)
+https://github.com/nutthakorn7/software-security/pull/93
