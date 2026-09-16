@@ -16,7 +16,7 @@
 
 ## Part 2 — Lecture Questions
 
-Answer in 2–4 sentences each.
+Answer in 2–4 sentences each.
 
 1. Why does a **parameterized query** (`execute(sql, (params,))`) defeat SQL injection, while string formatting (`"... '%s'" % user`) does not? Reference how the database treats data vs. code.
     - A parameterized query keeps the SQL command and the user input separate. The database treats the parameter as data only, so characters such as ', --, or OR cannot become SQL code. With string formatting, the user input is inserted directly into the SQL statement, so malicious input can change the query structure and cause SQL injection.
@@ -139,7 +139,7 @@ The endpoint uses shell=True with user input, so characters such as ; allow an a
   cropped window carries nothing that identifies you, and the lab's own output is
   byte-identical for the whole cohort *by design*, so the stamp is the only thing that makes
   the shot yours. Generic or borrowed evidence is not accepted.
-- **Personalized flag (if this lab issues one):** ____________________
+- **Personalized flag (if this lab issues one):** FLAG{sqli_demo}
   *Flags are unique per student — submitting another student's flag is a violation. How to submit: **learn.zcr.ai/submit** (full guide: `SUBMISSION.md` in the repo root).*
 - **Explain in your own words** *(graded on your reasoning, not copied text):*
   1. What did you do, and **why did the vulnerability work**?
