@@ -211,3 +211,7 @@ I verified the correct version against the running `fixed_app.py`: a stored `<sc
 
 **Verified result:** I ran the fix equivalent to `fixed_app.py` L25–34/L10–14 and re-fired a stored `<script>alert(1)</script>` comment against `/comments` → the response now renders `&lt;script&gt;...` as literal text (no `alert` fires) and carries `Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none'`. The stored-XSS exploit fails, so the prompt produced a correct, secure fix.
 *Graded on the prompt's precision and your verification — this trains problem decomposition and AI literacy (Denny et al. 2024).*
+
+
+Link of PR
+https://github.com/nutthakorn7/software-security/pull/94
