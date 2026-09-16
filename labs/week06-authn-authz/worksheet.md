@@ -73,8 +73,11 @@ Confirm `/api/orders/1` returns alice's Laptop order. *Deliverable: screenshot o
   curl -s http://localhost:8080/api/orders/1 -H "Authorization: Bearer $TOKEN"   # yours
   curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $TOKEN"   # bob's — leaks!
   ```
+
+  ![alt text](image.png)
+  ![alt text](image-1.png)
 - *Deliverable:* both responses + screenshot of bob's `Phone` order + why the missing ownership check (CWE-639) is the root cause.
-- **Answer (simple & short):** I sent alice's token to both order ids. `/api/orders/1` returned `{"owner": "alice", "item": "Laptop", "total": 1200}` — that's mine. `/api/orders/2` still returned data even though I'm not bob: `{"owner": "bob", "item": "Phone", "total": 800, "note": "FLAG{idor_demo}"}` — the flag leaked. It works because `get_order` (L63) calls `current_user()` but never checks `order["owner"] == me` (CWE-639). *Mitigation:* deny-by-default — reject the request server-side when the order's owner ≠ the token's subject, exactly as `solution_app.py` L64 does (`if order["owner"] != user: return 403`).
+- **Answer (simple & short):** I sent alice's token to both order ids. `/api/orders/1` returned `{"owner": "alice", "item": "Laptop", "total": 1200}` — that's mine. `/api/orders/2` still returned data even though I'm not bob: `{"owner": "bob", "item": "Phone", "total": 800, "note": "FLAG{idor_demo}"}` — the flag leaked. It works because `get_order` (L63) calls `current_user()` but never checks `order["owner"] == me` (CWE-639). *Mitigation:* deny-by-default — reject when the order's owner ≠ the token's subject, exactly as `solution_app.py` L64 does (`if order["owner"] != user: return 403`).
 
 ```sim
 jwt-forge
@@ -91,10 +94,10 @@ jwt-forge
   )
   curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $FORGED"
   ```
+
+  ![alt text](image-2.png)
 - *Deliverable:* the forged token + screenshot of the accepted response + explanation of the `none` flaw (CWE-347).
-- **Answer (simple & short):** I forged an **unsigned** token with `jwt.encode({"sub": "bob"}, key="", algorithm="none")` — the header says `"alg":"none"` and there is **no signature** at all:
-  `eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJib2IifQ.`
-  Sending it as `Authorization: Bearer` to `/api/orders/2` returned bob's order: `{"owner": "bob", "item": "Phone", "total": 800, "note": "FLAG{idor_demo}"}`. The **`none` flaw (CWE-347)** is that `current_user()` (L48–58) trusts the token's own header: if it sees `"none"` (L54) it decodes the token with `verify_signature: False` (L55), i.e. it skips signature checking entirely. So a token is signed by *nobody* yet still accepted — meaning any attacker can set `sub` to any user (here bob) with zero secret. *Fix:* never list `"none"` in the allowed algorithms and always require a real signature.
+- **Answer (simple & short):** I forged an **unsigned** token with `jwt.encode({"sub": "bob"}, key="", algorithm="none")` — the header says `"alg":"none"` and there is **no signature** at all. Sending it as `Authorization: Bearer` to `/api/orders/2` returned bob's order: `{"owner": "bob", "item": "Phone", "total": 800, "note": "FLAG{idor_demo}"}`. The **`none` flaw (CWE-347)** is that `current_user()` (L48–58) trusts the token's own header: if it sees `"none"` (L54) it decodes with `verify_signature: False` (L55) — signature checking is skipped entirely. So a token signed by *nobody* is accepted, meaning an attacker can set `sub` to any user (here bob) with zero secret. *Fix:* never list `"none"` in the allowed algorithms; always require a real signature.
 
 **Task 3 — JWT Forgery via weak secret (30 min) 🔏.**
 - *Goal:* sign a *valid* HS256 token because the secret is the guessable string `secret` (CWE-321).
@@ -107,8 +110,10 @@ jwt-forge
   )
   curl -s http://localhost:8080/api/orders/2 -H "Authorization: Bearer $FORGED2"
   ```
+
+  ![alt text](image-3.png)
 - *Deliverable:* token + screenshot + 2–3 sentences on why secret strength + key management matter.
-- **Answer (simple & short):** I signed a *real* HS256 token with the same secret the server uses: `jwt.encode({"sub": "bob"}, "secret", algorithm="HS256")`. Because the secret is the hardcoded string `"secret"` (L9), I can mint a token that's byte-for-byte as valid as bob's, and it was accepted — `/api/orders/2` returned `{"owner": "bob", "item": "Phone", "total": 800, "note": "FLAG{idor_demo}"}`. This is a **weak hardcoded key (CWE-321)**: it's sitting in the source, and it's only 6 bytes (pyjwt even warns it's under the 32-byte minimum), so it's trivially guessable. *Fix:* never hardcode secrets — use a strong random one from the environment (L10).
+- **Answer (simple & short):** I signed a *real* HS256 token with the same secret the server uses: `jwt.encode({"sub": "bob"}, "secret", algorithm="HS256")`. Because the secret is the hardcoded string `"secret"` (L9), I can mint a token that's byte-for-byte as valid as bob's, and it was accepted — `/api/orders/2` returned `{"owner": "bob", "item": "Phone", "total": 800, "note": "FLAG{idor_demo}"}`. This is a **weak hardcoded key (CWE-321)**: it's sitting in the source, and it's only 6 bytes (pyjwt even warns it's below the 32-byte minimum), so it's trivially guessable. *Fix:* never hardcode secrets — use a strong random one from the environment (L10).
 
 **Task 4 — Privilege/identity escalation reasoning (25 min).**
 - *Goal:* combine the flaws. Using Task 2/3 you became `bob` *without his password*; using Task 1 you read objects you don't own.
@@ -123,13 +128,17 @@ jwt-forge
   docker compose run --rm --service-ports authz-lab bash -c "pip install --no-cache-dir flask pyjwt && python solution_app.py"
   ```
   Re-run: get a fresh alice token, then re-fire each attack. Expected: `/api/orders/2` with alice's token → **403 forbidden** (ownership check, L64); the `alg:none` token → **401 invalid token** (algorithm pinned to HS256, L50); the `"secret"` token → **401** (strong random secret + required `aud`/`exp`, L10/40).
+
+  ![alt text](image-4.png)
+  ![alt text](image-5.png)
+
 - *Deliverable:* screenshots of the 403 and both 401s + name the fix line for each.
 - **Answer (simple & short):** With `solution_app.py` running the same attacks now fail: alice's valid token to `/api/orders/2` → **403 forbidden** (ownership check, **L64**); the `alg:none` unsigned token → **401 invalid token** (algorithm pinned to HS256, **L50**); the `"secret"`-signed token → **401** (real secret is random at **L10**, and `aud`/`exp` are required at **L50/40**). So all three Task 1–3 exploits are stopped.
 
 ## Part 4 — Reflection
 
 1. **CWE/OWASP mapping:** map IDOR → **CWE-639 / A01**, the JWT forgeries → **CWE-347 & CWE-321 / A07**.
-   - IDOR (reading `/api/orders/2` I don't own) → **CWE-639** under **A01 Broken Access Control**. The `alg:none` and weak-secret forgeries → **CWE-347** (signature not verified, or weak signature) and **CWE-321** (hardcoded key), both under **A07 Authentication Failures**.
+   - IDOR (reading `/api/orders/2` I don't own) → **CWE-639** under **A01 Broken Access Control**. The `alg:none` and weak-secret forgeries → **CWE-347** (signature not verified / weak signature) and **CWE-321** (hardcoded key), both under **A07 Authentication Failures**.
 2. **Real breach:** the **2022 Optus breach** exposed millions of customer records via an exposed/poorly-authorized API endpoint where identifiers could be enumerated — a textbook broken-access-control / IDOR-style failure. In 3–4 sentences connect it to Tasks 1 and 4 of this lab. *(Alternative: the Peloton API IDOR disclosure.)*
    - Optus leaked because an API let anyone pull records by enumerating customer IDs — the same way Task 1 let me walk `oid=1,2` and read bob's order. The breach also showed that being authenticated wasn't enough; you still have to check access on every item. That's exactly Task 4's point: once I forged a token (became bob), I could enumerate every object. The lesson is that a weak auth layer on top of no per-object authorization leaks everything.
 3. **Best mitigation:** between deny-by-default ownership checks, pinning the JWT algorithm, and a strong managed secret, which control protects the most attack surface here, and why is server-side authorization non-negotiable?
@@ -190,3 +199,7 @@ AI is a power tool you must **distrust** — you are graded on your *critique*, 
 > "Fix the Flask `/api/orders/<int:oid>` route: it authenticates with `current_user()` but forgets to check ownership, so any logged-in (or forged) user can read any order (IDOR, CWE-639). Return the corrected route that (1) keeps the authenticated user, (2) adds a deny-by-default owner check returning 403 when `order['owner'] != user`, and (3) verifies the JWT with a pinned algorithm (only HS256) plus required `exp`/`aud` so forged unsigned tokens are rejected."
 **Verified result:** Running this fix (equivalent to `solution_app.py` L50/L64): `/api/orders/2` with alice's token → **403**, the `alg:none` unsigned token → **401**, and the weak-`"secret"` token → **401**. The IDOR and both forgeries fail, so the prompt produced a correct, secure fix.
 *Graded on the prompt's precision and your verification — this trains problem decomposition and AI literacy (Denny et al. 2024).*
+
+
+Github PR
+https://github.com/nutthakorn7/software-security/pull/95
