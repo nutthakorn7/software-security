@@ -5,6 +5,8 @@
 
 > Submit per challenge: the **flag** (or noted proof), the **payload/command**, and a **one-line mitigation**. Difficulty rises with points. (The graded project demo is scored separately — see the [project rubric](../../project/README.md).)
 
+**Targets — graded flags come from *your own* instance in the hosted CTFd** (account + WireGuard VPN setup: [arena-vpn-guide](../../docs/arena-vpn-guide.md)) for challenges 1–6 and 11. Challenges 7–10 and 12 use the lab folders locally. Running a lab folder locally (`docker compose up`) is practice only: it serves public demo flags (`FLAG{..._demo}`), which are not a valid submission for a challenge that has a hosted instance.
+
 ![A two-column exam blueprint showing the 150-point capstone CTF split across six categories on the left, feeding via a funnel into the seven-step term project demo pipeline on the right, with the flag-payload-mitigation submission format tying the two halves together.](img/capstone-map.svg)
 
 | # | Title | Topic / target | Pts |

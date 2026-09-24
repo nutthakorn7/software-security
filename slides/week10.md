@@ -165,7 +165,7 @@ Local API, `docker compose up` → :8080 (vulnerable) / :8081 (fixed):
 - Proof exploits now fail
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
-<!-- Before/after + API-Top-10 mapping. AI-resilient tasks count. Also the NoteVault project API task. Both flags come from the local target — remind students crAPI capture isn't part of the deliverable. -->
+<!-- Before/after + API-Top-10 mapping. AI-resilient tasks count. Also the NoteVault project API task. Both flags come from the local target (public demo values — practice, not attributable) — remind students crAPI capture isn't part of the deliverable. -->
 
 ---
 

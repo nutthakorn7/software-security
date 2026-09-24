@@ -105,13 +105,14 @@ through, the crAPI raid is their extension.
 | Worksheet 10, Parts 2–4 | Payloads, raw responses / HTTP status, screenshots, fix lines, written answers | K1–K3, P1–P4, A2 | Part of the 30% worksheet component |
 | Weekly quiz (start of lecture) | Quiz score | K1–K2 | Part of the 10% quiz/participation component |
 | Viva spot-check / micro-demo | Live reproduction and explanation | P1–P4, A2 | Pass/flag for follow-up |
-| Per-student flag | Flag value tied to the individual student | A2 | Integrity control, not a mark |
+| Per-student flag (hosted instances only) | Flag value tied to the individual student; a local run serves a public demo value | A2 | Integrity control, not a mark |
 
 The worksheet's own rubric (100 pts) weights it as: Lecture questions (Part 2) 20 · Exploitation +
 evidence (Tasks 1–4) 40 · Defense (Task 5, fixes mapped to `solution_api.py`) 25 · Reflection
-(Part 4) 15. Per-student flags for this lab are seeded through the `FLAG_BOLA` / `FLAG_MASSASSIGN`
-environment variables (see the instructor note in `docker-compose.yml`); flag values are never
-printed here. Partial credit is available where a student explains the mechanism correctly but could
+(Part 4) 15. The lab's flags come from the `FLAG_BOLA` / `FLAG_MASSASSIGN` environment variables; a local
+run falls back to the public `…_demo` defaults (practice), and per-student, attributable flags exist
+only on hosted `w10-bola` / `w10-massassign` instances (whether Week 10 sends students there: ⬚);
+flag values are never printed here. Partial credit is available where a student explains the mechanism correctly but could
 not land the exploit.
 
 ## 7. Materials
@@ -132,7 +133,7 @@ not land the exploit.
 | Re-running the Task 3 `:8081` loop looks "broken" | The limiter is `RATE_LIMIT=5 / RATE_WINDOW=60`: a second run of the loop *inside the same 60-second window* returns `429` from the first attempt, not `401`×5 then `429`. Wait out the 60 s, or restart the `solution-api` container, before demonstrating the clean `401 401 401 401 401 429 429` sequence |
 | Need to reset seeded state between attempts | `USERS`, `ORDERS` and the rate-limiter counters are all in-memory — `docker compose restart` (or `down`/`up`) clears the mallory account from Task 2 and the login attempts from Task 3 back to the seeded three users |
 | Optional crAPI bonus needs network + a large pull | Task 4 clones and pulls a multi-container stack from the internet; if the room network is slow, skip it (it is optional) and grade against the local `:8080` / `:8081` pair. Pull crAPI ahead of class if you plan to demo it |
-| Copy-paste of a classmate's evidence | Per-student flags (`FLAG_BOLA` / `FLAG_MASSASSIGN`, seeded via the instructor script referenced in `docker-compose.yml`) make submitted evidence attributable; viva spot-check the pair |
+| Copy-paste of a classmate's evidence | Local flags are the public `…_demo` defaults, so they attribute nothing (per-student flags exist only on hosted instances); rely on identity-stamped evidence and viva spot-check the pair |
 
 ## 9. Post-teaching reflection
 

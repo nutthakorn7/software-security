@@ -9,10 +9,9 @@
 
 ![A CTF scoreboard diagram showing the Week 9 midterm practical's four graded categories, their point weights, source labs, the mechanism each flag actually tests, and their link to the Week 8 written exam sections.](img/ctf-categories.svg)
 
-**Targets (started by the instructor):**
-- Injection / Auth: `labs/week04-injection` and `labs/week06-authn-authz` apps (`docker compose up`)
-- XSS: `labs/week05-xss-client-side` app
-- Crypto: `labs/week03-cryptography` (`hashes.txt`, the ECB oracle)
+**Targets — your flags come from *your own* instance in the hosted CTFd (account + WireGuard VPN setup: [arena-vpn-guide](../../docs/arena-vpn-guide.md)):**
+- All 7 challenges: spawn your own instance of each in CTFd. The flag you submit must come from **your** instance.
+- Running the lab folders locally (`docker compose up`) is **practice only**: it serves public demo flags (`FLAG{..._demo}`), which are not a valid submission.
 
 ---
 
