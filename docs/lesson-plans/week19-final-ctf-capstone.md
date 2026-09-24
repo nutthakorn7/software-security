@@ -8,7 +8,7 @@
 | **Lab folder** | `labs/week19-final-ctf-capstone` — holds `README.md` and `ctf.md` (the student paper); it ships no target of its own |
 | **Slides** | `slides/week19.md` — proctor/compère deck, not a teaching deck |
 | **Covers** | The whole term (`ctf.md`, *Covers*): web, API, supply chain, cloud, memory safety and LLM/agentic challenges (`labs/week19-final-ctf-capstone/README.md`) |
-| **Targets** | `labs/week04-injection` · `labs/week05-xss-client-side` · `labs/week06-authn-authz` · `labs/week10-api-security` · `labs/week11-memory-safety-exploitation` · `labs/week12-supply-chain` · `labs/week13-cloud-container` · `labs/week14-ai-llm-security` (the week named against each challenge in `ctf.md`) · `project/starter-app` for the demos |
+| **Targets** | `labs/week04-injection` · `labs/week05-xss-client-side` · `labs/week06-authn-authz` · `labs/week10-api-security` · `labs/week11-memory-safety-exploitation` · `labs/week12-supply-chain` · `labs/week13-cloud-container` · `labs/week14-ai-llm-security` (the week named against each challenge in `ctf.md`) · `project/starter-app` for the demos. **Graded flags for challenges 1–6 and 11 come from hosted instances at `ctf.zcr.ai` (§3.1); the local lab folders are practice copies for those, and the only targets for challenges 7–10 and 12, which have no hosted instance** |
 | **Standards** | The ids the source weeks' READMEs attach: **A05** Injection · CWE-89, CWE-78 (W4) · **A05** Injection · CWE-79, CWE-352 (W5) · **A01** Broken Access Control, **A07** Authentication Failures · CWE-639, CWE-287 (W6) · **API1** BOLA, **API3** broken object property level auth (mass assignment), **API4** unrestricted resource consumption (W10) · CWE-787, CWE-121, CWE-416, CWE-134, CWE-193 (W11) · **A03** Software Supply Chain Failures, **A08** Software or Data Integrity Failures · CWE-1104, CWE-829 (W12) · **A02** Security Misconfiguration · CWE-732, CWE-16 (W13) · **LLM01** Prompt Injection, **LLM02** Sensitive Info Disclosure, **LLM05** Improper Output Handling, **LLM06** Excessive Agency, **LLM08** Vector/Embedding Weaknesses, **LLM10** Unbounded Consumption (W14) |
 | **CLOs addressed** | **CLO2** exploit · **CLO3** remediate · **CLO5** evaluate & communicate · **CLO6** evidence & ethics (course specification §6, row 19) |
 
@@ -93,16 +93,30 @@ identity-stamped evidence and the live viva carry **CLO6**.
 
 ### 3.1 What this sitting actually runs on
 
-- **Student machines, local Docker.** "All lab targets run locally in Docker" on the student's own
-  machine; no cloud account for the core labs (course specification §1, §10). Solving does not
-  depend on the campus network — but *starting* the targets does (§3.4, §9).
+- **Graded flags come from the hosted platform (challenges 1–6 and 11).** Each student spawns their
+  **own** instance of these challenges in the course's hosted CTFd (`ctf.zcr.ai`, container-spawning
+  plugin). The platform issues that student a flag per challenge — an HMAC of student ID + challenge
+  key with the cohort salt (`airsec_flag_bridge`) — so a flag can be traced to the student it was
+  issued to and cannot be read off the student's own machine. Challenge 6 is two hosted images
+  (`w10-bola`, `w10-massassign`). The hosted instances are reached over the network, so solving them
+  depends on it (§3.3, §9). How the members of a team spawn instances and which flag the team
+  submits: ⬚ (§3.3).
+- **Challenges 7–10 and 12 have no hosted instance.** They run from the local lab folders on the
+  student's own machine — "all lab targets run locally in Docker" (course specification §1, §10) —
+  and are attributed by evidence and viva, not by flag (§3.2).
+- **Local Docker is practice for challenges 1–6 and 11.** With no `.env` the compose files serve
+  the public `…_demo` flags. Do **not** plan graded flags around giving each student a per-student
+  `.env`: the student owns the machine and the file, so `cat .env` / `docker exec … env` reveals the
+  flag before any exploitation.
 - **No new target ships this week.** `labs/week19-final-ctf-capstone/` contains only `README.md`
-  and `ctf.md`; every challenge points at an existing lab folder, and the demos run each team's own
-  project repository plus `project/starter-app` (NoteVault).
-- **CTFd is the scoreboard, not the grade.** `instructor/CTFd-SETUP.md` is explicit: the flags in
-  `instructor/ctfd/challenges.yml` are shared/static placeholders (a `_XXXX` suffix to rotate per
-  cohort), and CTFd is the engagement arena; graded integrity uses the per-student flags from
-  `seed_flags.py`. CTFd runs on `http://localhost:8000` (`CTFd-SETUP.md` §1).
+  and `ctf.md`; every challenge points at an existing lab folder or a hosted challenge, and the
+  demos run each team's own project repository plus `project/starter-app` (NoteVault).
+- **CTFd's scoreboard is engagement, not the grade.** `instructor/CTFd-SETUP.md` is explicit: the
+  flags in `instructor/ctfd/challenges.yml` are shared/static placeholders (a `_XXXX` suffix to
+  rotate per cohort), and the board is the engagement arena; marks come from the answer key applied
+  to the submission of record. Graded integrity uses the per-student flags issued by the hosted
+  instances, tabulated and resolved with `seed_flags.py` (§3.2). The course's CTFd is hosted at
+  `ctf.zcr.ai`; `CTFd-SETUP.md` §1 documents a local one on `http://localhost:8000`.
 - **The two point systems are not the same board.** The paper (`ctf.md`) is 12 challenges / 150 pts
   with fixed values. `challenges.yml` is dynamic (`initial: 500`, `minimum: 100`, `decay: 15`),
   values 200–500, splits "Raid the API" into *"crAPI Raid: BOLA"* and *"crAPI Raid: Mass
@@ -112,19 +126,24 @@ identity-stamped evidence and the live viva carry **CLO6**.
   `slides/week19.md`'s speaker note says to run the tournament "from `ctf.md` + `exams/item-bank.md`
   (CTF pool, incl. the boss chain)". Decide before the day which board students are told is
   authoritative; the graded instrument is the paper.
-- **The spawnable platform is not in play.** `instructor/PLATFORM-ROADMAP.md` is a decision record
-  whose answer is "yes — but *not now*"; the prototype was built and torn down the same session, and
-  go-live is scoped to Apr 2027. Do not plan this sitting around it.
+- **The spawnable platform is in play — for challenges 1–6 and 11.** It is the hosted CTFd and
+  `airsec_flag_bridge` flag derivation already used for the 19 Sep 2026 Week 9 sitting, where the
+  per-student flags were verified against the issued table (38 of 40 matched; the other 2 came from
+  outside the platform).
 - **Submission of record.** "W19 Final CTF + demo — flags via Form; live project demo (graded by
   rubric)" ([SUBMISSION.md](../../SUBMISSION.md), *Exams*). `ctf.md`'s own submission table is the
   paper form of the same three columns.
 
-### 3.2 Per-student flag seeding — and where it does not reach
+### 3.2 Per-student flags — hosted platform, and where it does not reach
+
+The instructor-side tooling is still used for the **table and for attribution at marking** (the hosted
+platform derives its flags from the same salt, so `verify` resolves them). It is **not** how students
+get graded flags: students never had `instructor/`, and a `.env` in a student's own copy is readable
+by that student.
 
 ```bash
 export FLAG_SALT='<this cohort's salt — never published>'   # instructor/anti-cheating.md §A
 python3 instructor/seed_flags.py gen students.txt -o flags.csv     # authoritative table
-python3 instructor/seed_flags.py env <STUDENT_ID> > .env           # in the lab folder that uses it
 python3 instructor/seed_flags.py verify 'FLAG{...}' students.txt   # who was this issued to?
 ```
 
@@ -133,33 +152,39 @@ sibling `KOSEN69 - curriculum` monorepo — without it, it exits with
 `ERROR: curriculum monorepo not found at …` and generates nothing. The challenge-key vocabulary now
 comes from that monorepo's `courses/software-security.yml`.
 
-**Which of the twelve are actually attributable** (verified against the compose files, the app
-source and the course manifest — not assumed):
+**Which of the twelve have a hosted, per-student instance** (challenge titles as on the paper; the
+hosted images are the platform's spawnable challenges):
 
-| # | Challenge | Flag key | Seeded how | Attributable per student? |
+| # | Challenge | Flag key | Hosted image | Attributable per student? |
 |---|---|---|---|---|
-| 1 | Boolean Bypass | `sqli` | `labs/week04-injection` compose passes `FLAG_SQLI` | **Yes** |
-| 2 | Shell Out | `cmdi` | same compose passes `FLAG_CMDI` | **Yes** |
-| 3 | Persistent Pop | `xss` | `labs/week05-xss-client-side` compose has *no* `environment:` block | **No** |
-| 4 | Not Your Object | `idor` | `labs/week06-authn-authz` compose passes `FLAG_IDOR` | **Yes** |
-| 5 | Token Smith | `jwt` | same compose passes `FLAG_JWT` | **Yes** |
-| 6 | Raid the API | `bola`, `massassign` | `labs/week10-api-security` compose passes both; read at `vulnerable_api.py:15–16` | **Yes** |
-| 7 | Smash | `pwn` | `vuln.c:47` reads `getenv("FLAG_PWN")` — but W11 ships **no compose**; students `make` natively | **Only if `FLAG_PWN` is exported in the shell** |
-| 8 | Fuzz First | `fuzz` | no target env at all | **No** |
-| 9 | Bad Dependency | `supplychain` | W12 is scripts + Dockerfile, no compose, no env | **No** |
-| 10 | Misconfig Hunt | `misconfig` | W13 is Dockerfiles + IAM JSON, no compose, no env | **No** |
-| 11 | Jailbreak the Bot | `promptinj` | `labs/week14-ai-llm-security` compose passes `FLAG_PROMPTINJ` to both services | **Yes** |
-| 12 | Indirect Hit | `indirect` | no target env | **No** |
+| 1 | Boolean Bypass | `sqli` | `w04-sqli` | **Yes** — hosted instance |
+| 2 | Shell Out | `cmdi` | `w04-cmdi` | **Yes** — hosted instance |
+| 3 | Persistent Pop | `xss` | `w05-xss` | **Yes** — hosted instance (the local `labs/week05-xss-client-side` compose has *no* `environment:` block and never served per-student flags) |
+| 4 | Not Your Object | `idor` | `w06-idor` | **Yes** — hosted instance |
+| 5 | Token Smith | `jwt` | `w06-jwt` | **Yes** — hosted instance |
+| 6 | Raid the API | `bola`, `massassign` | `w10-bola`, `w10-massassign` | **Yes** — hosted instance |
+| 7 | Smash | `pwn` | — none — | **No** — `vuln.c:47` reads `getenv("FLAG_PWN")`, but W11 ships **no compose** and students `make` and run it themselves, so any value they are told to export is theirs to read |
+| 8 | Fuzz First | `fuzz` | — none — | **No** — no target env at all |
+| 9 | Bad Dependency | `supplychain` | — none — | **No** — W12 is scripts + Dockerfile, no compose, no env |
+| 10 | Misconfig Hunt | `misconfig` | — none — | **No** — W13 is Dockerfiles + IAM JSON, no compose, no env |
+| 11 | Jailbreak the Bot | `promptinj` | `w14-promptinj` | **Yes** — hosted instance |
+| 12 | Indirect Hit | `indirect` | — none — | **No** — no target env |
 
-The course manifest says this in as many words: `xss`, `crack`, `ecb`, `fuzz`, `supplychain`,
-`misconfig`, `indirect` and `boss` are listed under `extra_challenge_keys` and described there as
-*"Static/manually-graded CTFd-only challenges with no attributable per-lesson lab"*. So **five of
-twelve challenges (3, 8, 9, 10, 12) are not per-student by construction, and a sixth (7) only
-becomes so if the student exports the variable by hand.** Plan their attribution around
-identity-stamped evidence, the method note and the viva (§6) — not around the flag.
+The course manifest lists `xss`, `crack`, `ecb`, `fuzz`, `supplychain`, `misconfig`, `indirect` and
+`boss` under `extra_challenge_keys`, described there as *"Static/manually-graded CTFd-only challenges
+with no attributable per-lesson lab"*. Read that as a statement about the **local** labs: `xss`
+(`w05-xss`), `ecb` (`w03-ecb`) and `boss` (`notevault`) have hosted instances — only `xss` is on this
+paper — while `fuzz`, `supplychain`, `misconfig`, `indirect` — and `pwn` — do not. So **seven of twelve challenges (1–6 and 11) are attributable per student through hosted
+instances, and five (7, 8, 9, 10, 12) are not.** Plan the five's attribution around
+identity-stamped evidence, the method note and the viva (§6) — not around the flag. The seven are
+attributable per *student*, not per team: which member's flag a team submits is ⬚ (§3.3).
 
-**Pre-flight, in each of the four seeded folders.** `docker compose config` must show a *value* for
-each `FLAG_*`. Checked with no `.env` present, all four render `null`:
+**Pre-flight (the day before).** Spawn each hosted challenge on the paper (1–6 and 11 — eight images,
+since challenge 6 is two) once as a test student and check that the flag it returns resolves with
+`seed_flags.py verify` **using the same salt** (§3.4).
+
+**The local copies serve demo flags — practice only.** In the four local folders below, with no `.env`
+present, `docker compose config` renders `null` (checked):
 
 ```
 labs/week04-injection        FLAG_CMDI: null        FLAG_SQLI: null
@@ -168,12 +193,14 @@ labs/week10-api-security     FLAG_BOLA: null        FLAG_MASSASSIGN: null
 labs/week14-ai-llm-security  FLAG_PROMPTINJ: null   (both services)
 ```
 
-When that happens the variable never reaches the container and the app serves the placeholder
-committed in its source. W4/W6/W10 fall back to a `_demo`-suffixed `FLAG{...}` value; W14 instead
-falls back to the fixed placeholder `FLAG{pr0mpt_1nj3ction_l34ks_s3cr3ts}` (`vulnerable_chatbot.py`,
-`guarded_chatbot.py`) — check `docker compose config` for `FLAG_PROMPTINJ: null` rather than relying
-on the string shape for that one. **A placeholder flag arriving on a submission
-sheet means seeding failed, not that the team cheated.**
+The variable then never reaches the container and the app serves the placeholder committed in its
+source. That is the intended practice behaviour, not something to fix. W4/W6/W10 fall back to a
+`_demo`-suffixed `FLAG{...}` value; W14 instead falls back to the fixed placeholder
+`FLAG{pr0mpt_1nj3ction_l34ks_s3cr3ts}` (`vulnerable_chatbot.py`, `guarded_chatbot.py`) — check
+`docker compose config` for `FLAG_PROMPTINJ: null` rather than relying on the string shape for that
+one. **A demo/placeholder flag arriving on a submission sheet means the student worked on a local
+copy, not that the team cheated** — it is public, so it proves nothing either way; ask which
+instance they used before anything else.
 
 ### 3.3 Teams, room, network, machines
 
@@ -181,32 +208,38 @@ sheet means seeding failed, not that the team cheated.**
   scrimmage that previews it says "Teams of 2–4" (`labs/week16-capstone/scrimmage.md`). Project
   teams are 2–3 (`project/README.md`). `instructor/CTFd-SETUP.md` §5 is explicit that "the graded
   project teams of 2–3 are *not* CTFd teams … CTFd's single team layer **is** the House". Fix and
-  announce the competing unit before the day: ⬚. It determines whose `.env` a team's targets are
-  built from, and how one team score is entered against several students (§5).
+  announce the competing unit before the day: ⬚. It determines which members spawn hosted instances
+  and whose flag a team submits for each challenge (the platform issues flags per student — ⬚ how a
+  team handles that), and how one team score is entered against several students (§5).
 - **Sharing inside a team is permitted; per-student flags therefore detect *cross-team* sharing
   only.** This is the opposite of the Week 9 individual sitting and changes what §6 can promise.
 - Room / seating / invigilator count / demo room(s): ⬚ (not recorded in this repository).
 - Students work on their own machines; "phones away; one device" (`instructor/anti-cheating.md` §C).
-- Network is needed for image pulls, `pip install` at container start-up, Trivy's vulnerability
-  database, Cosign's OIDC flow and the submission Form — **not** for solving once targets are up.
+- Network is needed **throughout** for the hosted challenges (1–6 and 11): the instances are reached
+  over it, as is the submission Form. Have every student log in to CTFd and spawn a first instance
+  **before the clock starts** (§4). It is also needed for image pulls and `pip install` at start-up
+  of the local copies, Trivy's vulnerability database and Cosign's OIDC flow.
 - The class size the timetable assumes is N≈80–120 (`AGENDA.md`) — see the demo-throughput
   arithmetic in §9, which needs a decision *before* the day.
 
 ### 3.4 Test the day before
 
-- [ ] **Team unit fixed and announced** (§3.3), and the flag-planting model chosen and recorded
-      (`instructor/anti-cheating.md` §A: local build per student, or instructor-seeded).
-- [ ] `docker pull python:3.12-slim` — the base image W4, W5, W6, W10 and W14 all use.
-- [ ] Bring each web target up **once, one at a time** (they collide on 8080 — §9) and confirm it
-      answers: W4, W5, W6 and W10's `vulnerable-api` on `http://localhost:8080`; W10's
-      `solution-api` on `http://localhost:8081`; W14's chatbots on `http://localhost:6000` and
-      `http://localhost:6001`.
-- [ ] `docker compose config` in `labs/week04-injection`, `labs/week06-authn-authz`,
-      `labs/week10-api-security` and `labs/week14-ai-llm-security` shows real `FLAG_*` values, not
-      `null` (§3.2).
-- [ ] `python3 instructor/seed_flags.py verify '<one issued flag>' students.txt` resolves to the
-      right student, **using the same salt** that `gen` ran with. Run `gen` the day before, not on
-      the morning — the shim needs the sibling monorepo (§3.2).
+- [ ] **Team unit fixed and announced** (§3.3), and how a team submits flags issued to individual
+      students decided and recorded: ⬚.
+- [ ] **Hosted platform up for the cohort.** Every student has a CTFd account and can spawn and
+      reach an instance (connection steps: ⬚); each hosted challenge on the paper (1–6 and 11)
+      spawns (§3.2 pre-flight). A shared instance that issues one flag to everyone makes the
+      per-student flags decorative.
+- [ ] Local copies — practice, and the targets for challenges 7–10 and 12: `docker pull
+      python:3.12-slim`, the base image W4, W5, W6, W10 and W14 all use.
+- [ ] Local copies, if used: bring each web target up **once, one at a time** (they collide on
+      8080 — §9) and confirm it answers: W4, W5, W6 and W10's `vulnerable-api` on
+      `http://localhost:8080`; W10's `solution-api` on `http://localhost:8081`; W14's chatbots on
+      `http://localhost:8082` and `http://localhost:8083`. They serve `…_demo` flags and are **not**
+      graded targets for challenges 1–6 and 11.
+- [ ] `python3 instructor/seed_flags.py verify '<flag a hosted instance issued to a test student>'
+      students.txt` resolves to the right student, **using the same salt** that `gen` ran with. Run
+      `gen` the day before, not on the morning — the shim needs the sibling monorepo (§3.2).
 - [ ] `python3 instructor/check_flag_keys.py` exits 0 (flag-key vocabulary in sync across the
       manifest, the deployment whitelist, the challenge CSV and `ctfd/challenges.yml`).
 - [ ] **W11 builds on the machines in the room.** `make` in `labs/week11-memory-safety-exploitation`
@@ -221,7 +254,7 @@ sheet means seeding failed, not that the team cheated.**
 - [ ] **Cosign is not an offline step.** `sign.sh`'s own note: "keyless signing needs a browser/OIDC
       flow and registry push access; in class this is a guided demo, not an offline step". Do not
       make a challenge or a demo depend on live signing succeeding in the room.
-- [ ] CTFd (if in use) up on `:8000`, challenges imported with this cohort's rotated flag suffixes,
+- [ ] CTFd (`ctf.zcr.ai`) up, challenges imported with this cohort's rotated flag suffixes,
       dynamic scoring and first-blood on, scoreboard **frozen** for the window
       (`CTFd-SETUP.md` §3–§4).
 - [ ] Submission Form open/close times set, with the settings from `instructor/anti-cheating.md` §C
@@ -241,15 +274,16 @@ tournament, `2:30–4:00` graded final project demos.
 
 | Time | Block | Instructor does | Students do |
 |---|---|---|---|
-| 0:00–0:10 *(inside the 150)* | **Briefing + target check** | Run `slides/week19.md`: the two parts, the 150-minute window, the submit format (flag/proof + payload/command + one-line mitigation), the rules (provided targets only, one submission per team per challenge, document method), that flags are per-student where they exist and copying across teams is traceable, and the **port-8080 warning** (below). Confirm Docker works across the room | Stand their targets up; report anything that will not start **now**, not at 1:00 |
-| 0:10–2:30 | **Competition window** | Invigilate; answer environment questions only, not challenge questions; announce first bloods aloud for hype (`slides/week19.md`); watch for placeholder flags (§3.2) | Solve challenges 1–12 in any order; fill the three columns per challenge as they go |
+| 0:00–0:10 *(inside the 150)* | **Briefing + target check** | Run `slides/week19.md`: the two parts, the 150-minute window, the submit format (flag/proof + payload/command + one-line mitigation), the rules (provided targets only, one submission per team per challenge, document method), that graded flags for challenges 1–6 and 11 are per-student and come only from **your own hosted instance** (a local run serves demo flags, which are not graded flags) and copying across teams is traceable, and, for local copies, the **port-8080 warning** (below). Confirm everyone can log in to CTFd and reach a spawned instance, and that Docker / `make` works for the local-only challenges | Log in and spawn the hosted instances they need; stand up the local targets; report anything that will not start or connect **now**, not at 1:00 |
+| 0:10–2:30 | **Competition window** | Invigilate; answer environment questions only, not challenge questions; announce first bloods aloud for hype (`slides/week19.md`); watch for demo/placeholder flags — a student on a local copy (§3.2) | Solve challenges 1–12 in any order; fill the three columns per challenge as they go |
 | 2:30 | **Submission cutoff** | Close the Form / collect the paper tables | Submit flags + payload/command + one-line mitigation |
 | 2:30–4:00 | **Graded live Q&A** | Each team gets a **3-minute live Q&A** slot; ask one or two unscripted probing questions ("why this fix and not X?", "what does this SBOM line mean?") — the built-in viva (`anti-cheating.md` §D). Confirm the CI pipeline failing on a finding was shown in the submitted video (`slides/week19.md`) rather than re-demoing it live | Per team: answer the live Q&A on the video already submitted **before** the session (graded asynchronously on the project rubric) — not a re-demo, per `labs/week19-final-ctf-capstone/README.md` |
 
-**Port warning to give in the briefing.** `labs/week04-injection`, `labs/week05-xss-client-side`,
-`labs/week06-authn-authz`, `labs/week10-api-security` (`vulnerable-api`) and
-`project/starter-app` **all publish host port 8080**. Unlike the Week 9 individual sitting, a team
-here will want several up at once. See §9 for the fix.
+**Port warning to give in the briefing (local copies only).** `labs/week04-injection`,
+`labs/week05-xss-client-side`, `labs/week06-authn-authz`, `labs/week10-api-security`
+(`vulnerable-api`) and `project/starter-app` **all publish host port 8080**. Anyone running several
+local copies at once will hit it. How hosted instances are addressed, and whether they can collide
+with these: ⬚. See §9 for the fix.
 
 **Two demands competing for the same 240 minutes, both real:**
 1. `slides/week19.md`'s closing note records that the research **post-test + post-survey happen
@@ -314,7 +348,7 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 
 | Control | How it is operated | What it catches |
 |---|---|---|
-| **Per-student flags** | `seed_flags.py gen` before the day; `verify '<flag>' students.txt` at marking | A flag submitted by one team but *issued* to a student on another — reaches challenges 1, 2, 4, 5, 6, 11 only (§3.2) |
+| **Per-student flags (hosted instances)** | Issued by the hosted platform to the student who spawned the instance; `seed_flags.py gen` before the day, `verify '<flag>' students.txt` at marking | A flag submitted by one team but *issued* to a student on another — reaches challenges 1–6 and 11 only (§3.2) |
 | **Per-team NoteVault marker** | `TEAM_ID` seeds an `hmac(TEAM_SALT, TEAM_ID)`-derived marker into the app's own data (`project/starter-app/README.md`; `anti-cheating.md` §A) | A demo, report or screenshot carrying another team's marker |
 | **Identity-stamped evidence** | Screenshots must carry the student's terminal `whoami` / login email / student ID **and** a timestamp | Borrowed or generic screenshots (`anti-cheating.md` §B) |
 | **Method note per challenge** | The payload/command + mitigation columns of `ctf.md` | A flag held without the mechanism; also the basis for partial credit |
@@ -329,15 +363,20 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 - **Sharing within a team is allowed** — that is what "team-based" means. Per-student flags here
   prove *which team* a flag reached, not which student typed it. Individual mastery is evidenced
   elsewhere in the course (worksheets, quizzes, W8/W9/W18), not by this tournament.
-- **Challenges 3, 8, 9, 10 and 12 carry no per-student flag at all**, and 7 only if `FLAG_PWN` was
-  exported (§3.2). Their attribution rests on identity-stamped evidence, the method note and the
-  demo viva — weight the spot-checks towards them.
-- A placeholder flag is a **seeding failure**, not cheating (§3.2). Check `docker compose config`
-  before accusing anyone.
+- **Challenges 7, 8, 9, 10 and 12 have no hosted instance and carry no per-student flag** (§3.2).
+  Their attribution rests on identity-stamped evidence, the method note and the demo viva — weight
+  the spot-checks towards them.
+- A `…_demo` / placeholder flag means the student worked on a **local copy**, not that they cheated
+  (§3.2). It is public, so it proves nothing either way; ask which instance they used before
+  accusing anyone. How a demo flag is scored: ⬚.
 - `verify` only resolves flags generated with the **same salt**; a salt mismatch looks like an
   unattributable flag.
-- CTFd's own flags are **shared and static** by design (`CTFd-SETUP.md`) — a matching CTFd flag
-  proves nothing about authorship.
+- A flag `verify` attributes to another team's member does not by itself say *how* it got there, and
+  an unmatched flag does not either: at the 19 Sep 2026 Week 9 sitting 38 of 40 flags matched the
+  issued table and the other 2 came from outside the platform. Ask the teams involved before
+  deciding.
+- For the challenges with no hosted instance, CTFd's own flags are **shared and static** by design
+  (`CTFd-SETUP.md`) — a matching CTFd flag proves nothing about authorship.
 - Red flags to carry into marking (`anti-cheating.md` §F): identical screenshots across teams, a
   flag `verify` attributes to another team's member, a NoteVault marker that resolves to a different
   team, code that appears fully formed in one commit with no history, prose that does not match the
@@ -372,7 +411,9 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 
 - Paper + brief: `labs/week19-final-ctf-capstone/ctf.md`, `labs/week19-final-ctf-capstone/README.md`
 - Deck: `slides/week19.md`
-- Targets (`docker compose up` in each unless noted): `labs/week04-injection/`,
+- Targets — challenges 1–6 and 11: the hosted CTFd challenges at `ctf.zcr.ai` (graded, per-student
+  flags). Local copies (`docker compose up` in each unless noted; demo flags) are practice for those
+  and the only targets for challenges 7–10 and 12: `labs/week04-injection/`,
   `labs/week05-xss-client-side/`, `labs/week06-authn-authz/`, `labs/week10-api-security/`,
   `labs/week11-memory-safety-exploitation/` (`make`; no compose),
   `labs/week12-supply-chain/` (`bash sca_scan.sh`, `bash sign.sh`; no compose),
@@ -395,39 +436,45 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 | Risk | Mitigation |
 |---|---|
 | **The demo block does not fit the largest cohorts.** `AGENDA.md` gives 90 min (2:30–4:00); a strict live 10-min-demo + 5-min-Q&A format would be **15 min/team → 6 slots**, which cannot seat the ~27–60 teams N≈80–120 (`AGENDA.md`) implies in teams of 2–3 | **Resolved by `AGENDA.md`:** each team submits a pre-recorded video walkthrough before the session (graded asynchronously on the project rubric), and the in-class block is a **3-minute live Q&A per team**, which fits ~30 teams in 90 min. Above ~30 teams: run parallel rooms with a second assessor, or split the Q&A across the Week 16 studio and Week 19 (`AGENDA.md` §*Week 19*) |
-| **Five-way port-8080 collision.** W4, W5, W6, W10 (`vulnerable-api`) and `project/starter-app` all publish 8080; a team wants several up at once | Brief at 0:00–0:10: `docker compose down` one before the next, or override the **left** side of the ports mapping. The Flask apps listen on 5000 *inside* the W4/W5/W6/W10 containers — do not republish 5000 (macOS AirPlay squats 5000, not 8080). W10's `solution-api` already takes 8081; W14 uses 6000/6001; CTFd uses 8000 |
+| **Five-way port-8080 collision (local copies).** W4, W5, W6, W10 (`vulnerable-api`) and `project/starter-app` all publish 8080; a team running several local copies at once hits it | Brief at 0:00–0:10: `docker compose down` one before the next, or override the **left** side of the ports mapping. The Flask apps listen on 5000 *inside* the W4/W5/W6/W10 containers — do not republish 5000 (macOS AirPlay squats 5000, not 8080). W10's `solution-api` already takes 8081; W14 uses 8082/8083; a local CTFd, if run, uses 8000 |
 | **Burp on its default listener.** The Week 6 worksheet's optional Burp step proxies through `127.0.0.1:8080` — the same port the targets publish | Move either Burp's listener or the target's published port |
-| **Missing `.env` → no per-student flag.** Verified: with no `.env`, compose renders `FLAG_*: null` in all four seeded folders and the app falls back to its committed placeholder | `docker compose config` in W4, W6, W10 and W14 the day before; treat a placeholder flag on a sheet as a seeding failure, not cheating |
+| **Student works on a local copy → demo flag.** Verified: with no `.env`, compose renders `FLAG_*: null` in all four local labs (W4, W6, W10, W14) and the app falls back to its committed placeholder | Brief it at 0:00: graded flags for 1–6 and 11 come only from your own hosted instance. Treat a placeholder flag on a sheet as "worked locally", not as cheating; ask which instance was used. Do not try to fix it by seeding per-student `.env` files — the student owns the file |
 | **`seed_flags.py` cannot find the curriculum monorepo** — the shim `sys.exit`s with `ERROR: curriculum monorepo not found` and generates nothing | Run `gen` the **day before**; the sibling `KOSEN69 - curriculum` directory must be present. `check_flag_keys.py` (same shim pattern) is the cheap pre-flight |
 | **Salt mismatch** between `gen` and `verify` — attribution silently returns nothing | Record this cohort's `FLAG_SALT` alongside the `flags.csv` it produced; export the same value before `verify` |
 | **W11 will not link on a macOS host.** The Makefile's own note: `-z execstack` and `-no-pie` are GNU ld / Linux flags, so "on macOS the *link* step of these targets may fail"; `make syntax` still works. Apple clang also ships no libFuzzer runtime (`labs/toolbox/README.md`), which is challenge 8 | Have `softsec-toolbox` **built before the day** and the run line on a slide: `docker run -it --rm --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -v "$PWD":/work -w /work softsec-toolbox`. `--cap-add=SYS_PTRACE` + relaxed seccomp are what make `gdb`/ASan work |
-| **Challenge 7's flag needs a manual export.** `vuln.c:47` reads `FLAG_PWN`, but there is no compose to inject it | Either instruct `export FLAG_PWN=…` before `./vuln`, or accept that challenge 7 is attributed by evidence and viva like 3/8/9/10/12 |
+| **Challenge 7 has no hosted instance, so its flag cannot be per-student.** `vuln.c:47` reads `FLAG_PWN`, but there is no compose to inject it and students build and run `vuln` themselves — anything they are told to export, they can read | Attribute challenge 7 by evidence and viva like 8/9/10/12; do not ask students to export a per-student `FLAG_PWN` |
 | **W12/W13 need the network and the Docker socket.** `sca_scan.sh`, `sign.sh` and `scan.sh` run `aquasec/trivy:latest` with `-v /var/run/docker.sock:/var/run/docker.sock`, and Trivy fetches its vulnerability DB | Pre-pull `aquasec/trivy:latest` and warm the DB the day before. A locked-down machine that forbids socket mounts cannot run these — check in the target check, not at 1:00 |
 | **Cosign needs a browser OIDC flow and registry push access** — `sign.sh` says so itself, and calls it "a guided demo, not an offline step" in class | Do not gate challenge 9 or a demo on live keyless signing. Accept a previously produced signature + the verification command as the evidence (`week16-capstone/worksheet.md` Part 3 A, deliverable 5) |
 | **PyPI reachability at start-up.** W4/W5/W6/W10 `pip install flask` (W6 also `pyjwt`, W14 `flask`) at container start; a whole room starting at once needs the network | Pre-pull `python:3.12-slim`; keep a USB `docker save`/`docker load` copy; use the 0:00–0:10 target check to surface failures before the clock matters |
-| **CTFd unavailable, or never deployed for this cohort** | The board is engagement only; the submission of record is the Form / Classroom ([SUBMISSION.md](../../SUBMISSION.md)), and `ctf.md`'s submission table works on paper |
+| **The hosted platform is unavailable, or cannot hold the room.** It spawns challenges 1–6 and 11 and issues their flags; N≈80–120 students (`AGENDA.md`) may all spawn at once (capacity: ⬚) | Local Docker serves demo flags only, so per-student attribution for those seven is lost for that window; challenges 7–10 and 12 are unaffected. Decide the fallback before the day (extend, reschedule, or accept identity-stamped evidence only) and record it: ⬚. The board itself is engagement only; the submission of record is the Form / Classroom ([SUBMISSION.md](../../SUBMISSION.md)), and `ctf.md`'s submission table works on paper |
+| **A student or team cannot reach their hosted instance** | Sort it in the 0:00–0:10 target check; how instances are reached, and any spare-machine provision: ⬚ (not recorded in this repository) |
 | **The CTFd board and the paper disagree** — different point values, "Raid the API" split in two, an extra "Capture the Hash", and a 15th "Boss: Breach NoteVault" that is not on the paper | Announce at 0:00 which board is graded (the paper is), and either hide the extras or state that they score participation only |
-| **NoteVault is not hardened for shared hosting.** `instructor/PLATFORM-ROADMAP.md` records that `project/starter-app/app.py` runs with Flask `debug=True` — an active Werkzeug console — and must be turned off before any lab is baked for shared multi-tenant spawning | Keep NoteVault on the team's own machine for the demo, as the delivery model already assumes; do not stand it up on a shared host for this session |
+| **NoteVault is not hardened for shared hosting.** `instructor/PLATFORM-ROADMAP.md` records that `project/starter-app/app.py` runs with Flask `debug=True` — an active Werkzeug console — and must be turned off before any lab is baked for shared multi-tenant spawning | Keep NoteVault on the team's own machine for the demo, as the delivery model already assumes; do not stand `project/starter-app` up on a shared host for this session. The platform also hosts a `notevault` Boss image (not on the paper, so a caveat rather than a graded dependency); whether its `debug=True` console was disabled: ⬚ |
 | **A team's Docker will not run at all** | No spare-machine provision is recorded in this repository — decide and record it: ⬚ |
 | **Build artefacts left behind.** `make` in `labs/week11-memory-safety-exploitation` produces `vuln`, `vuln-*` and `fuzz` | `make clean`, or delete them — the curriculum monorepo's parity gate compares every file in the lab directory |
 
 **If it fails mid-session — decision order**
 
-1. **Network drops.** Solving is local and the targets are already up; keep going. Hold submissions
-   and collect `ctf.md`'s table on paper at 2:30, transcribe afterwards. Challenges 9 and 10 are the
-   exception — they depend on Trivy's DB fetch; note the outage against those items for partial credit.
+1. **Network drops.** Local targets that are already up (7, 8, 12) keep working; keep going on those.
+   The hosted instances (1–6, 11) are reached over the network and cannot be used without it, and
+   challenges 9 and 10 depend on Trivy's DB fetch. Hold submissions and collect `ctf.md`'s table on
+   paper at 2:30, transcribe afterwards; note the outage against the affected items for partial
+   credit. Whether the window is extended: ⬚.
 2. **One target dies for one team.** The twelve challenges are independent — they lose that item's
    points, not the paper. Note it against their sheet.
-3. **The Form / CTFd dies.** The paper table becomes the record; nothing else changes.
+3. **The Form dies.** The paper table becomes the record; nothing else changes. **If CTFd itself
+   dies**, the hosted challenges cannot be spawned or reached — see the hosted-platform row in §9's
+   risks table; the paper table is still the record for everything else.
 4. **A team's pre-recorded video is missing or will not play.** The pre-recorded format removes
    the live-exploit-fails failure mode from this block — there is no live attack segment left to
    fall back from. A missing/unplayable video is a missing deliverable against `project/README.md`'s
    rubric, not a live-demo contingency; run the 3-minute Q&A anyway on whatever artefacts the team
    can show and record the gap for marking. Exactly how the rubric penalizes a missing video: ⬚.
-5. **Widespread failure to start targets inside the first 10 minutes.** That is exactly what the
-   0:00–0:10 target check exists to expose. The repository defines no fallback adjustment to the
-   150-minute window, and this is the last session of term so there is nothing to postpone into —
-   the decision and its justification are the instructor's, and must be recorded: ⬚.
+5. **Widespread failure to start targets or reach the hosted instances inside the first 10
+   minutes.** That is exactly what the 0:00–0:10 target check exists to expose. The repository
+   defines no fallback adjustment to the 150-minute window, and this is the last session of term so
+   there is nothing to postpone into — the decision and its justification are the instructor's, and
+   must be recorded: ⬚.
 
 ## 10. Post-teaching reflection
 

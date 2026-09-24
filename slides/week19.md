@@ -9,7 +9,7 @@ header: "Software Security · Week 19 · Final"
 ## Final — Capstone CTF + Project Demos
 The grand finale
 
-<!-- The finale — make it celebratory + high-energy. Before class: plant per-student/team flags, bring up all targets + CTFd, set the demo schedule. Confirm projects run. ~2 min. -->
+<!-- The finale — make it celebratory + high-energy. Before class: graded flags for challenges 1–6 and 11 come from each student's own hosted instance (confirm everyone can log in and reach one); bring up the local targets for 7–10 and 12, open CTFd, set the demo schedule. Confirm projects run. ~2 min. -->
 
 ---
 

@@ -163,7 +163,7 @@ gate-check
 - Your personal `FLAG{...}` from the fail-open `/admin` bypass, submitted with this week's quiz Q6
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
-<!-- Two separate targets this week, both graded: security-ci.yml is the CI gate; insecure_service.py/secure_service.py (compose, :8090/:8091) is where the personal flag lives. The "build failing" screenshots are the proof the gate actually blocks — a green pipeline that never fails is useless, and one category alone undersells the deliverable. AI-resilient tasks count. This is also the last weekly quiz. -->
+<!-- Two separate targets this week, both graded: security-ci.yml is the CI gate; insecure_service.py/secure_service.py (compose, :8090/:8091) is where the local (public demo) flag lives; graded per-student flags come from the hosted instance. The "build failing" screenshots are the proof the gate actually blocks — a green pipeline that never fails is useless, and one category alone undersells the deliverable. AI-resilient tasks count. This is also the last weekly quiz. -->
 
 ---
 

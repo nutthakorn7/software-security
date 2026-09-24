@@ -9,7 +9,7 @@ header: "Software Security · Week 9 · Midterm"
 ## Midterm — Hands-on CTF Practical
 Covers Weeks 1–6 · Individual
 
-<!-- Proctor deck. BEFORE class: plant per-student flags (seed_flags.py + the flag-planting notes in exams/week09-…-answers.md), bring up the targets, open CTFd. Confirm everyone's VM/Docker works in the first 5 min. -->
+<!-- Proctor deck. BEFORE class: graded flags come only from each student's own hosted CTFd instance (see docs/lesson-plans/week09-midterm-practical.md §3.1) — local Docker is practice and serves demo flags. Confirm in the first 5 min that everyone can log in to CTFd and reach a spawned instance. -->
 
 ---
 
@@ -19,7 +19,7 @@ Covers Weeks 1–6 · Individual
 - Each solved challenge = a flag = points
 - Partial credit for documented progress
 
-<!-- State the time (150 min) + that flags are per-student (copying is traceable via seed_flags.py verify). Submit via CTFd or the Form. ~2 min. -->
+<!-- State the time (150 min) + that graded flags are per-student and come only from your own hosted instance (a flag issued to someone else is traceable via seed_flags.py verify). A local FLAG{..._demo} flag is not a valid submission. Submit via CTFd or the Form. ~2 min. -->
 
 ---
 
@@ -44,4 +44,4 @@ Covers Weeks 1–6 · Individual
 # Submit your flags
 Next: Week 10, API security
 
-<!-- Close: collect submissions; grade with the answer key + seed_flags.py verify for copied flags. Preview W10 (APIs). -->
+<!-- Close: collect submissions; grade with the answer key + seed_flags.py verify for copied flags (hosted-instance flags only — a _demo flag proves nothing). Preview W10 (APIs). -->

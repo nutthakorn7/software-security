@@ -4,7 +4,7 @@ Covers **Weeks 1–6**. Individual, in the sandbox. Flags = points.
 
 ## ✅ This week — what to do
 1. **Before** — VM + tools ready; warm up on the Week 7 mock CTF.
-2. **In class** — **hands-on CTF** (`ctf.md`); submit flags for points (your flags are per-student).
+2. **In class** — **hands-on CTF** (`ctf.md`); submit flags for points (your flags are per-student — spawn your own instances in CTFd; a local `docker compose up` only serves practice demo flags).
 3. **Rules** — sandbox targets only; individual.
 
 *Time breakdown: [AGENDA.md](../../AGENDA.md).*

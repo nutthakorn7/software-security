@@ -156,11 +156,11 @@ the CWE for each challenge solved.
 | `labs/week05-xss-client-side` | `docker compose up` | `8080:5000` | `flask` | a browser with DevTools |
 | `labs/week06-authn-authz` | `docker compose up` | `8080:5000` | `flask`, `pyjwt` | `curl` and host-side `python3` with `pyjwt` (worksheet 6 prerequisites) |
 
-Three of the four targets publish host port **8080** — see §10, risk 1. No per-student flag seeding
-is required for the mock: `vulnerable_app.py` in Weeks 4 and 6 falls back to public placeholder
-values when the `FLAG_*` environment variables are unset (`labs/week04-injection/vulnerable_app.py`
-L10–11, `labs/week06-authn-authz/vulnerable_app.py` L11–12). Flag seeding
-(`instructor/seed_flags.py env <STUDENT_ID> > .env`) matters for **Week 9**, not today.
+Three of the four targets publish host port **8080** — see §10, risk 1. No flag seeding is required
+for the mock: `vulnerable_app.py` in Weeks 4 and 6 falls back to public placeholder values when the
+`FLAG_*` environment variables are unset (`labs/week04-injection/vulnerable_app.py` L10–11,
+`labs/week06-authn-authz/vulnerable_app.py` L11–12). Week 9's graded per-student flags are **not**
+seeded onto students' machines either — they come from hosted CTFd instances (§7.2).
 
 **How scoring works.** The mock CTF is **ungraded** — `mock-ctf.md` marks it participation, with no
 flags and no point values, and the student's feedback loop is the self-check column above. The repo
@@ -243,24 +243,29 @@ DBMS fingerprinting are examinable.
 
 ### 7.2 Week 9 — CTF practical, 150 min, 100 pts
 
-Individual, sandbox targets only, targets started by the instructor. Seven challenges: six at 15 pts
+Individual, sandbox targets only, each student spawns their own instance of the hosted challenges in
+the course's CTFd (`ctf.zcr.ai`). Seven challenges: six at 15 pts
 and one at 10. For each challenge the submission table wants three things — the **flag**, the
 **payload or command**, and a **one-line mitigation**. There is partial credit for documented
 progress without the flag, which is the single most under-used mark on the paper: a student who can
 describe the mechanism and the fix should always write it down.
 
 Flags are **per-student** in Week 9 (SUBMISSION.md: a flag is traceable to the person it was issued
-to, and a duplicate implicates both parties). Submission route: flags + payload + mitigation via the
-CTF Form / Classroom.
+to, and a duplicate implicates both parties). The platform issues the flag to the student who spawned
+the instance — all 7 challenges now have a hosted, per-student instance. A local `docker compose up`
+serves only public demo flags and is practice, not a valid submission
+(`docs/lesson-plans/week09-midterm-practical.md` §3). Submission route: flags + payload + mitigation
+via the CTF Form / Classroom.
 
 ### 7.3 What today's mock does *not* cover — say this explicitly
 
 `mock-ctf.md` promises the "exact format of Week 9", and the six challenges do map one-to-one onto
-Week 9's first six. Three differences remain, and students should hear all three today:
+Week 9's first six. Four differences remain, and students should hear all four today:
 
 | | Mock CTF (today) | Week 9 |
 |---|---|---|
 | Challenges | 6 | **7** — the extra one is an ECB-oracle challenge (10 pts) drawn from Week 3, with **no counterpart in the mock** |
+| Targets and flags | Local Docker on your own machine; public `…_demo` flags | Instances you spawn yourself in the hosted CTFd; a per-student flag from your own instance for all 7 challenges |
 | Working | individual **or pairs** | individual |
 | Hints | included in the file | none |
 | Stakes | ungraded, participation | 100 pts |
@@ -276,8 +281,10 @@ of them are recorded in the repository:
 - Week 8 (written) — date / time / room: ⬚
 - Week 9 (CTF practical) — date / time / room: ⬚
 - What to bring; whether the cheat sheet is admitted: ⬚
-- Week 9 machine readiness — students sit it on the machine they used today; anyone whose targets
-  did not come up in the mock must be fixed before Week 9, not on the day.
+- Week 9 machine and access readiness — the graded targets are hosted CTFd instances, so each student
+  needs a working CTFd login and a way to reach a spawned instance from the machine they will sit on;
+  anyone who cannot must be fixed before Week 9, not on the day. How students get accounts and
+  connect: ⬚. Local Docker from today's mock still matters for practice and for Crack It (challenge 6).
 
 ### 7.5 Deliverable — the one-page cheat sheet
 
@@ -311,8 +318,9 @@ the course mark, course specification §4).
   `solution_skeleton.py` (W3), `attack.md` (W6)
 - What comes next: `labs/week08-midterm-written/` · `labs/week09-midterm-practical/`
 - Instructor-only (git-ignored): `instructor/CTFd-SETUP.md` (scoreboard, Houses, Awards),
-  `instructor/make_quiz_forms.gs` (build the quiz Form), `instructor/seed_flags.py` (per-student
-  flags — needed for Week 9, not for today), the item banks under `instructor/exams/` and
+  `instructor/make_quiz_forms.gs` (build the quiz Form), `instructor/seed_flags.py` (`gen` builds the
+  per-student flag table and `verify` attributes a submitted flag at Week 9 marking — not needed for
+  today), the item banks under `instructor/exams/` and
   `instructor/quizzes/`
 - Submission channels: [SUBMISSION.md](../../SUBMISSION.md) · Rules of engagement:
   [ETHICS.md](../../ETHICS.md)

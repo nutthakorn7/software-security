@@ -52,8 +52,11 @@ algorithm, a strong secret and required claims — never a longer list of ids to
 - **Instructor, before class:** pull `python:3.12-slim` ahead of the session so the room is not
   competing for it at once. Note that this lab does **not** ship a pre-built image — the compose
   file runs `pip install --no-cache-dir flask pyjwt` at container start, so the first
-  `docker compose up` needs PyPI access; pre-warm that (see §8). If flags are being graded, seed the
-  per-student `.env` first (`python3 ../../instructor/seed_flags.py env <STUDENT_ID> > .env`).
+  `docker compose up` needs PyPI access; pre-warm that (see §8). This local lab is **practice**: with
+  no `.env` it serves the public `…_demo` flags (`FLAG_IDOR`, `FLAG_JWT`). Do not seed a per-student
+  `.env` for grading — the student owns the machine and can read the file (or `docker exec … env`)
+  before exploiting anything, so it attributes nothing. Graded per-student flags come only from
+  instances a student spawns in the hosted CTFd (`ctf.zcr.ai`), as in the Week 9 practical.
 - **Prerequisite concept:** basic HTTP request/response and the `Authorization: Bearer` header; the
   three-part structure of a JWT (`header.payload.signature`).
 
@@ -104,7 +107,7 @@ stuck there should switch to Task 5 and return afterwards.
 | Worksheet 6, Parts 1–4 | Tokens/payloads, screenshots, fix lines, written answers | K1–K3, P1–P5, A2 | Part of the 30% worksheet component |
 | Weekly quiz (start of lecture) | Quiz score | K1–K3 | Part of the 10% quiz/participation component |
 | Viva spot-check / micro-demo | Live reproduction and explanation | P1–P5, A2 | Pass/flag for follow-up |
-| Per-student flag | Flag value tied to the individual student | A2 | Integrity control, not a mark |
+| Lab flag (practice) | Public `…_demo` flag from the local lab — shows the exploit landed, not who landed it | A2 | Not a mark and not attributable; per-student flags are issued only by hosted CTFd instances (Week 9) |
 
 The worksheet's own rubric (100 pts) splits as: Part 2 lecture questions (20), Part 3 exploitation +
 evidence for Tasks 1–4 (40), Part 3 defence for Task 5 with fixes proven and lines cited (25), Part
@@ -130,10 +133,10 @@ could not land the exploit.
 | Unpinned `pyjwt` behaves differently | `flask` and `pyjwt` are installed unpinned at container start, so behaviour tracks whatever PyPI serves that day; a PyJWT major-version change can alter how `alg:none` encodes/decodes. If Task 2 misbehaves, check `pip show pyjwt` and pin the version for the class |
 | Stale `$TOKEN` after switching to the fixed app | The fixed app's tokens carry `exp`/`aud`; an old vulnerable-app token replayed against `solution_app.py` yields 401 and can look like the exploit "still works" — have students re-run Task 0 to mint a fresh token after every restart |
 | Juice Shop optional target won't start | `bkimminich/juice-shop` is a large image needing port 3000 free; pull it before class only if students will actually use it |
-| Per-student flags not seeded | Flags come from `instructor/seed_flags.py` into `.env` (`FLAG_IDOR`, `FLAG_JWT`); without seeding the app falls back to placeholder flags that are not attributable — seed before class if flags are graded |
+| Someone expects the local flags to be per-student | They are not: with no `.env` the app serves the placeholder `…_demo` values (`FLAG_IDOR`, `FLAG_JWT`), and a `.env` on the student's own machine is readable by the student, so seeding one does not make flags attributable. Treat the flag as proof the exploit ran; attribute through the viva spot-check and micro-demo (§6). Per-student flags come only from hosted CTFd instances (Week 9) |
 | A student finishes Tasks 1–3 early | Extension: against the still-running `vulnerable_app.py` (Task 5 hasn't switched it over yet), forge a `sub: admin` token (via `alg:none` or the weak secret) to reach `/api/admin` and read `FLAG_JWT` — this route does not exist in `solution_app.py`, so don't offer it after the Task 5 switchover; or write the regression test that proves the ownership check and algorithm pin stay fixed |
 | A student cannot land any exploit | Pair them for Task 1 (IDOR, `curl`-only), then require they land Task 2 or 3 alone; mark the mechanism explanation, not the keystrokes |
-| Copy-paste of a classmate's token/payload | Per-student flags make submitted evidence attributable; viva spot-check the pair |
+| Copy-paste of a classmate's token/payload | The local flag is a public demo value and does not attribute anything; viva spot-check the pair |
 
 ## 9. Post-teaching reflection
 
