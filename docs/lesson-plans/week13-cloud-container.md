@@ -7,7 +7,7 @@
 | **Contact time** | 300 min = 120 lecture + 180 laboratory |
 | **Lab folder** | `labs/week13-cloud-container` |
 | **Slides** | `slides/week13.md` |
-| **Standards** | OWASP 2025 **A02 Security Misconfiguration** · CWE-732 (incorrect permission assignment), CWE-16 (configuration), CWE-798, CWE-250, CWE-538, CWE-269, CWE-1104 |
+| **Standards** | OWASP 2025 **A02 Security Misconfiguration** · CWE-732 (incorrect permission assignment), CWE-16 (configuration), CWE-526 (secret in an environment variable), CWE-798 (hard-coded credential — OWASP files this under A07), CWE-250, CWE-538, CWE-269, CWE-1104 |
 | **CLOs addressed** | **CLO3** remediate · **CLO4** operate security tooling (the course specification's weekly-schedule row for Week 13), plus **CLO5** evaluate & communicate and **CLO6** evidence & ethics through the recurring worksheet parts |
 
 ---

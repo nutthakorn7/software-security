@@ -7,7 +7,7 @@
 | **Contact time** | 300 min = 120 lecture + 180 laboratory |
 | **Lab folder** | `labs/week15-devsecops-pipeline` |
 | **Slides** | `slides/week15.md` |
-| **Standards** | OWASP 2025 **A09 Security Logging & Alerting Failures** · **A10 Mishandling of Exceptional Conditions** (the scanners also cover A02/A03) · CWE-636 (fail open), CWE-532 (logging sensitive data), CWE-209, CWE-489, CWE-798 · CISA **"Secure by Design"** |
+| **Standards** | OWASP 2025 **A09 Security Logging & Alerting Failures** · **A10 Mishandling of Exceptional Conditions** (the scanners also cover A02/A03/A07) · CWE-636 (fail open), CWE-532 (logging sensitive data), CWE-209, CWE-489, CWE-798 · CISA **"Secure by Design"** |
 | **CLOs addressed** | **CLO4** operate security tooling across the SDLC · **CLO5** evaluate & communicate (course-spec §6). The recurring *Audit the AI* / *EiPE* + *Prompt Problem* parts carry **CLO5**, and *Evidence & Integrity* carries **CLO6** (course-spec §4). |
 
 ---
