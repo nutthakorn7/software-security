@@ -160,6 +160,20 @@ function buildStores() {
   }
 }
 
+// Fill `el` with plain strings and {tag, cls, text} nodes. Built with DOM calls,
+// never by assigning a markup string (tests/test_content.py forbids that in every
+// sim), so a caption can never be turned into injected HTML.
+function setParts(el, parts) {
+  el.textContent = "";
+  for (const p of parts) {
+    if (typeof p === "string") { el.append(p); continue; }
+    const node = document.createElement(p.tag);
+    if (p.cls) node.className = p.cls;
+    node.textContent = p.text;
+    el.append(node);
+  }
+}
+
 // The two .q blocks stay pure, evenly-columned "username  value" data — no
 // inline annotation. A wrapped span mid-line in a half-width grid column (or
 // the worksheet's 4:3 iframe) has nowhere sane to go once it breaks, so the
@@ -174,11 +188,12 @@ function renderStores() {
   const capA = document.getElementById("store-a-cap");
   const capB = document.getElementById("store-b-cap");
   if (TWIN_USER) {
-    capA.innerHTML = `Target: <strong>${TARGET_USER}</strong>. <span class="hash-crack-flag same">` +
-      `${TWIN_USER} shares this exact hash</span> — crack ${TARGET_USER} and you've read ` +
-      `${TWIN_USER}'s password too, for free.`;
-    capB.innerHTML = `Target: <strong>${TARGET_USER}</strong>. <span class="hash-crack-flag diff">` +
-      `${TWIN_USER}'s entry looks nothing alike</span>, despite the identical password.`;
+    setParts(capA, ["Target: ", { tag: "strong", text: TARGET_USER }, ". ",
+      { tag: "span", cls: "hash-crack-flag same", text: `${TWIN_USER} shares this exact hash` },
+      ` — crack ${TARGET_USER} and you've read ${TWIN_USER}'s password too, for free.`]);
+    setParts(capB, ["Target: ", { tag: "strong", text: TARGET_USER }, ". ",
+      { tag: "span", cls: "hash-crack-flag diff", text: `${TWIN_USER}'s entry looks nothing alike` },
+      ", despite the identical password."]);
   } else {
     capA.textContent = `Target: ${TARGET_USER}. No other row here happens to share its hash.`;
     capB.textContent = `Target: ${TARGET_USER}.`;
@@ -234,9 +249,11 @@ function updateGuessLive() {
   const targetB = STORE_B.find(u => u.username === TARGET_USER);
   const hitA = md5hex(guess) === targetA.digest;
   const hitB = kdfHex(guess, targetB.salt, COST) === targetB.digest;
-  liveEl.innerHTML =
-    `Store A (${TARGET_USER}): ${hitA ? '<span class="hash-crack-flag same">✓ MATCH</span>' : "no match"} · ` +
-    `Store B (${TARGET_USER}): ${hitB ? '<span class="hash-crack-flag diff">✓ match (found it, the slow way)</span>' : "no match"}`;
+  setParts(liveEl, [
+    `Store A (${TARGET_USER}): `,
+    hitA ? { tag: "span", cls: "hash-crack-flag same", text: "✓ MATCH" } : "no match",
+    ` · Store B (${TARGET_USER}): `,
+    hitB ? { tag: "span", cls: "hash-crack-flag diff", text: "✓ match (found it, the slow way)" } : "no match"]);
 }
 document.getElementById("guess").addEventListener("input", updateGuessLive);
 
