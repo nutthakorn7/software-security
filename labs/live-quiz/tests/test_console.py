@@ -54,13 +54,30 @@ def _alice_set_id(appmod):
     )[0]["id"]
 
 
+# Every console page carries a random 43-character base64url CSRF token (secrets.token_urlsafe(32)). A short
+# needle built from that alphabet, such as the old "W1", occurs inside about 1% of them, so `needle not in page`
+# failed at random in CI. Spaces cannot occur in a token, so this title cannot collide with one.
+ISOLATION_TITLE = "Alice private set"
+
+
 def test_create_list_and_isolation(tmp_path, monkeypatch):
     appmod = _app(tmp_path, monkeypatch)
     alice = _register(appmod, "alice")
-    alice.post("/console/sets/new", data={"title": "W1", "source_md": SET_MD, "csrf_token": _tok(alice)})
-    assert b"W1" in alice.get("/console").get_data()
+    alice.post("/console/sets/new", data={"title": ISOLATION_TITLE, "source_md": SET_MD, "csrf_token": _tok(alice)})
+    assert ISOLATION_TITLE.encode() in alice.get("/console").get_data()
     bob = _register(appmod, "bob")
-    assert b"W1" not in bob.get("/console").get_data()          # bob doesn't see alice's set
+    assert ISOLATION_TITLE.encode() not in bob.get("/console").get_data()          # bob doesn't see alice's set
+
+
+def test_isolation_check_is_not_fooled_by_a_csrf_token_that_contains_a_short_needle(tmp_path, monkeypatch):
+    """Deterministic guard for the flake above: force bob's CSRF token to contain the old needle "W1"."""
+    appmod = _app(tmp_path, monkeypatch)
+    import auth
+    monkeypatch.setattr(auth, "new_csrf_token", lambda: "abcdefgW1hijklmnopqrstuvwxyz0123456789ABCDE")
+    bob = _register(appmod, "bob")
+    page = bob.get("/console").get_data()
+    assert b"W1" in page                                        # the trap is armed: a token really contains "W1"
+    assert ISOLATION_TITLE.encode() not in page                 # and the isolation check is unaffected
 
 
 def test_idor_edit_delete_blocked(tmp_path, monkeypatch):
