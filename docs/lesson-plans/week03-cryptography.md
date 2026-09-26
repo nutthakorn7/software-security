@@ -7,7 +7,7 @@
 | **Contact time** | 300 min = 120 lecture + 180 laboratory |
 | **Lab folder** | `labs/week03-cryptography` |
 | **Slides** | `slides/week03.md` |
-| **Standards** | OWASP 2025 **A04 Cryptographic Failures** · CWE-327 (broken/risky crypto algorithm — MD5, AES-ECB) · CWE-916 (weak password hashing — unsalted/fast) · CWE-330 (insufficiently random values — predictable token) · CWE-798 (hard-coded credentials — hardcoded key) |
+| **Standards** | OWASP 2025 **A04 Cryptographic Failures** · CWE-327 (broken/risky crypto algorithm — MD5, AES-ECB) · CWE-916 (weak password hashing — unsalted/fast) · CWE-330 (insufficiently random values — predictable token) · CWE-321 (hard-coded cryptographic key) · **A07 Authentication Failures** · CWE-798 (hard-coded credentials — the general case of the hardcoded key) |
 | **CLOs addressed** | **CLO2** exploit · **CLO3** remediate · **CLO5** evaluate & communicate · **CLO6** evidence & ethics |
 
 > The course-specification schedule row for Week 3 names **CLO2, CLO3**; CLO5 and CLO6 enter through the worksheet's *Audit the AI* and *Evidence & Integrity* sections, which every teaching week carries.

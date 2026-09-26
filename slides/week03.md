@@ -109,7 +109,7 @@ hashcat -m 0 hashes.txt rockyou.txt
 ## Common crypto failures (A04:2025)
 
 - **ECB mode** → block patterns leak
-- Hardcoded keys / keys in source (CWE-798)
+- Hardcoded keys / keys in source (CWE-321, a case of CWE-798)
 - Weak RNG (`random` instead of `secrets`/CSPRNG) (CWE-330)
 - **MD5 / SHA-1** for security; unauthenticated encryption (no integrity)
 
@@ -133,7 +133,7 @@ hashcat -m 0 hashes.txt rockyou.txt
 - **CWE-327** — broken/risky crypto algorithm
 - **CWE-916** — weak password hash (no/weak KDF)
 - **CWE-330** — insufficiently random values
-- **CWE-798** — hardcoded key
+- **CWE-321** — hardcoded key (a case of CWE-798, which OWASP files under A07)
 
 <!-- Quick reference; they map lab findings to these. ~1 min. -->
 
