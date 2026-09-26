@@ -107,8 +107,11 @@ function parseBlock(block) {
     // eats the "[alt](src)" part of "![alt](src)" but leaves the leading "!"
     // glued to the alt text as stray punctuation. Render a labeled pointer
     // instead, same idea as the ```sim fence handling above.
-    const imgMatch = line.trim().match(/^!\[([^\]]*)\]\([^)]*\)$/);
-    if (imgMatch) {
+    // The alt text may itself contain "]" (e.g. "data[3]" in a code-flavoured
+    // description), so match it greedily up to the LAST "](" and reject a line that
+    // has a second "](" inside the alt (two links, not one image).
+    const imgMatch = line.trim().match(/^!\[(.*)\]\(([^)\s]+)\)$/);
+    if (imgMatch && !imgMatch[1].includes("](")) {
       const alt = strip(imgMatch[1]);
       body.push({ t: "raw", v: alt ? `See diagram: ${alt} (web only)` : "See diagram (web only)" });
       continue;
