@@ -7,7 +7,7 @@
 | **Contact time** | 300 min = 120 lecture + 180 laboratory |
 | **Lab folder** | `labs/week02-sdlc-tooling` |
 | **Slides** | `slides/week02.md` |
-| **Standards** | OWASP 2025 **A05 Injection** [CWE-89, CWE-78] · **A04 Cryptographic Failures** [CWE-327] · **A02 Security Misconfiguration** [CWE-798, CWE-489] |
+| **Standards** | OWASP 2025 **A05 Injection** [CWE-89, CWE-78] · **A04 Cryptographic Failures** [CWE-327] · **A07 Authentication Failures** [CWE-798] · **A02 Security Misconfiguration** [CWE-489] |
 | **CLOs addressed** | **CLO4** operate security tooling across the SDLC · **CLO5** evaluate & communicate · **CLO6** evidence & ethics |
 
 ---
