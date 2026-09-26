@@ -160,7 +160,7 @@ Local API, `docker compose up` → :8080 (vulnerable) / :8081 (fixed):
 
 > 📋 **Worksheet 10** — `labs/week10-api-security/worksheet.md` (Part 3) · **kickoff:** `docker compose up` → :8080 (insecure) / :8081 (secure)
 
-- Findings mapped to the API Top 10:2023 + your two personal flags (`FLAG_BOLA`, `FLAG_MASSASSIGN`)
+- Findings mapped to the API Top 10:2023 + your two flags (`FLAG_BOLA`, `FLAG_MASSASSIGN` — public demo values on a local run: practice, not personal)
 - Fixes (authz checks, schemas, limits) — cited from `solution_api.py`
 - Proof exploits now fail
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)

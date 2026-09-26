@@ -148,7 +148,7 @@ gate-check
 
 - **Blue:** build the gate (Semgrep + Trivy + Gitleaks), fail on HIGH/CRITICAL, add security logging that fails closed
 - **Red:** three gate-mapped attacks only — outdated dependency (Trivy SCA), a Dockerfile running as root (Trivy config), a hardcoded token (Gitleaks). `chmod 777` and `FROM:latest` are decoys that stay green — not gate bypasses
-- **Score:** Blue per catch, Red per successful bypass; then capture your personal flag from the fail-open `/admin` bypass in `insecure_service.py`
+- **Score:** Blue per catch, Red per successful bypass; then leak the flag from the fail-open `/admin` bypass in `insecure_service.py` (a public demo value on a local run; your personal flag comes from your hosted instance)
 
 <!-- The capstone game. Both roles teach: Blue learns to configure gates, Red learns where gates have blind spots — but Red's menu is fixed to 3 attacks that actually map to a gate, not open-ended. Run it as live PRs against the pipeline. The weekly quiz no longer asks for the gate/what-it-blocks/flag (dropped — quiz runs before the lab) — that's required in the worksheet instead, don't drop the flag half there, it's still graded. ~3 min. -->
 
@@ -160,7 +160,7 @@ gate-check
 
 - A passing PR that adds the pipeline
 - Screenshot: build **failing** on each of the 3 Red-team categories (dependency, root Dockerfile, hardcoded token) — not just one
-- Your personal `FLAG{...}` from the fail-open `/admin` bypass, submitted with this week's quiz Q6
+- The `FLAG{...}` from the fail-open `/admin` bypass, in the **worksheet** (not the weekly quiz, which runs before the lab); your personal flag comes from your hosted instance
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
 <!-- Two separate targets this week, both graded: security-ci.yml is the CI gate; insecure_service.py/secure_service.py (compose, :8090/:8091) is where the local (public demo) flag lives; graded per-student flags come from the hosted instance. The "build failing" screenshots are the proof the gate actually blocks — a green pipeline that never fails is useless, and one category alone undersells the deliverable. AI-resilient tasks count. This is also the last weekly quiz. -->
