@@ -95,9 +95,11 @@ identity-stamped evidence and the live viva carry **CLO6**.
 
 - **Graded flags come from the hosted platform (challenges 1–6 and 11).** Each student spawns their
   **own** instance of these challenges in the course's hosted CTFd (`ctf.zcr.ai`, container-spawning
-  plugin). The platform issues that student a flag per challenge — an HMAC of student ID + challenge
-  key with the cohort salt (`airsec_flag_bridge`) — so a flag can be traced to the student it was
-  issued to and cannot be read off the student's own machine. Challenge 6 is two hosted images
+  plugin). The platform issues that student a **random flag per spawned instance**
+  (`FLAG{<key>_<16 hex>}`, minted by `airsec_flag_bridge`; nothing about it can be derived from a
+  student ID or a salt) and records who it was issued to — so a flag can be traced to the student it
+  was issued to, is accepted only on its own challenge, and cannot be read off the student's own
+  machine. Challenge 6 is two hosted images
   (`w10-bola`, `w10-massassign`). The hosted instances are reached over the network, so solving them
   depends on it (§3.3, §9). How the members of a team spawn instances and which flag the team
   submits: ⬚ (§3.3).
@@ -115,7 +117,7 @@ identity-stamped evidence and the live viva carry **CLO6**.
   flags in `instructor/ctfd/challenges.yml` are shared/static placeholders (a `_XXXX` suffix to
   rotate per cohort), and the board is the engagement arena; marks come from the answer key applied
   to the submission of record. Graded integrity uses the per-student flags issued by the hosted
-  instances, tabulated and resolved with `seed_flags.py` (§3.2). The course's CTFd is hosted at
+  instances, resolved from CTFd's own records with `ctf_integrity_report.py` (§3.2). The course's CTFd is hosted at
   `ctf.zcr.ai`; `CTFd-SETUP.md` §1 documents a local one on `http://localhost:8000`.
 - **The two point systems are not the same board.** The paper (`ctf.md`) is 12 challenges / 150 pts
   with fixed values. `challenges.yml` is dynamic (`initial: 500`, `minimum: 100`, `decay: 15`),
@@ -136,21 +138,26 @@ identity-stamped evidence and the live viva carry **CLO6**.
 
 ### 3.2 Per-student flags — hosted platform, and where it does not reach
 
-The instructor-side tooling is still used for the **table and for attribution at marking** (the hosted
-platform derives its flags from the same salt, so `verify` resolves them). It is **not** how students
-get graded flags: students never had `instructor/`, and a `.env` in a student's own copy is readable
-by that student.
+Hosted flags are **random per spawned instance** (since 26 Sep 2026): there is no table to generate
+and no salt to keep. CTFd records who each flag was issued to (`container_flags`, plus an append-only
+`airsec_flag_ledger` that survives a stopped instance) and refuses a flag on any challenge other than
+its own. Attribution and integrity triage at marking are one read-only command:
 
 ```bash
-export FLAG_SALT='<this cohort's salt — never published>'   # instructor/anti-cheating.md §A
-python3 instructor/seed_flags.py gen students.txt -o flags.csv     # authoritative table
-python3 instructor/seed_flags.py verify 'FLAG{...}' students.txt   # who was this issued to?
+python3 instructor/ctf_integrity_report.py --since <sitting start, UTC> --until <sitting end, UTC> \
+    --sheets <folder with the answer sheets as text>
 ```
 
-`instructor/seed_flags.py` is a shim: it forwards `FLAG_SALT` to `SWSEC_FLAG_SALT` and requires the
-sibling `KOSEN69 - curriculum` monorepo — without it, it exits with
-`ERROR: curriculum monorepo not found at …` and generates nothing. The challenge-key vocabulary now
-comes from that monorepo's `courses/software-security.yml`.
+It reports a flag CTFd issued to someone else, a flag CTFd never issued to anyone, a flag submitted
+before its instance existed, a flag credited on the wrong challenge and implausibly fast solves, and
+says whether each flag's owner ever launched that challenge. To attribute a single flag by hand:
+`SELECT account_id, challenge_id, issued_at FROM airsec_flag_ledger WHERE flag_hash = SHA2('<flag>', 256);`.
+Details, checks and rollback: `instructor/platform-build/FLAG-SCHEME-RANDOM.md`. Students never had
+`instructor/`, and a `.env` in a student's own copy is readable by that student, so a per-student `.env`
+was never a way to give graded flags. `instructor/seed_flags.py` now only serves the optional
+local-practice `.env`. The challenge-key vocabulary the platform accepts still comes from
+`AIRSEC_CHALLENGE_KEYS`, kept in sync with that monorepo's `courses/software-security.yml` by
+`instructor/check_flag_keys.py`.
 
 **Which of the twelve have a hosted, per-student instance** (challenge titles as on the paper; the
 hosted images are the platform's spawnable challenges):
@@ -180,8 +187,9 @@ identity-stamped evidence, the method note and the viva (§6) — not around the
 attributable per *student*, not per team: which member's flag a team submits is ⬚ (§3.3).
 
 **Pre-flight (the day before).** Spawn each hosted challenge on the paper (1–6 and 11 — eight images,
-since challenge 6 is two) once as a test student and check that the flag it returns resolves with
-`seed_flags.py verify` **using the same salt** (§3.4).
+since challenge 6 is two) once as a test student and check that the flag it returns has the form
+`FLAG{<key>_<16 hex>}` (an 8-hex flag means the old plugin is loaded: do not start the sitting), has a
+row in `airsec_flag_ledger`, and is refused when typed into a different challenge (§3.4).
 
 **The local copies serve demo flags — practice only.** In the four local folders below, with no `.env`
 present, `docker compose config` renders `null` (checked):
@@ -237,9 +245,8 @@ instance they used before anything else.
       `http://localhost:8080`; W10's `solution-api` on `http://localhost:8081`; W14's chatbots on
       `http://localhost:8082` and `http://localhost:8083`. They serve `…_demo` flags and are **not**
       graded targets for challenges 1–6 and 11.
-- [ ] `python3 instructor/seed_flags.py verify '<flag a hosted instance issued to a test student>'
-      students.txt` resolves to the right student, **using the same salt** that `gen` ran with. Run
-      `gen` the day before, not on the morning — the shim needs the sibling monorepo (§3.2).
+- [ ] A flag spawned by a test student matches `FLAG{<key>_<16 hex>}`, has a row in `airsec_flag_ledger`
+      and is refused on a different challenge (§3.2; `instructor/platform-build/FLAG-SCHEME-RANDOM.md`).
 - [ ] `python3 instructor/check_flag_keys.py` exits 0 (flag-key vocabulary in sync across the
       manifest, the deployment whitelist, the challenge CSV and `ctfd/challenges.yml`).
 - [ ] **W11 builds on the machines in the room.** `make` in `labs/week11-memory-safety-exploitation`
@@ -348,7 +355,7 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 
 | Control | How it is operated | What it catches |
 |---|---|---|
-| **Per-student flags (hosted instances)** | Issued by the hosted platform to the student who spawned the instance; `seed_flags.py gen` before the day, `verify '<flag>' students.txt` at marking | A flag submitted by one team but *issued* to a student on another — reaches challenges 1–6 and 11 only (§3.2) |
+| **Per-student flags (hosted instances)** | Random flag per spawned instance, issued to the student who spawned it, recorded by CTFd and accepted only on its own challenge; `ctf_integrity_report.py` at marking | A flag submitted by one team but *issued* to a student on another, or never issued — reaches challenges 1–6 and 11 only (§3.2) |
 | **Per-team NoteVault marker** | `TEAM_ID` seeds an `hmac(TEAM_SALT, TEAM_ID)`-derived marker into the app's own data (`project/starter-app/README.md`; `anti-cheating.md` §A) | A demo, report or screenshot carrying another team's marker |
 | **Identity-stamped evidence** | Screenshots must carry the student's terminal `whoami` / login email / student ID **and** a timestamp | Borrowed or generic screenshots (`anti-cheating.md` §B) |
 | **Method note per challenge** | The payload/command + mitigation columns of `ctf.md` | A flag held without the mechanism; also the basis for partial credit |
@@ -356,7 +363,7 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 | **Similarity checking** | The same MOSS/JPlag pass used on weekly forks, run on **team project repos** at the Week 19 milestone — report PDFs through MOSS's plain-text mode too | Verbatim copying between teams (`anti-cheating.md` §B) |
 | **Scoreboard freeze** | CTFd → Settings → Freeze time for the window | Progress leaking between teams mid-sitting (`CTFd-SETUP.md` §4) |
 | **Dynamic scoring + first blood** | Already configured (`initial: 500`, `minimum: 100`, `decay: 15`) | Reduces the incentive to pool answers (`anti-cheating.md` §C) |
-| **Rotation each cohort** | New `FLAG_SALT`, new data seeds, new CTFd flag suffixes, at least one target changed per topic | Last year's flag dump (`anti-cheating.md` §E; `CTFd-SETUP.md` §7) |
+| **Rotation each cohort** | New data seeds, new CTFd flag suffixes for the shared placeholders, at least one target changed per topic (hosted flags are random per instance: no salt to rotate) | Last year's answers and flag dump (`anti-cheating.md` §E; `CTFd-SETUP.md` §7); an old hosted flag is refused by CTFd and flagged by the report (`--prior-flags`) |
 
 **Known limits, so they are covered deliberately rather than assumed away:**
 
@@ -369,19 +376,19 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 - A `…_demo` / placeholder flag means the student worked on a **local copy**, not that they cheated
   (§3.2). It is public, so it proves nothing either way; ask which instance they used before
   accusing anyone. How a demo flag is scored: ⬚.
-- `verify` only resolves flags generated with the **same salt**; a salt mismatch looks like an
-  unattributable flag.
-- A flag `verify` attributes to another team's member does not by itself say *how* it got there, and
-  an unmatched flag does not either: at the 19 Sep 2026 Week 9 sitting 38 of 40 flags matched the
-  issued table and the other 2 came from outside the platform. Ask the teams involved before
-  deciding.
+- The report reads text: convert PDFs and screenshots first (it lists what it did not scan). Its speed
+  check is a hint, not proof.
+- A flag the report attributes to another team's member does not by itself say *how* it got there, and
+  the owner may never have seen it: at the 19 Sep 2026 Week 9 sitting two flags in students' sheets had
+  never been shown to their owners, who had not launched those challenges. Do not act against the owner
+  on this evidence alone; ask the teams involved before deciding.
 - For the challenges with no hosted instance, CTFd's own flags are **shared and static** by design
   (`CTFd-SETUP.md`) — a matching CTFd flag proves nothing about authorship.
 - Red flags to carry into marking (`anti-cheating.md` §F): identical screenshots across teams, a
-  flag `verify` attributes to another team's member, a NoteVault marker that resolves to a different
+  flag the integrity report attributes to another team's member, a NoteVault marker that resolves to a different
   team, code that appears fully formed in one commit with no history, prose that does not match the
   team's own data seed.
-- If copying is found: [ETHICS.md](../../ETHICS.md) + the conduct process; keep the `verify` output,
+- If copying is found: [ETHICS.md](../../ETHICS.md) + the conduct process; keep the integrity-report output,
   the MOSS report and the commit log as evidence (`anti-cheating.md` §G).
 
 ## 7. After the session — debrief and how results feed the final mark
@@ -424,7 +431,8 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
   `docker build -t softsec-toolbox labs/toolbox`
 - Dry runs students should have done: `labs/week16-capstone/scrimmage.md`,
   `labs/week17-review-final-prep/mock-ctf.md`
-- Instructor-only (git-ignored): `instructor/seed_flags.py`, `instructor/check_flag_keys.py`,
+- Instructor-only (git-ignored): `instructor/ctf_integrity_report.py`, `instructor/platform-build/FLAG-SCHEME-RANDOM.md`,
+  `instructor/seed_flags.py` (local-practice `.env` only), `instructor/check_flag_keys.py`,
   `instructor/anti-cheating.md`, `instructor/CTFd-SETUP.md`, `instructor/GRADEBOOK.md`,
   `instructor/ctfd/challenges.yml`, `instructor/exams/week19-final-ctf-capstone-ctf-answers.md`,
   `instructor/exams/item-bank.md`, `instructor/research/`
@@ -439,8 +447,8 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 | **Five-way port-8080 collision (local copies).** W4, W5, W6, W10 (`vulnerable-api`) and `project/starter-app` all publish 8080; a team running several local copies at once hits it | Brief at 0:00–0:10: `docker compose down` one before the next, or override the **left** side of the ports mapping. The Flask apps listen on 5000 *inside* the W4/W5/W6/W10 containers — do not republish 5000 (macOS AirPlay squats 5000, not 8080). W10's `solution-api` already takes 8081; W14 uses 8082/8083; a local CTFd, if run, uses 8000 |
 | **Burp on its default listener.** The Week 6 worksheet's optional Burp step proxies through `127.0.0.1:8080` — the same port the targets publish | Move either Burp's listener or the target's published port |
 | **Student works on a local copy → demo flag.** Verified: with no `.env`, compose renders `FLAG_*: null` in all four local labs (W4, W6, W10, W14) and the app falls back to its committed placeholder | Brief it at 0:00: graded flags for 1–6 and 11 come only from your own hosted instance. Treat a placeholder flag on a sheet as "worked locally", not as cheating; ask which instance was used. Do not try to fix it by seeding per-student `.env` files — the student owns the file |
-| **`seed_flags.py` cannot find the curriculum monorepo** — the shim `sys.exit`s with `ERROR: curriculum monorepo not found` and generates nothing | Run `gen` the **day before**; the sibling `KOSEN69 - curriculum` directory must be present. `check_flag_keys.py` (same shim pattern) is the cheap pre-flight |
-| **Salt mismatch** between `gen` and `verify` — attribution silently returns nothing | Record this cohort's `FLAG_SALT` alongside the `flags.csv` it produced; export the same value before `verify` |
+| **`check_flag_keys.py` cannot find the curriculum monorepo** — the shim `sys.exit`s with `ERROR: curriculum monorepo not found` and checks nothing | Run it the **day before**; the sibling `KOSEN69 - curriculum` directory must be present |
+| **The platform is running an old plugin image** — flags come out in the older 8-hex, salt-derived form, or a flag from one challenge is accepted on another | Pre-flight (§3.2): a test flag must be `FLAG{<key>_<16 hex>}` and be refused on a different challenge. If not, do not start the sitting; roll-forward/rollback steps are in `instructor/platform-build/FLAG-SCHEME-RANDOM.md` |
 | **W11 will not link on a macOS host.** The Makefile's own note: `-z execstack` and `-no-pie` are GNU ld / Linux flags, so "on macOS the *link* step of these targets may fail"; `make syntax` still works. Apple clang also ships no libFuzzer runtime (`labs/toolbox/README.md`), which is challenge 8 | Have `softsec-toolbox` **built before the day** and the run line on a slide: `docker run -it --rm --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -v "$PWD":/work -w /work softsec-toolbox`. `--cap-add=SYS_PTRACE` + relaxed seccomp are what make `gdb`/ASan work |
 | **Challenge 7 has no hosted instance, so its flag cannot be per-student.** `vuln.c:47` reads `FLAG_PWN`, but there is no compose to inject it and students build and run `vuln` themselves — anything they are told to export, they can read | Attribute challenge 7 by evidence and viva like 8/9/10/12; do not ask students to export a per-student `FLAG_PWN` |
 | **W12/W13 need the network and the Docker socket.** `sca_scan.sh`, `sign.sh` and `scan.sh` run `aquasec/trivy:latest` with `-v /var/run/docker.sock:/var/run/docker.sock`, and Trivy fetches its vulnerability DB | Pre-pull `aquasec/trivy:latest` and warm the DB the day before. A locked-down machine that forbids socket mounts cannot run these — check in the target check, not at 1:00 |
@@ -484,5 +492,5 @@ Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The ge
 - Time actually taken per block (vs. plan) — did the CTF hold to 150 min and did every team demo: ⬚
 - Where the class got stuck, and what unblocked them: ⬚
 - Challenge with the lowest solve rate, and what that says about the week it came from: ⬚
-- Integrity flags raised by `seed_flags.py verify` / the NoteVault `TEAM_ID` marker, and how each resolved: ⬚
+- Integrity flags raised by `ctf_integrity_report.py` / the NoteVault `TEAM_ID` marker, and how each resolved: ⬚
 - Anything to change before this week runs again: ⬚

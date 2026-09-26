@@ -318,8 +318,8 @@ the course mark, course specification §4).
   `solution_skeleton.py` (W3), `attack.md` (W6)
 - What comes next: `labs/week08-midterm-written/` · `labs/week09-midterm-practical/`
 - Instructor-only (git-ignored): `instructor/CTFd-SETUP.md` (scoreboard, Houses, Awards),
-  `instructor/make_quiz_forms.gs` (build the quiz Form), `instructor/seed_flags.py` (`gen` builds the
-  per-student flag table and `verify` attributes a submitted flag at Week 9 marking — not needed for
+  `instructor/make_quiz_forms.gs` (build the quiz Form), `instructor/ctf_integrity_report.py`
+  (attributes a submitted hosted flag and raises integrity signals at Week 9 marking — not needed for
   today), the item banks under `instructor/exams/` and
   `instructor/quizzes/`
 - Submission channels: [SUBMISSION.md](../../SUBMISSION.md) · Rules of engagement:

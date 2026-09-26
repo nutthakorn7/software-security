@@ -141,8 +141,8 @@ explains the mechanism correctly but could not land the exploit.
   that component from `slides/week14.md` and collect it as worksheet Part 2 Q5 plus the README's
   written least-privilege agent/MCP design — do not promise students a runnable agent.
 - Per-student flags: graded, attributable flags come only from hosted CTFd instances (`ctf.zcr.ai`,
-  spawnable `w14-promptinj`); instructor-side, `instructor/seed_flags.py gen` builds the table and
-  `verify` attributes a submitted flag at marking (needs the cohort salt). The local `docker compose up`
+  spawnable `w14-promptinj`); instructor-side, hosted flags are random per instance and CTFd records who each
+  was issued to, so `instructor/ctf_integrity_report.py` attributes a submitted flag at marking. The local `docker compose up`
   is practice and serves the public demo flag. `instructor/` is git-ignored and must never be
   distributed.
 - Submission channels: [SUBMISSION.md](../../SUBMISSION.md) · Rules of engagement:
@@ -153,12 +153,12 @@ explains the mechanism correctly but could not land the exploit.
 | Risk | Mitigation |
 |---|---|
 | Both services run `pip install --no-cache-dir flask` on **every** `docker compose up`, not only the first — a room of students needs PyPI at the start of each lab, and `--no-cache-dir` means nothing is reused between runs | Pre-pull `python:3.12-slim` and have a local PyPI mirror, or pre-bake an image with Flask already installed and swap the `image:` line; a plain `docker save`/`docker load` of `python:3.12-slim` alone will **not** get an offline room past the pip step |
-| `FLAG_PROMPTINJ` unset (the normal state of a local `docker compose up`) → both bots silently fall back to the hardcoded default in `vulnerable_chatbot.py` / `guarded_chatbot.py`, so every student leaks the **same** public `_demo` flag and a local run cannot give the per-student attribution that weekly-quiz Q6 and course-specification §9 depend on | Do not try to fix this with a per-student `.env`: the student owns the machine and can read the file, or `docker exec … env`, before exploiting anything, so it is not a graded mechanism. The local lab is practice; graded, attributable flags come only from the student's own hosted instance (`w14-promptinj` on `ctf.zcr.ai`, resolved at marking with `seed_flags.py verify`). Whether Week 14 sends students to it: ⬚ |
+| `FLAG_PROMPTINJ` unset (the normal state of a local `docker compose up`) → both bots silently fall back to the hardcoded default in `vulnerable_chatbot.py` / `guarded_chatbot.py`, so every student leaks the **same** public `_demo` flag and a local run cannot give the per-student attribution that weekly-quiz Q6 and course-specification §9 depend on | Do not try to fix this with a per-student `.env`: the student owns the machine and can read the file, or `docker exec … env`, before exploiting anything, so it is not a graded mechanism. The local lab is practice; graded, attributable flags come only from the student's own hosted instance (`w14-promptinj` on `ctf.zcr.ai`, resolved at marking with `ctf_integrity_report.py`). Whether Week 14 sends students to it: ⬚ |
 | Task 4 (35 min) is the only network-dependent block — `gandalf.lakera.ai` may be down, rate-limited, or blocked by campus filtering | Once the containers are up (see the pip-install row above for the one-time PyPI dependency), Tasks 0–3 and 5 run fully offline against the local mock, so the lab is not lost: roll Task 4 to homework and keep the leaderboard open until the next session |
 | Another process on a student's machine is already bound to 8082 or 8083 | Override the published ports in `docker-compose.yml` (host side only — the apps listen on 8082/8083 inside their containers, so `"9082:8082"` / `"9083:8083"` needs no code change) |
 | A student "tries the same trick" on a production AI assistant | The worksheet's ethics note bounds the target set to this lab and Lakera Gandalf, which is explicitly built to be attacked. Restate it at the game brief; this is a graded ethics expectation (A1), not a suggestion |
 | A student finishes Tasks 1–2 well ahead of 1:25 | Extension: measure the guardrail's **false positives** — `_INJECTION_RE`'s `reveal\|print\|show\|tell .* (secret\|password)` alternation makes the bare words `reveal`, `print`, and `show` blocking on their own — only `tell` correctly requires the `secret`/`password` suffix — so the guarded bot refuses benign messages such as `please print my notes` (verified). Ask for three such messages and a narrower rule that still blocks the Task-1 phrases; that is the *Prompt Problem* in miniature |
-| Copy-paste of a classmate's payload or flag | Flags issued per student by hosted instances make a submitted flag attributable (`seed_flags.py verify`); a `…_demo` flag from the local lab proves nothing either way; viva spot-check the pair |
+| Copy-paste of a classmate's payload or flag | Flags issued per student by hosted instances make a submitted flag attributable (`ctf_integrity_report.py`); a `…_demo` flag from the local lab proves nothing either way; viva spot-check the pair |
 
 ## 9. Post-teaching reflection
 
