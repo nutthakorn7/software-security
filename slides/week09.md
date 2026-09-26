@@ -19,7 +19,7 @@ Covers Weeks 1–6 · Individual
 - Each solved challenge = a flag = points
 - Partial credit for documented progress
 
-<!-- State the time (150 min) + that graded flags are per-student and come only from your own hosted instance (a flag issued to someone else is traceable via seed_flags.py verify). A local FLAG{..._demo} flag is not a valid submission. Submit via CTFd or the Form. ~2 min. -->
+<!-- State the time (150 min) + that graded flags are per-student and come only from your own hosted instance (a flag issued to someone else is traceable through CTFd's own records and ctf_integrity_report.py). A local FLAG{..._demo} flag is not a valid submission. Submit via CTFd or the Form. ~2 min. -->
 
 ---
 
@@ -44,4 +44,4 @@ Covers Weeks 1–6 · Individual
 # Submit your flags
 Next: Week 10, API security
 
-<!-- Close: collect submissions; grade with the answer key + seed_flags.py verify for copied flags (hosted-instance flags only — a _demo flag proves nothing). Preview W10 (APIs). -->
+<!-- Close: collect submissions; grade with the answer key + ctf_integrity_report.py for copied flags (hosted-instance flags only — a _demo flag proves nothing). Preview W10 (APIs). -->

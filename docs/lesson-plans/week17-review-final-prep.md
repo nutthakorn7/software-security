@@ -237,7 +237,7 @@ There is **no worksheet** for Week 17: the lab folder holds `README.md` and `moc
 - Solution files the mock self-checks against: `solution_api.py` (W10), `exploit_skeleton.py` and `safe.rs` (W11), `sign.sh` and `sca_scan.sh` (W12), `harden.md` (W13), `guarded_chatbot.py` (W14), and the week04–06 solutions
 - Toolbox image (Week 11 binary): `labs/toolbox` (`docker build -t softsec-toolbox labs/toolbox`, `FROM silkeh/clang:19`)
 - What comes next: `labs/week18-final-written/` · `labs/week19-final-ctf-capstone/` · term project `project/README.md`
-- Instructor-only (git-ignored): `instructor/CTFd-SETUP.md` (scoreboard, Houses, Awards), `instructor/make_quiz_forms.gs` (build the quiz Form), `instructor/exams/item-bank.md` (Jeopardy seed / final pool), `instructor/seed_flags.py` (`gen` table / `verify` attribution for the hosted per-student flags — for Week 19, not today)
+- Instructor-only (git-ignored): `instructor/CTFd-SETUP.md` (scoreboard, Houses, Awards), `instructor/make_quiz_forms.gs` (build the quiz Form), `instructor/exams/item-bank.md` (Jeopardy seed / final pool), `instructor/ctf_integrity_report.py` (attribution and integrity triage for the hosted per-student flags — for Week 19, not today)
 - Submission channels: [SUBMISSION.md](../../SUBMISSION.md) · Rules of engagement: [ETHICS.md](../../ETHICS.md)
 
 ## 10. Risks and contingencies
