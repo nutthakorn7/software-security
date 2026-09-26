@@ -1,0 +1,124 @@
+# Week 2 Task 6 — security gate, ADAPTED from labs/week15-devsecops-pipeline/security-ci.yml
+#
+# Changes from the Week 15 template, and why:
+#   1. Trigger now includes `wk02` — the template only fires on `main`, so on a
+#      feature branch it never runs and there is no failing run to evidence.
+#   2. trivy-action pinned to the commit SHA of v0.36.0 — the template's
+#      `@0.24.0` tag no longer resolves ("unable to find version 0.24.0").
+#   3. Scans are scoped to the two deliberately vulnerable targets
+#      (labs/week02-sdlc-tooling/vulnerable-repo, project/starter-app) instead of
+#      the whole course repo, so the gate fails on the material this lab is about.
+#   4. Gitleaks runs with `--no-git` against the lab folder — the template's
+#      `detect -s /repo` auto-loads the repo root .gitleaks.toml, which allowlists
+#      this lab's planted secrets on purpose and would make the job pass.
+#   5. SARIF upload steps carry `continue-on-error: true` — on a fork the
+#      security-events permission may be unavailable, and an upload failure would
+#      mask the gate result it is meant to accompany.
+#
+# It runs three security tools and FAILS the build on findings / HIGH+CRITICAL:
+#   - Semgrep  (SAST)            CWE-coverage via OWASP rulesets
+#   - Trivy    (SCA)
+#   - Gitleaks (secret scanning)
+#
+# OWASP 2025: A03 (supply chain), A02 (misconfig), A09 (logging/alerting).
+
+name: security-ci
+
+# CHANGED (1): added wk02 so the gate runs on the working branch.
+on:
+  push:
+    branches: [main, wk02]
+  pull_request:
+  workflow_dispatch:
+
+# Least-privilege token: read code, write security events (for SARIF upload).
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # ---------------------------------------------------------------
+  # 1) SAST — Semgrep scans source for insecure patterns.
+  # ---------------------------------------------------------------
+  semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # CHANGED (3): explicit scan targets.
+      - name: Semgrep scan (report)
+        run: |
+          semgrep scan --metrics=off \
+            --config p/default --config p/owasp-top-ten \
+            labs/week02-sdlc-tooling/vulnerable-repo project/starter-app
+
+      - name: Gate — fail on Semgrep findings
+        # `--error` makes Semgrep exit non-zero when findings exist.
+        run: |
+          semgrep scan --metrics=off --error \
+            --config p/default --config p/owasp-top-ten \
+            labs/week02-sdlc-tooling/vulnerable-repo project/starter-app
+
+  # ---------------------------------------------------------------
+  # 2) Trivy — filesystem (SCA) scan of the project target.
+  # ---------------------------------------------------------------
+  trivy:
+    name: SCA (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Report pass -> SARIF (no fail) ---
+      # CHANGED (2): SHA pin. CHANGED (3): scan-ref scopes it to NoteVault.
+      - name: Trivy fs (SCA) -> SARIF
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: project/starter-app
+          scanners: vuln,secret
+          format: sarif
+          output: trivy-fs.sarif
+          severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true
+          exit-code: "0"          # report only; the gate step enforces failure
+
+      - name: Upload Trivy fs SARIF
+        if: always()
+        continue-on-error: true   # CHANGED (5)
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-fs.sarif
+          category: trivy-fs
+
+      # --- GATE: re-scan with exit-code 1 so HIGH/CRITICAL FAILS the build ---
+      - name: Gate — fail on HIGH/CRITICAL (SCA)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: project/starter-app
+          scanners: vuln,secret
+          severity: HIGH,CRITICAL
+          ignore-unfixed: false
+          exit-code: "1"          # <-- real failure semantics, not `|| true`
+
+  # ---------------------------------------------------------------
+  # 3) Gitleaks — secret scanning of the lab target.
+  # ---------------------------------------------------------------
+  gitleaks:
+    name: Secrets (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history so history-buried secrets are caught
+
+      # CHANGED (4): --no-git + explicit lab path so the root allowlist cannot
+      # suppress the two planted secrets this task is graded on.
+      - name: Gate — fail if any secret found
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            detect --no-git -s /repo/labs/week02-sdlc-tooling/vulnerable-repo \
+            --exit-code 1 -v   # <-- non-zero => build fails

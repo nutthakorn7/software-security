@@ -1,33 +1,44 @@
 """
-Deliberately INSECURE sample for Week 2 scanning practice.
-Do NOT copy these patterns into real code. Find them with SAST + secret scanning.
+Week 2 Task 8 — remediated version of the deliberately insecure sample.
+Five planted flaws fixed: CWE-89, CWE-78, CWE-798, CWE-327, CWE-489.
 """
-import sqlite3, hashlib, subprocess
+import os
+import sqlite3
+import subprocess
+
+import bcrypt
 from flask import Flask, request
 
 app = Flask(__name__)
 
-# CWE-798: hardcoded credentials / secret  (Gitleaks should flag this)
-AWS_SECRET_ACCESS_KEY = "hK8pQ2mN5vX9wZ3rT6yU1sA4bC7dE0fG2hJ5kL8"
-DB_PASSWORD = "xQ7mK2pL9wR4tY6u"
+# FIX 3 (CWE-798): secrets read from the environment, never hardcoded.
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
 
 @app.route("/user")
 def user():
     name = request.args.get("name", "")
     con = sqlite3.connect("app.db")
-    # CWE-89: SQL injection (string formatting into query)
-    q = "SELECT * FROM users WHERE name = '%s'" % name
-    return str(con.execute(q).fetchall())
+    # FIX 1 (CWE-89): parameterised query — the value is bound, never parsed as SQL.
+    rows = con.execute("SELECT * FROM users WHERE name = ?", (name,)).fetchall()
+    con.close()
+    return str(rows)
 
 @app.route("/ping")
 def ping():
     host = request.args.get("host", "127.0.0.1")
-    # CWE-78: OS command injection (shell=True with user input)
-    return subprocess.check_output("ping -c 1 " + host, shell=True)
+    # FIX 2 (CWE-78): no shell, argument list, and the host is allow-listed.
+    if not all(c.isalnum() or c in ".-" for c in host) or not host:
+        return {"error": "invalid host"}, 400
+    return subprocess.check_output(["ping", "-c", "1", host])
 
 def store_password(pw):
-    # CWE-327: weak hash for passwords
-    return hashlib.md5(pw.encode()).hexdigest()
+    # FIX 4 (CWE-327): bcrypt — salted and deliberately slow, unlike MD5.
+    return bcrypt.hashpw(pw.encode(), bcrypt.gensalt()).decode()
+
+def verify_password(pw, stored):
+    return bcrypt.checkpw(pw.encode(), stored.encode())
 
 if __name__ == "__main__":
-    app.run(debug=True)  # CWE-489: debug mode in production
+    # FIX 5 (CWE-489): debug off by default; opt in only via the environment.
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1")
