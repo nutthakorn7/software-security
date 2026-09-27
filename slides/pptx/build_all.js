@@ -195,6 +195,9 @@ async function loadImage(ww, src) {
   if (!m) return null;
   const dir = labDirFor(ww);
   if (!dir) return null;
+  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+  // m[1] is IMG_RE's capture group, anchored ^...$ over [A-Za-z0-9._-]+ with a known extension —
+  // it cannot contain "/" or "..", so this can never resolve outside dir/img/.
   const file = path.join(dir, "img", m[1]);
   if (_imgCache.has(file)) return _imgCache.get(file);
   let out = null;
