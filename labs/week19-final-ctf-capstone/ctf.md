@@ -16,18 +16,27 @@
 | 3 | **Persistent Pop** | stored XSS (week05) | 10 |
 | 4 | **Not Your Object** | IDOR (week06) | 10 |
 | 5 | **Token Smith** | forge JWT to admin (week06) | 15 |
-| 6 | **Raid the API** | BOLA + mass assignment (week10) | 15 |
-| 7 | **Smash** | stack overflow → `win()` ret2win (week11) | 20 |
-| 8 | **Fuzz First** | crash the binary with a fuzzer (week11) | 10 |
-| 9 | **Bad Dependency** | find the vulnerable dep / unsigned image (week12) | 10 |
-| 10 | **Misconfig Hunt** | exposed secret / `*:*` IAM / root Dockerfile (week13) | 15 |
-| 11 | **Jailbreak the Bot** | prompt injection → leak the secret (week14) | 10 |
-| 12 | **Indirect Hit** | indirect injection / output XSS (week14) | 10 |
+| 6 | **BOLA (API)** | broken object-level authorization (week10) | 8 |
+| 7 | **Mass Assignment** | bind a privileged field the server should not accept (week10) | 7 |
+| 8 | **Smash** | stack overflow → `win()` ret2win (week11) | 20 |
+| 9 | **Fuzz First** | crash the binary with a fuzzer (week11) | 10 |
+| 10 | **Bad Dependency** | find the vulnerable dep / unsigned image (week12) | 10 |
+| 11 | **Misconfig Hunt** | exposed secret / `*:*` IAM / root Dockerfile (week13) | 15 |
+| 12 | **Jailbreak the Bot** | prompt injection → leak the secret (week14) | 10 |
+| 13 | **Indirect Hit** | indirect injection / output XSS (week14) | 10 |
+
+> **Note (8 Oct 2026):** #6/#7 were one combined "Raid the API" challenge on an earlier draft of this
+> sheet; the hosted CTFd host already runs BOLA and Mass Assignment as two separate challenge
+> instances, so this sheet now matches that rather than requiring a rebuild. Point split (8/7) is a
+> provisional even-ish division of the old combined 15 and can be rebalanced freely — nothing depends
+> on these exact numbers. (The CTFd scoreboard's own dynamic point values for these two are a
+> *different*, much larger scale used only for engagement/leaderboard purposes — not the number to
+> copy onto this capstone sheet.)
 
 **Submission table**
 
 | # | Flag / proof | Payload or command | Mitigation |
 |---|---|---|---|
-| 1–12 | | | |
+| 1–13 | | | |
 
 *Rules:* attack only provided targets; one submission per team per challenge; document method. First-blood bonus at instructor's discretion.
