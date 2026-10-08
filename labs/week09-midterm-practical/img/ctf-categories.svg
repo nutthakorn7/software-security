@@ -23,8 +23,10 @@
     .chipText { fill:#ffffff; font: 600 11px system-ui, sans-serif; text-anchor:middle; }
     .legend { fill:#6b7280; font: 11px system-ui, sans-serif; }
     .rules { fill:#374151; font: 11px system-ui, sans-serif; }
+    .bg { fill:#ffffff; }
 
     @media (prefers-color-scheme: dark) {
+      .bg { fill:#0b1220; }
       .title { fill:#e5e7eb; }
       .subtitle { fill:#9aa3ad; }
       .pairnote { fill:#c7ccd1; }
@@ -47,6 +49,8 @@
       .rules { fill:#c7ccd1; }
     }
   </style>
+
+  <rect class="bg" x="0" y="0" width="720" height="640"/>
 
   <text class="title" x="20" y="28">Week 9 — Midterm Practical: CTF Scoreboard</text>
   <text class="subtitle" x="20" y="46">100 pts · 150 min · Weeks 1–6 · individual, sandbox-only</text>

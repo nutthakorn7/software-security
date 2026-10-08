@@ -28,8 +28,10 @@
   .mini-lbl { font: 10.5px system-ui, sans-serif; fill: #6b7280; }
   .mini-bar-text { font: 10px system-ui, sans-serif; fill: #ffffff; text-anchor: middle; }
   .footer { font: italic 10.5px system-ui, sans-serif; fill: #6b7280; }
+  .bg { fill:#ffffff; }
 
   @media (prefers-color-scheme: dark) {
+    .bg { fill:#0b1220; }
     .title { fill: #f1f5f9; }
     .subtitle { fill: #9aa3ad; }
     .hdr { fill: #4aa3dd; }
@@ -58,6 +60,8 @@
     .footer { fill: #9aa3ad; }
   }
 </style>
+
+<rect class="bg" x="0" y="0" width="720" height="550"/>
 
 <text class="title" x="360" y="26">Week 18 Final Written Exam — Blueprint</text>
 <text class="subtitle" x="360" y="44">Cumulative · 150 min · 100 pts · heaviest weight on Weeks 10–15</text>
