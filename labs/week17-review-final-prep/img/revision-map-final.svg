@@ -20,7 +20,9 @@
     .bdg   { fill: none; stroke: #E35205; stroke-width: 1.8 }
     .bdgn  { font: 700 11px system-ui, sans-serif; fill: #E35205; text-anchor: middle }
     .foot  { font: 11px system-ui, sans-serif; fill: #6b7280 }
+    .bg    { fill: #ffffff }
     @media (prefers-color-scheme: dark) {
+      .bg    { fill: #0b1220 }
       .h     { fill: #e6e8ea }
       .col   { fill: #9aa3ad }
       .spine { fill: #151a20; stroke: #4aa3dd }
@@ -41,6 +43,8 @@
       .foot  { fill: #9aa3ad }
     }
   </style>
+
+  <rect class="bg" x="0" y="0" width="720" height="736"/>
 
   <text class="h" x="16" y="24">Final revision map — Weeks 10 to 16</text>
   <text class="col" x="16" y="43">THE SPINE — WHAT MAKES A CONTROL A CONTROL</text>

@@ -15,11 +15,13 @@
     .pts{font:700 12px system-ui,sans-serif;fill:#017BC4;text-anchor:middle;}
     .subnote{font:400 10px system-ui,sans-serif;fill:#6b7280;text-anchor:middle;}
     .footer{font:400 10.5px system-ui,sans-serif;fill:#6b7280;text-anchor:middle;}
+    .bg{fill:#ffffff;}
     @media (prefers-color-scheme: dark) {
+      .bg{fill:#0b1220;}
       .title{fill:#e5e7eb;}
       .subtitle{fill:#9aa3ad;}
-      .segBlue{fill:#4aa3dd;stroke:#12181f;}
-      .segOrange{fill:#ff7a3d;stroke:#12181f;}
+      .segBlue{fill:#4aa3dd;stroke:#0b1220;}
+      .segOrange{fill:#ff7a3d;stroke:#0b1220;}
       .segNum{fill:#0b1220;}
       .leader{stroke:#9aa3ad;}
       .chip{fill:#374151;stroke:#6b7280;}
@@ -32,6 +34,8 @@
       .footer{fill:#9aa3ad;}
     }
   </style>
+
+  <rect class="bg" x="0" y="0" width="720" height="300"/>
 
   <!-- Title -->
   <text x="40" y="28" class="title">Week 8 Midterm — Written Exam Blueprint</text>
