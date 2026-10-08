@@ -58,15 +58,15 @@ evidence. Week 12 was what you build with; this week is where you run it.
     aquasec/trivy:latest image week13-hardened:lab`) so the ~100 MiB vulnerability database is
     already cached — `docker build` alone never invokes Trivy and does not populate that cache; a
     room of students pulling both at once is the standard way to lose twenty minutes.
-  - **Run both scan commands yourself, then pick ONE command for all counting — Tasks 0, 1 and 4.**
-    `bash scan.sh` carries `--severity HIGH,CRITICAL`, and `DS-0001` (the unpinned `:latest`) is
-    MEDIUM — so the rule the worksheet names in Task 1 does **not** appear in the kickoff output.
-    The unfiltered `docker run --rm -v "$PWD:/src" aquasec/trivy:latest config /src` does show it,
-    which makes it the command that leaves Task 1 completable. Under the unfiltered command the
-    hardened "after" count is **2, not 0** — that is a number students explain (an untagged
-    distroless `FROM` and a missing `HEALTHCHECK`), not a failed defence. Mixing the two commands
-    across Tasks 0/1/4 makes the before/after delta meaningless, so announce the choice once. See
-    §8, rows 1–2.
+  - **`bash scan.sh` alone is now sufficient and correct for all of Tasks 0, 1 and 4 — verified
+    8 Oct 2026, superseding the "run both commands" guidance below.** Commit `d487869` (31 Jul 2026)
+    widened `scan.sh`'s filter to `MEDIUM,HIGH,CRITICAL` and digest-pinned `Dockerfile.hardened`'s
+    distroless stage, after this lesson plan was written. Reproduced today: filtered (`bash scan.sh`)
+    = `Dockerfile.insecure` **4** (MEDIUM 1, HIGH 1, CRITICAL 2), `Dockerfile.hardened` **0**.
+    `DS-0001` (the unpinned `:latest`) now appears in `scan.sh`'s own output — the unfiltered-command
+    workaround in §8 rows 1–2 is no longer needed and should not be announced; doing so would make the
+    hardened "after" file look un-clean (the unfiltered count is 1, not the old 2 — see §8) and
+    undermine Task 4's point that it is clean. See §8 rows 1–2 for the full correction.
   - Have the offline fallback ready (`docker save` / `docker load` of `aquasec/trivy:latest`).
 - **Prerequisite concepts:** what a Docker image layer is; how to read an AWS IAM policy document
   (`Effect` / `Action` / `Resource` / `Condition`).
@@ -116,10 +116,10 @@ double as the submit-and-wrap window. The rotating micro-demo can roll to the ne
 by viva.
 
 **Formative checkpoints.**
-- A student who reports that "one of the three Trivy rules doesn't exist" is usually right about
-  their command, not wrong about the lab. `bash scan.sh` filters to `HIGH,CRITICAL`; `DS-0001` is
-  MEDIUM and is filtered out. Have them re-run without the severity filter (§8, row 1) — do not mark
-  this as a missed finding.
+- As of commit `d487869` (31 Jul 2026), `bash scan.sh` filters to `MEDIUM,HIGH,CRITICAL` and all
+  three Trivy-mappable rules (`DS-0001`, `DS-0002`, `DS-0031`) already appear in its output —
+  verified 8 Oct 2026. If a student reports one missing, check their command/flags first; it is no
+  longer an expected gap in the lab.
 - Task 1's table has six rows but only three scanner findings. A student waiting for `COPY . .`,
   `chmod -R 777` and the unpinned `pip install` to light up should be sent back to the `# DEFECT:`
   comments in `Dockerfile.insecure` and told to write "manual review — no Trivy rule". The point of
@@ -166,17 +166,18 @@ is available where a student maps and justifies a fix correctly but could not ge
 
 | Risk | Mitigation |
 |---|---|
-| **Task 1 names `DS-0001`, but the kickoff command hides it.** `bash scan.sh` runs `trivy config --severity HIGH,CRITICAL`; `DS-0001` (unpinned `:latest`) is MEDIUM, so it never appears — a graded deliverable is unreachable via the documented command | For Task 1, have the class run `docker run --rm -v "$PWD:/src" aquasec/trivy:latest config /src` with no severity flag. Verified 26 Jul 2026: the unfiltered run reports `DS-0001` (MEDIUM) at `Dockerfile.insecure:11`; `bash scan.sh` does not. Announce this at 1:55 in the lecture, before students lose time hunting |
-| **Before/after counts differ depending on which command produced them** | Verified 26 Jul 2026 — filtered (`bash scan.sh`): `Dockerfile.insecure` 3 (HIGH 1, CRITICAL 2), `Dockerfile.hardened` 0. Unfiltered: `Dockerfile.insecure` 5, `Dockerfile.hardened` **2** — `DS-0001` (MEDIUM) at `Dockerfile.hardened:34`, because the distroless `FROM gcr.io/distroless/python3-debian12` carries no tag, plus `DS-0026` (LOW, missing `HEALTHCHECK`). Require the submitted pair to state its command; grade the **delta and the defect→fix mapping**, not the absolute number — counts move whenever Trivy's checks bundle updates |
+| **RESOLVED 31 Jul 2026 (commit `d487869`), re-verified 8 Oct 2026 — superseded, kept for history.** `scan.sh` used to run `trivy config --severity HIGH,CRITICAL`, under which `DS-0001` (unpinned `:latest`, MEDIUM) never appeared | `scan.sh` now filters `MEDIUM,HIGH,CRITICAL`; `DS-0001` appears in its own output. The unfiltered-command workaround below is no longer needed — do not give it in class, it now shows a confusing non-zero "hardened" count (see next row) |
+| **RESOLVED 31 Jul 2026, re-verified 8 Oct 2026 — superseded, kept for history.** Before/after counts used to differ by command | `scan.sh` alone is now correct for all counting: `Dockerfile.insecure` **4** (MEDIUM 1, HIGH 1, CRITICAL 2), `Dockerfile.hardened` **0**. (The distroless stage was digest-pinned in the same commit, so `DS-0001` no longer fires on the hardened file even unfiltered; the unfiltered count is now `Dockerfile.hardened` **1** — only `DS-0026`, LOW, missing `HEALTHCHECK` — not the old 2.) Still require the submitted pair to state its command and grade the delta + defect→fix mapping, not the absolute number — Trivy's checks bundle can move it again |
 | **Students wait for an IAM finding that never comes.** Trivy's config scanner does not parse standalone AWS IAM policy JSON (verified: the scan reports `Detected config files num=2` — the two Dockerfiles only). `slides/week13.md` still describes the kickoff as "trivy config over Dockerfiles + IAM JSON" | Correct that slide line verbally when briefing the game; `worksheet.md` Task 2 and `scan.sh`'s header comment already say the IAM policies are reviewed manually |
 | **The game brief promises a round the lab does not ship.** `README.md` and `slides/week13.md` list four rounds including "Storage: lock down a publicly-exposed bucket (provided as IaC/localstack)"; no localstack or IaC artifact exists in the lab folder, and the worksheet's tally is 6 container + 3 IAM = 9 flags, where "storage" means the `COPY . .` / `.dockerignore` leak (CWE-538) | Brief the game from the worksheet, not the slide: 9 flags, container + IAM. If a student asks for the bucket round, point them at Part 4 Q2 (a real public-bucket breach) as the written substitute |
 | **Slow or failed pulls; Docker Hub rate limits** | Pre-pull `aquasec/trivy:latest`. The first `trivy config` downloads the checks bundle; the first `trivy image` downloads a ~100 MiB vulnerability database. Keep a `docker save` / `docker load` copy on a USB stick, and stagger the room if bandwidth is thin |
 | **The optional CVE scan needs the Docker socket.** Step [2/2] of `scan.sh` mounts `-v /var/run/docker.sock:/var/run/docker.sock`, which fails on setups where the socket is elsewhere (rootless, Colima) | Step [2/2] is explicitly optional and all of Task 4's graded evidence comes from `trivy config`. `scan.sh` already prints a skip message when the image has not been built. Do not widen the task to depend on it |
+| **`README.md`'s own documented CVE-scan command is broken — verified 8 Oct 2026, not previously flagged.** `docker run --rm aquasec/trivy image week13-hardened:lab` (as written in the README) fails with `failed to connect to the docker API at unix:///var/run/docker.sock` — it is missing the socket mount | Do not hand students the README's one-liner for the optional CVE scan; point them at `scan.sh` step [2/2] instead, which already includes `-v /var/run/docker.sock:/var/run/docker.sock` and works. (Fixed in the README itself, 8 Oct 2026.) |
 | **Apple Silicon platform mismatch** | Verified 26 Jul 2026 on an arm64 Mac: `docker build -f Dockerfile.hardened -t week13-hardened:lab .` succeeds, the image reports Architecture `arm64` and `Config.User` `65532:65532`, and the container answers `{"app":"week13-demo","status":"ok"}`. The pinned build-stage digest is an OCI **image index** — `docker buildx imagetools inspect python:3.11-slim@sha256:cdbd05…` lists `linux/amd64` and `linux/arm64/v8` among its platforms — so it resolves on both halves of the room. Warn any student who refreshes it with the command in the Dockerfile comment (`docker buildx imagetools inspect python:3.11-slim`) to take that **index** digest, not one of the per-platform manifest digests underneath it, which would pin the build to a single architecture |
 | **Port clash if anyone runs the demo app** | `app.py` binds `0.0.0.0:5000` and the Dockerfiles `EXPOSE 5000`; on macOS AirPlay Receiver squats host 5000, and on a busy machine 8080 may already be allocated (`Bind for 0.0.0.0:8080 failed: port is already allocated` happened while verifying this plan). No graded task needs a published port — if demoing, publish any free host port |
 | **"Prove it runs as non-root" from inside the container fails.** The hardened runtime is distroless: no shell, so `docker run -it … sh` and `docker exec … sh` both fail | Have students use `docker image inspect --format '{{.Config.User}}' week13-hardened:lab` (verified: returns `65532:65532`), or cite `USER 65532:65532` in the Dockerfile plus the cleared `DS-0002` finding |
 | **`docker compose up` muscle memory** | There is no compose file this week. The kickoff, per `README.md`, is `bash scan.sh` from inside `labs/week13-cloud-container` |
-| **A student finishes the hunt early** | Extensions: write the `.dockerignore` from Task 3 and show `COPY . .` no longer pulls `.git`; add the missing `HEALTHCHECK` and re-scan to clear `DS-0026`; or add a digest pin to the distroless `FROM` and watch `DS-0001` clear on `Dockerfile.hardened:34` |
+| **A student finishes the hunt early** | Extensions: write the `.dockerignore` from Task 3 and show `COPY . .` no longer pulls `.git`; add the missing `HEALTHCHECK` and re-scan to clear `DS-0026`. (The "add a digest pin and watch `DS-0001` clear" extension is already done — the distroless `FROM` at `Dockerfile.hardened:42` is pinned as of 31 Jul 2026 — so it is no longer available as an early-finisher task) |
 | **Copy-pasted tables between students** | The six defect rows are fixed by the file, so the tables converge — grade the mitigation sentences and the flag-tally reasoning, keep the identity-stamped screenshots, and viva spot-check any pair whose wording matches |
 
 ## 9. Post-teaching reflection
