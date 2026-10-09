@@ -62,6 +62,18 @@ GET /api/users/2/orders   → bob's orders — while authenticated as alice
 
 ---
 
+## BOLA — change the id, watch it leak
+
+Pick a login, request another user's `id`, flip the server. The ladder is live.
+
+```sim
+bola-view
+```
+
+<!-- The interactive companion to the BOLA ladder diagram. Re-implements both get_orders() paths from this week's real code — nothing is sent anywhere. Let them drive it: on :8080 any id returns, even with no login; switch to :8081 and the same request becomes 401 (no identity) / 403 (not owner) / 200 (own). The one move that matters: on the vulnerable server, changing only the URL id changes the data, which is the whole bug. Ties to Task 1 (the 401→403→200 ladder they'll reproduce against the container). ~3 min. -->
+
+---
+
 ## Mass assignment (API3)
 
 ```json

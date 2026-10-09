@@ -648,3 +648,35 @@ input.jwt-forge-in{font-size:.95rem;padding:.4rem .5rem}
 .hash-crack-flag{font-weight:700}
 .hash-crack-flag.same{color:var(--orange)}
 .hash-crack-flag.diff{color:var(--blue)}
+
+/* ---- bola-view (Week 10) ---- */
+.bola-sel{width:100%;font:inherit;padding:.4rem .5rem;border:1px solid var(--line);
+          border-radius:6px;background:var(--bg);color:var(--fg)}
+.bola-mode{margin:.7rem 0 .2rem;border:1px solid var(--line);border-radius:6px;padding:.5rem .6rem}
+.bola-mode legend{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);padding:0 .3rem}
+.bola-radio{display:block;margin:.25rem 0;font-size:.82rem;color:var(--fg)}
+.bola-reqline{margin:.2rem 0 .4rem;font-size:.82rem}
+.bola-hdr{color:var(--mut)}
+.bola-status{margin:.3rem 0;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+.bola-ok{color:var(--blue)}
+.bola-denied{color:var(--orange)}
+.bola-body{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;
+           white-space:pre-wrap;word-break:break-word;background:var(--bg);
+           border:1px solid var(--line);border-radius:6px;padding:.6rem;margin:.4rem 0;min-height:1.2rem}
+
+/* ---- cosign-verify (Week 12) ---- */
+.cosign-sel{width:100%;font:inherit;padding:.4rem .5rem;border:1px solid var(--line);
+            border-radius:6px;background:var(--bg);color:var(--fg)}
+.cosign-policy{margin:.7rem 0 .2rem;border:1px solid var(--line);border-radius:6px;padding:.5rem .6rem}
+.cosign-policy legend{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);padding:0 .3rem}
+.cosign-check{display:block;font-size:.82rem;color:var(--fg)}
+.cosign-note{display:block;margin:.2rem 0 0 1.4rem;font-size:.72rem;color:var(--mut)}
+.cosign-cmd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.76rem;
+            white-space:pre-wrap;word-break:break-word;background:var(--bg);
+            border:1px solid var(--line);border-radius:6px;padding:.5rem .6rem;margin:.2rem 0 .5rem;color:var(--mut)}
+.cosign-status{margin:.3rem 0;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace}
+.cosign-ok{color:var(--blue)}
+.cosign-blocked{color:var(--orange)}
+.cosign-body{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;
+             white-space:pre-wrap;word-break:break-word;background:var(--bg);
+             border:1px solid var(--line);border-radius:6px;padding:.6rem;margin:.4rem 0;min-height:1.2rem}

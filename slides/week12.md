@@ -134,6 +134,18 @@ docker run --rm -e COSIGN_EXPERIMENTAL=1 \
 
 ---
 
+## Verify the signature — does it deploy?
+
+Signed, unsigned, tampered, or signed by someone else. Run the gate and watch.
+
+```sim
+cosign-verify
+```
+
+<!-- The interactive companion to the keyless-signing diagram: it runs cosign's VERIFY logic in the page, so students drive the deploy gate themselves. Walk the four image states: unsigned → "no signatures found"; tampered → the signature no longer matches the digest; our CI → deploys; signed by another identity → blocked ONLY if the policy pins the expected signer. The move that lands the lesson: flip "pin the expected signer" OFF (the lab command's own '.*') and the attacker's validly-signed image deploys — a valid signature is not a signature you should trust. That's why the two --certificate-*-regexp flags from the previous slide must name YOUR identity, not '.*'. Ties to Task 3's verify-before-deploy gate and worksheet Q4. ~3 min. -->
+
+---
+
 ## Tooling — GitHub Advanced Security (GHAS)
 
 - **Secret scanning** + **push protection** — block secrets at push time (before they reach the remote)
