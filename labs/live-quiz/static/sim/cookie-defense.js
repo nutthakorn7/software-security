@@ -70,16 +70,16 @@
     xssDetail.textContent = "";
     if (!raw) {
       set(xssStatus, "stored as text — never executes", "ok");
-      line(xssDetail, "output encoding", "escaped — <script> printed literally", true);
+      line(xssDetail, "output encoding", "escaped — the injected script tag is printed as text", true);
       line(xssDetail, "result", "no code runs, nothing to steal", true);
     } else if (!httpOnly) {
       set(xssStatus, "cookie stolen — document.cookie leaks", "bad");
-      line(xssDetail, "output encoding", "raw — your <script> executes in the origin", false);
+      line(xssDetail, "output encoding", "raw — your injected script tag executes in the origin", false);
       line(xssDetail, "HttpOnly", "off — document.cookie = \"session=abc123\"", false);
       line(xssDetail, "result", "the beacon exfiltrates the session", false);
     } else {
       set(xssStatus, "script runs, but the cookie is hidden", "warn");
-      line(xssDetail, "output encoding", "raw — the <script> still executes (defacement/keylogging)", false);
+      line(xssDetail, "output encoding", "raw — the injected script tag still executes (defacement/keylogging)", false);
       line(xssDetail, "HttpOnly", "on — document.cookie is empty for session", true);
       line(xssDetail, "result", "THIS theft fails — but encoding, not HttpOnly, was the missing layer", false);
     }
