@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>Which flag stops which attack?</h1>
+<p class="lead">HttpOnly, SameSite and a CSRF token each stop a <i>different</i> thing. Set this
+week's cookie + endpoint config and watch two attacks at once: a stored-XSS cookie theft and a
+forged cross-site POST to <code>/comments</code>. The lab's own Task 4 vs Task 5 lives in the gap.
+Nothing is sent anywhere.</p>
+<div class="wrap">
+  <div class="card">
+    <h3>Server config</h3>
+    <label for="enc">Comment output</label>
+    <select id="enc" class="cookie-sel">
+      <option value="raw" selected>raw HTML — <code>vulnerable_app.py</code></option>
+      <option value="escaped">escaped — <code>fixed_app.py</code></option>
+    </select>
+
+    <label for="samesite">Session cookie <code>SameSite</code></label>
+    <select id="samesite" class="cookie-sel">
+      <option value="unset" selected>— not set —</option>
+      <option value="Lax">Lax</option>
+      <option value="Strict">Strict</option>
+    </select>
+
+    <label class="cookie-check" for="httponly"><input type="checkbox" id="httponly"> cookie is <code>HttpOnly</code></label>
+    <label class="cookie-check" for="csrftoken"><input type="checkbox" id="csrftoken"> <code>/comments</code> requires a CSRF token</label>
+
+    <div class="preset" id="presets"></div>
+  </div>
+  <div>
+    <div class="card">
+      <h3>Attack 1 — stored <code>&lt;script&gt;</code> steals the cookie</h3>
+      <p class="cookie-line" id="xss-status"></p>
+      <div id="xss-detail"></div>
+    </div>
+    <div class="card cookie-gap">
+      <h3>Attack 2 — a forged cross-site POST to <code>/comments</code></h3>
+      <p class="cookie-line" id="csrf-status"></p>
+      <div id="csrf-detail"></div>
+    </div>
+  </div>
+</div>
+<script src="/static/sim/cookie-defense.js?v={{ asset_v }}"></script>
+</body></html>

@@ -143,6 +143,18 @@ html = "<h1>Hello, " + str(escape(name)) + "!</h1>"
 
 ---
 
+## Which flag stops which attack? — drive it
+
+Flip HttpOnly, SameSite, and the token. The hardened server kills the XSS — but the CSRF still posts, until you add the token.
+
+```sim
+cookie-defense
+```
+
+<!-- The interactive matrix for the diagram above. Runs both of this week's real handlers: vulnerable_app.py (raw render, cookie with no flags) and fixed_app.py (escape + HttpOnly+SameSite=Strict+Secure), where /comments in BOTH checks no token. Three beats students have to see for themselves: (1) HttpOnly and output-encoding are SEPARATE layers — turn HttpOnly on but leave output raw and the script still runs (defacement), so encoding was the missing control, not HttpOnly; (2) run the full fixed_app.py preset and the XSS dies but the forged comment STILL posts — this is exactly Task 4 ("why SameSite=Strict blocks it") vs Task 5 ("the PoC still gets through — explain why"): SameSite stops the cookie from being ATTACHED, not the POST from being accepted; (3) only adding a server-side CSRF token (the real fix) returns 403. Drive presets in order: vulnerable → HttpOnly-only → fixed_app.py → add-a-token. ~4 min. -->
+
+---
+
 ## Real-world: British Airways (2018)
 
 - Attackers injected malicious JS (Magecart) into BA's site/app

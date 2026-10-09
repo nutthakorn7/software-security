@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>How many tries before the door locks?</h1>
+<p class="lead">Hammer <code>POST /api/login</code> and watch the per-IP window. The fixed
+server allows 5 attempts per 60 seconds and checks the limit <i>before</i> the password —
+so the 6th try is <code>429</code>, even with the right password. Advance the clock to age
+attempts out. Nothing is sent anywhere; the limiter is computed here.</p>
+<div class="wrap">
+  <div class="card">
+    <fieldset class="ratelimit-srv">
+      <legend>Server</legend>
+      <label class="ratelimit-radio"><input type="radio" name="server" id="server-fixed" checked>
+        <code>solution_api.py</code> :8081 — 5 / 60s per IP</label>
+      <label class="ratelimit-radio"><input type="radio" name="server" id="server-vuln">
+        <code>vulnerable_api.py</code> :8080 — no limiter</label>
+    </fieldset>
+
+    <label class="ratelimit-check" for="pw-correct">
+      <input type="checkbox" id="pw-correct"> Use the correct password
+    </label>
+
+    <p class="ratelimit-clock" id="clock">t = 0s</p>
+    <div class="preset">
+      <button type="button" id="send">Send login attempt</button>
+      <button type="button" id="adv10">advance +10s</button>
+      <button type="button" id="adv60">advance +60s</button>
+      <button type="button" id="reset">reset</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Response</h3>
+    <p class="ratelimit-resp" id="resp">— no request yet —</p>
+    <h3>Per-IP window</h3>
+    <div class="ratelimit-window" id="window"></div>
+    <p class="verdict" id="verdict"></p>
+    <p id="explain"></p>
+  </div>
+</div>
+<script src="/static/sim/rate-limit.js?v={{ asset_v }}"></script>
+</body></html>

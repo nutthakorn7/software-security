@@ -102,6 +102,18 @@ mass-assign
 
 ---
 
+## API4 — watch the lockout window
+
+The fixed server allows **5 attempts per 60s per IP**, checked *before* the password. Hammer it; advance the clock; find the lockout.
+
+```sim
+rate-limit
+```
+
+<!-- The interactive companion to API4. Re-implements solution_api.py's rate_limited() exactly: it prunes to a 60s window, then the 6th attempt is 429 — and because the >= check returns BEFORE appending, a rejected 429 is NOT counted, so holding the button down never extends the lockout (students always assume it does). Two beats to land: (1) the limiter runs before the credential check, so a legit user with the RIGHT password is locked out too — that's the availability/DoS face, and the reason per-IP limits behind shared NAT are a real-world headache; (2) the vulnerable server has no limiter, so it's 401 forever — unlimited brute force. This is Task 3 (401×5 then 429×2). The clock control makes the sliding window visible: advance past a timestamp and a slot frees. ~4 min. -->
+
+---
+
 ## Defenses
 
 - **Object-level authorization** on every request (check ownership)
