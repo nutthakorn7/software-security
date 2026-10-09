@@ -35,6 +35,14 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
+## Why it still matters — in one picture
+
+![Why memory safety still matters: C/C++ runs the world's critical infrastructure (OS kernels, browsers, embedded, network stacks); memory bugs are about 70% of severe CVEs historically (Microsoft, Chrome and Android all agree); and it is now a national-policy issue (CISA Secure by Design, ONCD memory-safe roadmap, NSA guidance). Memory safety is not a legacy footnote — it is still the dominant source of serious vulnerabilities, which is why this week ends at "rewrite it in a memory-safe language".](img/why-memory-safety-matters.svg)
+
+<!-- The visual for the motivation — point at the ~70%, say "C/C++ is everywhere AND it's where most severe bugs live," then the policy response. Sets up why the week ends with the Rust rewrite. ~1 min. -->
+
+---
+
 ## The stack frame
 
 - `gets`/`strcpy`/unchecked `memcpy` → overflow
@@ -55,6 +63,14 @@ stack-frame
 - *(this week's binary: no UAF, no off-by-one — those are real bug classes but not in this lab's code)*
 
 <!-- Map the family — these four are what's actually in vuln.c/fuzz_harness.c, verified against the source. UAF and off-by-one are legitimate classes worth mentioning exist, but don't cite them as "this week's bug classes" — nothing here demonstrates them. CWE-121 (this week's actual bug) ranks #14 in the 2025 CWE Top 25 — a stronger, on-topic stat than the old CWE-787-was-#1 line, which is now #5. ~3 min. -->
+
+---
+
+## The four bug classes, side by side
+
+![The four memory-safety weakness classes present in this week's vuln.c, as a classification (not an exploitation guide): CWE-121 stack-based buffer overflow (writing past a fixed char buf[] overruns adjacent stack memory), CWE-787 out-of-bounds write (the umbrella class, of which CWE-121 is the stack case), CWE-134 use of an externally-controlled format string (printf(user) instead of printf("%s", user) lets input read or corrupt memory), and CWE-242 use of an inherently dangerous function (gets(), which cannot be used safely and was removed from C11). Footnote: this binary has no use-after-free and no off-by-one — real classes, just not in this code.](img/memory-bug-classes.svg)
+
+<!-- The four classes as cards — each is a weakness definition (what it IS), not a how-to. Point out CWE-121 is the stack case of the CWE-787 umbrella, and that gets() (CWE-242) is so unsafe it was removed from the C standard. Keep the UAF/off-by-one footnote honest — those aren't in this binary. ~1 min. -->
 
 ---
 

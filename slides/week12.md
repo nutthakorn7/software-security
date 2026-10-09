@@ -35,6 +35,14 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
+## Most of your attack surface is other people's code
+
+![Why the supply chain is now the top-tier risk: you write about 10% of what you ship and dependencies are the other ~90%, so every bug in that 90% ships under your name; one poisoned package fans out to thousands of downstream victims (xz-utils 2024, event-stream 2018, SolarWinds 2020); and OWASP promoted this up the list to A03:2025 Software Supply Chain Failures. You can write perfect code and still be owned through a dependency you never read.](img/supply-chain-design-risk.svg)
+
+<!-- The 10/90 ratio made visual — land it hard, then the blast radius (one publish → thousands), then the A03:2025 promotion. The closing line is the week's thesis. ~2 min. -->
+
+---
+
 ## Real supply-chain attacks
 
 | Case | What happened |
@@ -59,6 +67,14 @@ Software Security · Nutthakorn Chalaemwongwan
 - **Transitive risk** — deps of deps you never chose
 
 <!-- Define dependency confusion clearly (it's the game): if your internal pkg "acme-utils" isn't scoped, a public "acme-utils" with a higher version number can get pulled instead. Transitive = you vet your 10 deps, but they pull 800 you never saw. Stress the install-time-execution point — it's why "I never imported it" isn't a defense, and it's exactly what the lab's PWNED.txt marker proves. ~5 min. -->
+
+---
+
+## Four ways a dependency turns malicious
+
+![The four supply-chain attack vectors as a taxonomy: typosquatting (a malicious package named like one you use — reqeusts for requests — whose setup.py runs at install time, before any import, so a single typo is enough to be owned); dependency confusion (CWE-1357, a public package with a higher version shadows your internal name and is pulled instead); malicious updates (a hijacked or compromised maintainer ships a bad version of a package you already trust); and transitive risk (the dependencies of your dependencies, code you never chose or reviewed but still ship). The trust boundary is bigger than your requirements.txt.](img/supply-chain-attack-vectors.svg)
+
+<!-- The four vectors as cards — the one to hammer is install-time execution (typosquat setup.py), because it kills the "I never imported it" defense and is exactly what the lab's PWNED.txt proves. Dependency confusion is the game. ~2 min. -->
 
 ---
 
@@ -97,6 +113,14 @@ pip-audit                                                          # vs PyPI adv
 - **A08:2025** Software/Data Integrity Failures
 
 <!-- SBOM = the food-label analogy: you can't manage what you can't list. When the next Log4Shell drops, an SBOM answers "are we affected?" in seconds. SLSA Build Track = levels L0–L3 of build provenance / tamper-resistance (L3 is the top; the old "1–4" numbering was v0.1 and is deprecated). ~5 min. -->
+
+---
+
+## Know what's in it, prove how it was built
+
+![Two integrity controls side by side. Left, an SBOM (CycloneDX / SPDX): the build's itemized ingredient list — every component and version — so when the next Log4Shell drops you search it and answer "are we affected?" in seconds, not weeks. Right, SLSA: a ladder of build-provenance levels from L0 to L3 — L0 no guarantees, L1 provenance exists but is forgeable, L2 hosted build and signed (tamper-evident), L3 hardened builds whose provenance cannot be forged. SBOM knows what is in it; SLSA proves how it was built. Both map to OWASP A08:2025 Software or Data Integrity Failures.](img/sbom-slsa-integrity.svg)
+
+<!-- SBOM = food label (know the ingredients, fast incident response); SLSA = the provenance ladder L0-L3 (prove how it was built). Two different questions, both integrity. Note the L0-L3 numbering replaces the deprecated 1-4. ~2 min. -->
 
 ---
 
