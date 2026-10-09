@@ -34,6 +34,14 @@ Software Security · Nutthakorn Chalaemwongwan
 
 ---
 
+## The web half, at API scale
+
+![The web-half bugs reappearing at API scale: Injection/SQLi (W4), XSS (W5) and Auth/IDOR (W6) all return; IDOR becomes BOLA (API1); and APIs add their own — mass assignment (API3) and no rate limit (API4). The point: there is no browser to hide behind, so the API endpoint is the whole attack surface, every field attacker-chosen.](img/web-to-api-bridge.svg)
+
+<!-- The visual bridge for the recap — walk left (the bugs they already know) to right (the same bugs at the endpoint + the three API-native ones). The one line: everything they learned W4-6 still applies, APIs just strip away the browser safety layer. ~1 min. -->
+
+---
+
 ## Why APIs are different
 
 - Machine-to-machine, no browser to "protect" them
@@ -102,6 +110,14 @@ mass-assign
 
 ---
 
+## The whole map — API Top 10:2023
+
+![The ten OWASP API Security Top 10:2023 categories as a single map, with API1 (BOLA), API3 (BOPLA / mass assignment) and API4 (unrestricted resource consumption) highlighted as this week's three graded bugs and the other seven shown as the rest of the map. Footnote: API3:2023 BOPLA folds in the old 2019 "excessive data exposure". The three we drill are authorization and design bugs, not input-validation bugs.](img/api-top10-map.svg)
+
+<!-- The overview that frames the three graded bugs against the full ten. Don't read all ten aloud — point at the three orange ones and say "these are today; the other seven exist and you'll meet them in the CTF weeks." Reinforces the taxonomy note (API3 absorbs excessive data exposure). ~2 min. -->
+
+---
+
 ## API4 — watch the lockout window
 
 The fixed server allows **5 attempts per 60s per IP**, checked *before* the password. Hammer it; advance the clock; find the lockout.
@@ -123,6 +139,14 @@ rate-limit
 - Schema validation (OpenAPI / GraphQL types)
 
 <!-- The payoff. #1: ownership check on every object access (kills BOLA). DTO/allow-list binding kills mass assignment AND excessive exposure in one move. Schema validation at the edge rejects junk early. ~5 min. -->
+
+---
+
+## Each defense, and the attack it kills
+
+![Each Week 10 API defense mapped to the attack it stops: object-level authorization (an ownership check) kills BOLA (API1), allow-listing the request schema kills mass assignment (API3), rate limiting kills unrestricted resource consumption (API4), plus schema validation and response DTOs as defense-in-depth. These are authorization and design controls, not escaping or a WAF, because the JSON was always well formed — the bug was in what the server allowed, not how it was encoded.](img/api-defenses-map.svg)
+
+<!-- The checklist as a map: each control points at the exact bug it closes. Land the closing line — none of today's bugs are input-validation problems, so "sanitize your inputs" doesn't apply; the fix is a missing check, not bad parsing. ~2 min. -->
 
 ---
 
@@ -158,6 +182,14 @@ nc -lvp 34567 -e /bin/bash   # attacker gets a shell
 > Legitimate admin features become RCE without strict authz + integrity checks.
 
 <!-- Shows that "a feature" + missing authz = RCE. A legit admin editor, abused once an attacker has access. Ties to least-privilege: even admins shouldn't be able to inject executable code. ~3 min. -->
+
+---
+
+## That backdoor, step by step
+
+![A five-step attack chain turning a legitimate WordPress admin feature into RCE: (1) the attacker already has wp-admin access, (2) opens Appearance → Theme Editor → 404.php, (3) pastes a PHP exec() payload saved straight to disk as part of the active theme, (4) visits any non-existent page so the 404 runs 404.php and the payload executes, (5) gets an nc bind shell as the web-server user. A legitimate admin feature becomes RCE without authorization and integrity checks — separate content editing from code editing, and version, sign and verify theme files.](img/wp-backdoor-flow.svg)
+
+<!-- The chain the bash on the previous slide describes — walk it top to bottom once. The point is not WordPress specifics; it's that a legitimate, authenticated feature became RCE because nothing separated "edit content" from "edit code" and nothing verified integrity. ~2 min. -->
 
 ---
 
