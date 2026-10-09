@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>Does this image get to deploy?</h1>
+<p class="lead">Pick what state the image is in, choose whether your deploy policy pins the
+expected signer or leaves it wide open, and run <code>cosign verify</code>. A valid
+signature is not enough — it has to be a signature by the signer you expected. Nothing
+is sent anywhere; the verify logic is re-implemented here.</p>
+<div class="wrap">
+  <div class="card">
+    <label for="image">The image arriving at the deploy gate</label>
+    <select id="image" class="cosign-sel">
+      <option value="signed-ci" selected>signed by our CI</option>
+      <option value="unsigned">never signed</option>
+      <option value="tampered">signed, then a layer re-pushed</option>
+      <option value="wrong-identity">signed — but by another identity</option>
+    </select>
+
+    <fieldset class="cosign-policy">
+      <legend>Verify policy</legend>
+      <label class="cosign-check" for="pin">
+        <input type="checkbox" id="pin" checked>
+        Pin the expected signer identity
+        <span class="cosign-note">off = <code>--certificate-identity-regexp '.*'</code> (accept any signer)</span>
+      </label>
+    </fieldset>
+
+    <div class="preset" id="presets"></div>
+  </div>
+  <div class="card">
+    <h3>cosign verify</h3>
+    <pre class="cosign-cmd" id="cmd"></pre>
+    <p class="cosign-status" id="status"></p>
+    <pre class="cosign-body" id="bodyout"></pre>
+    <p class="verdict" id="verdict"></p>
+    <p id="explain"></p>
+  </div>
+</div>
+<script src="/static/sim/cosign-verify.js?v={{ asset_v }}"></script>
+</body></html>

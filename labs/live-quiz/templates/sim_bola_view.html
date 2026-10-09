@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="/static/sim/sim.css"></head>
+<body>
+<h1>Who are you, and whose orders are you asking for?</h1>
+<p class="lead">Pick who you're logged in as, pick which user's orders to request at
+<code>GET /api/users/&lt;id&gt;/orders</code>, and toggle between this week's two real
+implementations. Watch what comes back. Nothing is sent anywhere — the two servers'
+logic is re-implemented here.</p>
+<div class="wrap">
+  <div class="card">
+    <label for="identity">Authenticated as (the <code>X-User-Id</code> header)</label>
+    <select id="identity" class="bola-sel">
+      <option value="none">— no identity sent —</option>
+      <option value="1" selected>alice (id 1)</option>
+      <option value="2">bob (id 2)</option>
+    </select>
+
+    <label for="reqid">Request <code>/api/users/&lt;id&gt;/orders</code></label>
+    <select id="reqid" class="bola-sel">
+      <option value="1">id 1 — alice</option>
+      <option value="2" selected>id 2 — bob</option>
+      <option value="3">id 3 — carol (admin)</option>
+    </select>
+
+    <fieldset class="bola-mode">
+      <legend>Server implementation</legend>
+      <label class="bola-radio">
+        <input type="radio" name="mode" id="mode-vuln" checked> <code>vulnerable_api.py</code> :8080 — no ownership check
+      </label>
+      <label class="bola-radio">
+        <input type="radio" name="mode" id="mode-fixed"> <code>solution_api.py</code> :8081 — checks ownership
+      </label>
+    </fieldset>
+
+    <div class="preset" id="presets"></div>
+  </div>
+  <div class="card">
+    <h3>Response</h3>
+    <p class="bola-reqline" id="reqline"></p>
+    <p class="bola-status" id="status"></p>
+    <div class="bola-body" id="bodyout"></div>
+    <p class="verdict" id="verdict"></p>
+    <p id="explain"></p>
+  </div>
+</div>
+<script src="/static/sim/bola-view.js?v={{ asset_v }}"></script>
+</body></html>
