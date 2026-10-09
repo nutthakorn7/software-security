@@ -41,6 +41,8 @@ Software Security · Nutthakorn Chalaemwongwan
 - Clients can send any field → mass assignment
 - Maps to the **OWASP API Security Top 10:2023** (still current — no 2025 revision)
 
+![Side-by-side of why an API is a harder target than a browser-fronted web app. Left, the classic web app: a user → the browser (a free safety layer: same-origin, SameSite cookies, CSP, CSRF tokens) → the server, which is partly shielded because the browser enforces rules before a request leaves. Right, the API: an attacker-controlled client (curl, Postman, a script, a modified mobile app) talks straight to a raw JSON endpoint — no browser, no safety net, every byte and field attacker-chosen, so the endpoint itself is the whole attack surface. Two consequences: REST exposes object IDs, so incrementing one gives IDOR/BOLA; and the client can send any field, so binding the whole body gives mass assignment. The browser was doing security work you never noticed — remove it and every input must be treated as attacker-chosen.](img/browser-vs-api.svg)
+
 <!-- Key framing. No browser = no SameSite/CSP safety net; the API is the raw attack surface. APIs expose object ids by design (REST). Mobile/SPA clients are fully attacker-controlled — never trust what they send. ~5 min. -->
 
 ---
@@ -53,6 +55,8 @@ GET /api/users/2/orders   → bob's orders — while authenticated as alice
 
 - Broken Object Level Authorization = IDOR, at API scale
 - The catch: the vulnerable endpoint doesn't check ownership **at all** — it hands back whatever `<id>`'s orders you ask for, full stop. There's no spoofable-but-present check to defeat; there's no check. (The `X-User-Id` header exists as this lab's stand-in for "auth," but on this route the code never even reads it.)
+
+![BOLA shown as insecure versus secure. On the insecure API (:8080), alice (authenticated) sends GET /api/users/2/orders — asking for id 2, not hers — and because the code never reads who is calling, there is no check to spoof and none runs, so the server returns bob's orders with 200 OK. On the secure API (:8081) one ownership check produces a three-rung ladder: no identity header → 401 Unauthorized; alice (X-User-Id 1) requesting carol's id 3 → 403 Forbidden (she's known, but the object isn't hers); alice requesting her own id 1 → 200 OK. The whole fix is one question asked every request — does the caller own this object? — not escaping or a WAF rule, since the JSON was always well formed.](img/bola-ladder.svg)
 
 <!-- The worked example — this is today's local target (vulnerable_api.py), not crAPI's vehicle-location challenge (which uses GUID ids you can't just increment — don't reuse that worked example against this lab or the ids won't line up). Same root cause as W6 IDOR. Verify before teaching: `get_orders()` in vulnerable_api.py never calls current_user() — grep it live if you doubt this. Toggling X-User-Id (garbage value, wrong id, omitted) makes zero difference; only the URL's own id matters. Don't say "server trusts a client-set header" — that implies a check exists and is merely spoofable. It's simpler and worse than that: no check runs. The fix (solution_api.py) is what actually introduces the X-User-Id comparison — that's where "auth" first exists in this exercise, fake as it is. ~6 min. -->
 

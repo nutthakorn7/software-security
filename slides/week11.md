@@ -68,6 +68,8 @@ afl-fuzz -i seeds -o out -- ./vuln @@                                  # AFL++
 - Coverage-guided mutation finds crashes fast
 - Pair with sanitizers (ASan) for root cause
 
+![Coverage-guided fuzzing as a feedback loop. The top row runs seed corpus → mutate (flip/splice bytes) → run target → "what happened?", which asks two questions. First: did the input reach NEW code? If yes it's kept and added to the corpus, and a dashed arrow feeds back to mutate — this is the coverage-guided loop that lets the fuzzer learn its way to deep bugs instead of guessing blindly. Second: did it crash? If yes, AddressSanitizer turns a silent memory corruption into a precise report naming the faulting line, and the crashing input is minimized and saved as crash-<hash>. Two notes: coverage guidance reaches bugs a random generator never would, and ASan turns a mystery segfault into an actionable root cause. This is round 1 of the lab — finding the crash, not exploiting it.](img/fuzz-loop.svg)
+
 <!-- Connect to W2 fuzzing (now hands-on). Coverage-guided = the fuzzer mutates inputs and keeps the ones that reach NEW code, so it "learns" its way to deep bugs. ASan turns a silent corruption into a precise crash report. This is round 1 of the game. ~6 min. -->
 
 ---
@@ -107,6 +109,8 @@ afl-fuzz -i seeds -o out -- ./vuln @@                                  # AFL++
 - **Rust / Go** remove whole bug classes by design
 - CISA "Secure by Design" + ONCD: move off C/C++ for new code
 - Borrow checker / bounds checks = no overflow, no UAF
+
+![Two columns contrasting how C/C++ and memory-safe languages treat the same bug family. In C/C++ you manage memory by hand with no automatic checks, so a whole family is possible — buffer overflow (CWE-121), out-of-bounds write (CWE-787), use-after-free, format string (CWE-134) — and the mitigations (canary, ASLR, PIE, NX, FORTIFY) only raise the cost of exploiting the bug while the bug still compiles and ships, a treadmill where the class never goes away. In Rust/Go the language manages memory for you: the borrow checker enforces lifetimes and arrays are bounds-checked, so an overflow or use-after-free becomes a compile error or a safe panic — the class is removed, not patched, because the unsafe write never reaches the machine. Mitigations are a treadmill; a memory-safe language ends the race, which is why CISA Secure by Design and the US ONCD both call for moving off C/C++ for new code.](img/memory-safe-languages.svg)
 
 <!-- The thesis of the week. Mitigations are a treadmill; memory-safe languages END the bug class. Rust's borrow checker makes UAF a compile error, not a CVE. This is exactly where industry + government are steering. ~4 min. -->
 
