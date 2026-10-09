@@ -84,7 +84,9 @@ pip-audit                                                          # vs PyPI adv
 - Produces CVEs + fix versions
 - CWE-1104 (unmaintained), CWE-829 (untrusted inclusion), **CWE-1395** (known-vulnerable 3rd-party dependency)
 
-<!-- Hands-on tooling (ties to W2 SCA). This lab is pure Python — no npm project — so it's trivy fs + pip-audit, not npm audit/dependency-check. Run trivy live on the project — it lists CVEs + the fixed version. Q6 of the quiz asks for one real vulnerable dependency they found + remediation. ~4 min. -->
+![Software Composition Analysis turns requirements.txt into a remediation worklist: the pinned-but-outdated deps (Flask 1.1.4, Jinja2 2.11.3, urllib3 1.26.4) feed two scanners — trivy fs (matches versions to the CVE database) and pip-audit (checks PyPI advisories) — neither of which reads your code, both read your dependency list. The output is one row per vulnerable package with the version that fixes it: Flask → 2.3.2 (CVE-2023-30861, HIGH), Jinja2 → 2.11.4 (CVE-2020-28493 ReDoS), urllib3 → 1.26.17 (CVE-2023-43804, HIGH). The contrast: SAST reads the code you wrote and finds your bugs; SCA reads the versions you depend on and finds other people's known, already-patched bugs, so the fix is a version bump, not a code change.](img/sca-worklist.svg)
+
+<!-- Hands-on tooling (ties to W2 SCA). This lab is pure Python — no npm project — so it's trivy fs + pip-audit, not npm audit/dependency-check. Run trivy live on the project — it lists CVEs + the fixed version. The diagram's one job: SCA ≠ SAST. SAST = your code, your bugs; SCA = your versions, other people's known bugs, fix = bump the pin. Don't read the worklist rows aloud — they'll run it live; point at the "→ FIXED IN" column and say "that's the whole remediation, a version number." Q6 of the quiz asks for one real vulnerable dependency they found + remediation. ~4 min. -->
 
 ---
 
@@ -121,6 +123,14 @@ docker run --rm -e COSIGN_EXPERIMENTAL=1 \
 - Keyless signing is backed by **Fulcio** (short-lived cert authority) + **Rekor** (public transparency log) — no long-lived private key sitting on disk to leak (**CWE-321**)
 
 <!-- Demo the sign→verify loop. sign.sh runs both tools dockerized — match that here, not a bare local binary. Keyless (Sigstore) = identity-based signing via OIDC through Fulcio, logged in Rekor, no key to leak — name both by name, worksheet Q4 grades on the vocabulary. The deploy gate: refuse any image that doesn't verify → a tampered artifact can't ship. This is the lab's defend step. ~4 min. -->
+
+---
+
+## Keyless signing — the flow
+
+![How Sigstore keyless signing works with no long-lived private key: cosign sign authenticates via an OIDC identity (GitHub/Google), Fulcio issues a short-lived (~10 min) certificate bound to that identity, cosign signs with an ephemeral key then discards it, and the signature + certificate are recorded in Rekor's public transparency log — so nothing long-lived is ever written to disk and there is no private key to leak (avoiding CWE-321). At deploy, cosign verify checks the signature against the expected identity and the Rekor log: a valid, matching signature is allowed to deploy; an unsigned or tampered image returns "no signatures found" and the gate blocks it.](img/sigstore-keyless.svg)
+
+<!-- The mental model behind the bash on the previous slide — walk it once, left to right across the sign lane, then down to the verify gate. The one idea that lands: there is no key to protect because there is no long-lived key at all; trust is anchored to an OIDC identity and a public log, not a secret file. Fulcio = the short-lived-cert CA, Rekor = the transparency log — worksheet Q4 grades on naming both. Don't re-read every box; students have the diagram, spend the time on the "identity, not a key" punchline. ~3 min. -->
 
 ---
 
