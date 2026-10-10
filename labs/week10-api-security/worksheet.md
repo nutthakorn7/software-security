@@ -612,6 +612,26 @@ The rate limiter stores attempts in memory and only tracks IP addresses. In prod
 2. **Real breach:** research an API authorization breach (e.g., the Optus or T-Mobile BOLA/IDOR incidents). Which API Top 10 id matches, and would the `solution_api.py` ownership check have prevented it?
 3. **Best mitigation:** of object-level auth, allow-list binding, and rate limiting — which gives the most risk reduction for an API platform, and why?
 
+
+## Part 4 — Reflection
+
+### 1. Security Mapping
+
+| Finding | Endpoint | OWASP API ID | Fix Applied |
+|---|---|---|---|
+| BOLA | `GET /api/users/{uid}/orders` | API1:2023 | Check authentication and object ownership |
+| Mass Assignment | `POST /api/users` | API3:2023 | Allow-list permitted fields; set `is_admin` and `balance` server-side |
+| Missing Rate Limit | `POST /api/login` | API4:2023 | Limit login attempts to 5 per 60 seconds; return HTTP 429 |
+
+### 2. Real Breach — Optus (2022)
+
+The Optus data breach involved unauthorized access to customer information through an exposed API. It relates to **API1:2023 — Broken Object Level Authorization (BOLA)**. Proper authentication and per-object authorization checks, similar to those in `solution_api.py`, could have helped prevent unauthorized access, provided they were applied to the affected endpoint.
+
+### 3. Best Mitigation
+
+I believe **object-level authorization** provides the greatest risk reduction because it prevents users from accessing other people's private data. Checking permissions on every request protects sensitive information even when an attacker changes an object ID.
+
+
 ## Grading rubric (100)
 
 | Criterion | Weight |
