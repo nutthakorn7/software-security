@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gcc make \
         gdb \
         python3 python3-pip \
+        rustc \
         nmap sqlmap \
         curl git vim less ca-certificates \
     && rm -rf /var/lib/apt/lists/*
