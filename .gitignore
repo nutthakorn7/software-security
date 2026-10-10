@@ -52,3 +52,6 @@ crash-*
 
 # /codex skill session-continuity state (Codex thread ID for resume)
 .context/
+
+# Week 10 local session test files
+**/*-cookies.txt
