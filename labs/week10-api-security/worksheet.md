@@ -377,7 +377,7 @@ Rate limiting should also be combined with monitoring, appropriate authenticatio
 
 #### 6. Evidence
 
-![Task 3 - Login Rate Limiting Test](img/task3.png)
+![Task 3 - Login Rate Limiting Test](img/week10_task3.png)
 
 
 ### Task 4 — Bonus: crAPI Raid (optional, 20 min)
