@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resolver Confusion Simulation — Mode Comparison</title>
+<style>
+:root{--bg:#0e1116;--fg:#e6e8ea;--mut:#9aa3ad;--line:#2a3038;--card:#151a20;
+      --orange:#E35205;--blue:#017BC4;--green:#00c853}
+*{box-sizing:border-box}
+body{margin:0;padding:1.5rem;background:var(--bg);color:var(--fg);
+     font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+h1{font-size:1.4rem;margin:0 0 .25rem}
+h3{font-size:.85rem;margin:0 0 .5rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.lead{color:var(--mut);margin:0 0 1.2rem;max-width:85ch}
+.terminal-bar{background:#1a1f26;border:1px solid #30363d;color:#00ff66;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;padding:9px 14px;border-radius:6px;margin-bottom:1.2rem;display:flex;justify-content:space-between}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.2rem;display:flex;flex-direction:column;gap:1rem}
+.mode-badge{display:inline-block;padding:.25rem .6rem;border-radius:4px;font-size:.8rem;font-weight:700;font-family:ui-monospace,Menlo,monospace}
+.badge-merged{background:rgba(227,82,5,0.2);color:#ff7043;border:1px solid rgba(227,82,5,0.4)}
+.badge-single{background:rgba(1,123,196,0.2);color:#4fc3f7;border:1px solid rgba(1,123,196,0.4)}
+.cards-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.box{border:1px solid var(--line);border-radius:6px;padding:.7rem .8rem;background:#10141a}
+.box.is-picked-bad{border-color:var(--orange);box-shadow:0 0 0 1px var(--orange) inset}
+.box.is-picked-ok{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
+.box-title{font-size:.8rem;color:var(--mut);text-transform:uppercase;margin:0 0 .3rem}
+.box-pkg{font-family:ui-monospace,Menlo,monospace;font-size:.85rem;font-weight:600;margin:0 0 .3rem}
+.box-ver{font-family:ui-monospace,Menlo,monospace;font-size:1.1rem;font-weight:700}
+.box-ver.high{color:#ff7043}
+.box-ver.priv{color:#4fc3f7}
+.verdict-box{border-radius:6px;padding:.9rem 1rem;border:1px solid var(--line);background:#10141a;flex-grow:1}
+.verdict{margin:0 0 .4rem;font-weight:700;font-size:1rem}
+.verdict.bad{color:var(--orange)}
+.verdict.ok{color:#4fc3f7}
+.explain{font-size:.88rem;line-height:1.55;color:#c9d1d9;margin:0}
+</style>
+</head>
+<body>
+<div class="terminal-bar">
+  <span>$ saisengmain | 6631503085 | 2026-10-10 13:25:00 +07</span>
+  <span>Week 12 Supply-Chain Security · Task 2 Resolver Simulation</span>
+</div>
+
+<h1>Task 2 — Dependency Confusion Resolver Simulation</h1>
+<p class="lead">Comparison of pip package resolver behavior between <strong>Merged Mode</strong> (<code>--extra-index-url</code>) and <strong>Single-Index Mode</strong> (<code>--index-url</code>) for package <code>acme-internal-utils</code>.</p>
+
+<div class="grid-2">
+  <!-- Mode 1: Merged (The Attack) -->
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Configuration A: Merged Indexes</h3>
+      <span class="mode-badge badge-merged">--extra-index-url (VULNERABLE)</span>
+    </div>
+    <div class="cards-row">
+      <div class="box">
+        <div class="box-title">Private Index</div>
+        <div class="box-pkg">acme-internal-utils</div>
+        <div class="box-ver priv">v1.4.0</div>
+      </div>
+      <div class="box is-picked-bad">
+        <div class="box-title">Public PyPI (Attacker)</div>
+        <div class="box-pkg">acme-internal-utils</div>
+        <div class="box-ver high">v99.0.0 ★ PICKED</div>
+      </div>
+    </div>
+    <div class="verdict-box" style="border-left:4px solid var(--orange)">
+      <div class="verdict bad">Verdict: Confused — installs v99.0.0 from PUBLIC</div>
+      <p class="explain">
+        <code>--extra-index-url</code> merges private and public registries into a single candidate pool. The resolver enforces PEP 440 ordering ("highest version wins") with no source trust boundaries. Because <code>99.0.0 > 1.4.0</code>, the attacker's public wheel is installed and its malicious <code>setup.py</code> runs at install time as root/developer.
+      </p>
+    </div>
+  </div>
+
+  <!-- Mode 2: Single Index (The Defense) -->
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Configuration B: Single Index</h3>
+      <span class="mode-badge badge-single">--index-url (SECURE DEFENSE)</span>
+    </div>
+    <div class="cards-row">
+      <div class="box is-picked-ok">
+        <div class="box-title">Private Index</div>
+        <div class="box-pkg">acme-internal-utils</div>
+        <div class="box-ver priv">v1.4.0 ★ PICKED</div>
+      </div>
+      <div class="box" style="opacity:0.45">
+        <div class="box-title">Public PyPI (Attacker)</div>
+        <div class="box-pkg">acme-internal-utils</div>
+        <div class="box-ver">v99.0.0 (IGNORED)</div>
+      </div>
+    </div>
+    <div class="verdict-box" style="border-left:4px solid var(--blue)">
+      <div class="verdict ok">Verdict: Safe — installs v1.4.0 from PRIVATE</div>
+      <p class="explain">
+        <code>--index-url</code> explicitly designates exactly ONE authoritative index. The resolver never queries the public PyPI index for this package name, meaning the public <code>99.0.0</code> candidate is never fetched, evaluated, or installed. The attack vector is completely severed.
+      </p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
