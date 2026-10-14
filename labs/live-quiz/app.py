@@ -698,6 +698,11 @@ def on_player_join(data):
                 "players": _connected_count(game),
             },
         )
+    elif q is not None and nickname in game.round_results:
+        # The round closed while this player had no socket, so _reveal_results skipped them. Their
+        # own result is no longer a secret (the round is over) and nothing else would ever carry
+        # their cumulative score to the phone, so replay just that. Never reached mid-round.
+        emit("answer:feedback", {**game.round_results[nickname], "score": player.score})
     _broadcast_lobby(game, data["pin"])
 
 
@@ -802,7 +807,13 @@ def _reveal_results(pin):
     # renders it from its question:results handler. The round is already closed above, so
     # nothing sent here can still help anyone answer.
     for sid, result in private:
-        socketio.emit("answer:feedback", result, to=sid)
+        try:
+            socketio.emit("answer:feedback", result, to=sid)
+        except Exception:
+            # The round is already marked revealed, so a raise here would leave it closed for
+            # everyone with no question:results (a second call returns early on the flag). One
+            # bad socket costs only that player their banner.
+            app.logger.exception("private result delivery failed")
     socketio.emit("question:results", payload, to=pin)
 
 
