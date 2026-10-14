@@ -787,7 +787,22 @@ def _reveal_results(pin):
         "leaderboard": game.leaderboard(),
         "correct": q["correct"] if q else None,
     }
+    # Each answerer's own result (cumulative score included, so the phone never has to guess it —
+    # client-side accumulation drifts across a reconnect), built before the flag flips for the
+    # same recover-on-raise reason as the payload. A player with no socket on file, or who never
+    # answered, gets nothing; player.js renders "Time's up" from the absence.
+    private = []
+    for nick, res in game.round_results.items():
+        sid = CURRENT_SID.get((pin, nick))
+        player = game.players.get(nick)
+        if sid is not None and player is not None:
+            private.append((sid, {**res, "score": player.score}))
     game._revealed_this_round = True
+    # Private results go out BEFORE the broadcast: player.js keeps the result pending and
+    # renders it from its question:results handler. The round is already closed above, so
+    # nothing sent here can still help anyone answer.
+    for sid, result in private:
+        socketio.emit("answer:feedback", result, to=sid)
     socketio.emit("question:results", payload, to=pin)
 
 
@@ -818,10 +833,12 @@ def on_answer_submit(data):
         return
     if result is None:
         return
-    # feedback carries the player's authoritative cumulative score so the phone never has to
-    # guess it (client-side accumulation drifts across a reconnect)
-    player = game.players.get(nickname)
-    emit("answer:feedback", {**result, "score": player.score if player else 0})
+    # Acknowledge ONLY that the tap was recorded. correct / points / score are held until the
+    # round closes (_reveal_results): whether a choice is right is the one thing every other
+    # nickname in the room is trying to learn, and a hostile client reads this event straight
+    # off the socket, so hiding it in player.js is not a control. Nothing in this ack may vary
+    # with the answer's correctness.
+    emit("answer:recorded", {})
     # keep the projector's "answered" counter climbing live — count only still-connected answerers
     answered = sum(1 for n in game.answers_this_round if game.players[n].connected)
     socketio.emit(

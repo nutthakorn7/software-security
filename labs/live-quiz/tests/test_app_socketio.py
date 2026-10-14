@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from app import app, socketio, GAMES, GAME_OWNER, get_db
+from app import app, socketio, GAMES, GAME_OWNER, get_db, _reveal_results
 import content as C
 import db as dbmod
 import roster
@@ -199,6 +199,134 @@ def test_a_legitimate_reconnect_with_the_right_token_still_resumes_the_same_play
     reconnecting_socket.emit("answer_submit", {"pin": "445445", "nickname": "alice", "choice": 1})
     assert GAMES["445445"].players["alice"].score > 0, \
         "the reconnected socket must be able to score as the same player"
+
+
+LEAKY_KEYS = {"correct", "points", "score"}
+
+
+def _payload_keys(events):
+    keys = set()
+    for e in events:
+        for arg in e["args"]:
+            if isinstance(arg, dict):
+                keys |= set(arg)
+    return keys
+
+
+def test_throwaway_nicknames_cannot_probe_the_answer_before_the_reveal():
+    # Codex finding #3. on_answer_submit used to emit answer:feedback -- {correct, points,
+    # score} -- the instant a player answered. player.js held the banner back until the
+    # reveal, but that is a client-side courtesy: a hostile client reads the event straight off
+    # the socket. The one-answer limit is per NICKNAME, so a student joins with one throwaway
+    # nickname per option, submits a different choice from each, and the one that comes back
+    # correct is the answer -- before the real reveal, relayable to the whole class.
+    GAMES.clear()
+    GAMES["555000"] = GameSession("555000", QUESTIONS)   # four options, correct == 1
+
+    host = _authed_host_socket("555000")
+    slow = socketio.test_client(app)                     # a real student who hasn't answered,
+    slow.emit("player_join", {"pin": "555000", "nickname": "slow"})   # so the round stays open
+    probes = []
+    for i in range(4):
+        s = socketio.test_client(app)
+        s.emit("player_join", {"pin": "555000", "nickname": f"probe{i}"})
+        probes.append(s)
+    host.emit("host_next", {"pin": "555000"})
+    for s in probes:
+        s.get_received()  # drop the join / question:show noise
+
+    for i, s in enumerate(probes):
+        s.emit("answer_submit", {"pin": "555000", "nickname": f"probe{i}", "choice": i})
+
+    assert not getattr(GAMES["555000"], "_revealed_this_round", False), "round must still be open"
+    for i, s in enumerate(probes):
+        got = s.get_received()
+        names = [e["name"] for e in got]
+        assert "answer:feedback" not in names, f"probe{i} was told its result mid-round"
+        assert not (LEAKY_KEYS & _payload_keys(got)), \
+            f"probe{i} received correctness-bearing data mid-round: {got}"
+        assert "answer:recorded" in names, "the phone must still be told its tap landed"
+
+
+def test_each_player_gets_their_own_result_at_the_reveal_and_only_theirs():
+    # The other half of the fix: withholding must not lose the result. It is delivered
+    # privately -- to that player's own socket -- when the round closes, before the
+    # question:results broadcast (player.js keeps it pending and renders it from that handler).
+    GAMES.clear()
+    GAMES["555001"] = GameSession("555001", QUESTIONS)
+
+    host = _authed_host_socket("555001")
+    alice = socketio.test_client(app)
+    bob = socketio.test_client(app)
+    alice.emit("player_join", {"pin": "555001", "nickname": "alice"})
+    bob.emit("player_join", {"pin": "555001", "nickname": "bob"})
+    host.emit("host_next", {"pin": "555001"})
+    alice.get_received(); bob.get_received()
+
+    alice.emit("answer_submit", {"pin": "555001", "nickname": "alice", "choice": 1})   # correct
+    assert "answer:feedback" not in [e["name"] for e in alice.get_received()]          # round still open
+    bob.emit("answer_submit", {"pin": "555001", "nickname": "bob", "choice": 0})       # wrong -> reveal
+
+    a_events = alice.get_received()
+    b_events = bob.get_received()
+    a_names = [e["name"] for e in a_events]
+    assert a_names.index("answer:feedback") < a_names.index("question:results"), \
+        "the private result must arrive before the reveal broadcast the client renders it from"
+
+    a_fb = [e["args"][0] for e in a_events if e["name"] == "answer:feedback"]
+    b_fb = [e["args"][0] for e in b_events if e["name"] == "answer:feedback"]
+    assert len(a_fb) == 1 and len(b_fb) == 1, "exactly one private result each, nobody else's"
+    assert a_fb[0]["correct"] is True and a_fb[0]["points"] > 0
+    assert a_fb[0]["score"] == GAMES["555001"].players["alice"].score
+    assert b_fb[0]["correct"] is False and b_fb[0]["points"] == 0
+
+
+def test_a_timeout_reveal_still_delivers_results_and_skips_non_answerers():
+    # The reveal also fires from the 20 s timer (_auto_reveal_after_timeout), not only when
+    # everyone has answered. Same path, so the same delivery -- and a player who never answered
+    # gets no result event at all (player.js renders "Time's up" from the absence).
+    GAMES.clear()
+    GAMES["555002"] = GameSession("555002", QUESTIONS)
+
+    host = _authed_host_socket("555002")
+    alice = socketio.test_client(app)
+    bob = socketio.test_client(app)
+    alice.emit("player_join", {"pin": "555002", "nickname": "alice"})
+    bob.emit("player_join", {"pin": "555002", "nickname": "bob"})
+    host.emit("host_next", {"pin": "555002"})
+    alice.emit("answer_submit", {"pin": "555002", "nickname": "alice", "choice": 1})
+    alice.get_received(); bob.get_received()
+
+    _reveal_results("555002")
+
+    assert [e for e in alice.get_received() if e["name"] == "answer:feedback"][0]["args"][0]["correct"] is True
+    b_names = [e["name"] for e in bob.get_received()]
+    assert "question:results" in b_names and "answer:feedback" not in b_names
+
+
+def test_a_reconnected_player_gets_the_result_on_the_new_socket():
+    # Results go to CURRENT_SID, the same "newest socket for this nickname" record
+    # on_answer_submit and on_disconnect already trust -- not to a stale socket.
+    GAMES.clear()
+    GAMES["555003"] = GameSession("555003", QUESTIONS)
+
+    host = _authed_host_socket("555003")
+    old = socketio.test_client(app)
+    old.emit("player_join", {"pin": "555003", "nickname": "alice"})
+    token = [e for e in old.get_received() if e["name"] == "join_ok"][0]["args"][0]["token"]
+    other = socketio.test_client(app)
+    other.emit("player_join", {"pin": "555003", "nickname": "bob"})   # keeps the round open
+    host.emit("host_next", {"pin": "555003"})
+
+    new = socketio.test_client(app)                                   # wifi drop: same browser, new socket
+    new.emit("player_join", {"pin": "555003", "nickname": "alice", "token": token})
+    new.emit("answer_submit", {"pin": "555003", "nickname": "alice", "choice": 1})
+    old.get_received(); new.get_received()
+
+    _reveal_results("555003")
+
+    assert [e for e in new.get_received() if e["name"] == "answer:feedback"], "new socket must get the result"
+    assert not [e for e in old.get_received() if e["name"] == "answer:feedback"], "stale socket must not"
 
 
 def test_nickname_is_sanitized_server_side():
