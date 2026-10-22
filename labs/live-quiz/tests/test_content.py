@@ -446,6 +446,52 @@ def test_image_layers_replays_the_real_secret_and_files():
         assert os.path.exists(os.path.join(_W13, name)), f"{name} is not in the lab folder"
     hardened = _w13("Dockerfile.hardened")
     assert "USER 65532:65532" in hardened and 'user: "65532:65532"' in src
+def _w14_lab_lists():
+    """injection_phrases / INJECTION_PATTERNS / the default flag, read out of the
+    real Week 14 bots with ast — the sims must carry these exact values."""
+    import ast
+    lab = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__)))), "week14-ai-llm-security")
+    if not os.path.isdir(lab):
+        pytest.skip("week14 lab directory not present next to live-quiz")
+    phrases = patterns = secret = None
+    for name in ("vulnerable_chatbot.py", "guarded_chatbot.py"):
+        tree = ast.parse(open(os.path.join(lab, name), encoding="utf-8").read())
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+                continue
+            tgt = getattr(node.targets[0], "id", None)
+            if tgt == "injection_phrases":
+                phrases = list(ast.literal_eval(node.value))
+            elif tgt == "INJECTION_PATTERNS":
+                patterns = list(ast.literal_eval(node.value))
+            elif tgt == "SECRET":
+                secret = ast.literal_eval(node.value.args[1])  # os.environ.get(_, default)
+    assert phrases and patterns and secret
+    return phrases, patterns, secret
+
+
+@pytest.mark.parametrize("slug", ["llm-output", "rag-inject"])
+def test_the_week14_sims_carry_the_labs_exact_lists(slug):
+    """Both sims claim to re-implement the real chatbots. A phrase list or a regex
+    that drifts from the .py files would teach a guard that doesn't exist — e.g.
+    "what's the password" leaking, or <img onerror=print()> passing the guard."""
+    import json
+    phrases, patterns, secret = _w14_lab_lists()
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    src = open(os.path.join(here, "static", "sim", f"{slug}.js"), encoding="utf-8").read()
+
+    body = src[src.index("var INJECTION_PHRASES = ["):]
+    body = body[body.index("["):body.index("];") + 1]
+    assert json.loads(body) == phrases, f"{slug}.js injection_phrases drifted from vulnerable_chatbot.py"
+
+    line = next(x for x in src.splitlines() if "var INJECTION_RE = /" in x)
+    literal = line.split("= /", 1)[1].rsplit("/i;", 1)[0]
+    # guarded_chatbot.py compiles "|".join(INJECTION_PATTERNS) with IGNORECASE
+    assert literal == "|".join(patterns), f"{slug}.js _INJECTION_RE drifted from guarded_chatbot.py"
+    assert f'"{secret}"' in src
+    assert "Hello! I'm HelpBot. How can I help you today?" in src
+    assert "I can't help with that request." in src
 
 
 # --- the allowlist covers every student-facing document ---------------------
