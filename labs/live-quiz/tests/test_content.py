@@ -366,6 +366,88 @@ def test_the_sqli_sim_does_not_regress_to_quote_parity():
     assert 'indexOf("\'")' in fn
 
 
+# --- the Week 13 sims must say what the real lab files say -----------------
+#
+# trivy-blindspot and image-layers re-implement this week's Dockerfiles and
+# scanner output. If the lab files change and the sims don't, they would teach a
+# Dockerfile that no longer exists — so pin every line they print to the file it
+# claims to come from. (The trivy rule model itself was checked against a real
+# Trivy 0.76.1 scan of all 96 toggle combinations; see trivy-blindspot.js.)
+
+_W13 = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                    "week13-cloud-container")
+
+
+def _w13(name):
+    with open(os.path.join(_W13, name), encoding="utf-8") as f:
+        return f.read()
+
+
+def _sim_js(slug):
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(here, "static", "sim", f"{slug}.js"), encoding="utf-8") as f:
+        return f.read()
+
+
+def _js_strings(src):
+    """Every double-quoted JS string literal, unescaped (\\" and \\\\ only)."""
+    return [m.replace('\\"', '"').replace("\\\\", "\\")
+            for m in re.findall(r'"((?:[^"\\]|\\.)*)"', src)]
+
+
+def test_trivy_blindspot_prints_only_real_dockerfile_lines():
+    insecure, hardened = _w13("Dockerfile.insecure"), _w13("Dockerfile.hardened")
+    ins_lines = {l.strip() for l in insecure.splitlines()}
+    hard_lines = {l.strip() for l in hardened.splitlines()}
+    src = _sim_js("trivy-blindspot")
+    strings = set(_js_strings(src))
+    for line in ("FROM python:latest", "ENV API_TOKEN=sk_live_supersecret_DO_NOT_DO_THIS",
+                 "ENV AWS_SECRET_ACCESS_KEY=AKIAEXAMPLEdeadbeefdeadbeef", "COPY . .",
+                 "RUN pip install -r requirements.txt", "RUN chmod -R 777 /app",
+                 "WORKDIR /app", "EXPOSE 5000", 'CMD ["python", "app.py"]'):
+        assert line in strings, f"sim no longer prints {line!r}"
+        assert line in ins_lines, f"{line!r} is not in Dockerfile.insecure any more"
+    for line in ("COPY requirements.txt .", "COPY app.py .", "USER 65532:65532",
+                 "RUN python -m venv /venv \\",
+                 "&& /venv/bin/pip install --no-cache-dir -r requirements.txt"):
+        assert any(line in s for s in strings), f"sim no longer prints {line!r}"
+        assert line in hard_lines, f"{line!r} is not in Dockerfile.hardened any more"
+    # the digest the sim pins is the one Dockerfile.hardened pins
+    digest = re.search(r"python:3\.11-slim@sha256:[0-9a-f]{64}", src).group(0)
+    assert digest in hardened
+
+
+def test_trivy_blindspot_cites_the_worksheets_three_rules():
+    ws = _w13("worksheet.md")
+    src = _sim_js("trivy-blindspot")
+    for rule, sev in (("DS-0001", "MEDIUM"), ("DS-0002", "HIGH"), ("DS-0031", "CRITICAL")):
+        assert rule in ws, f"worksheet no longer cites {rule}"
+        assert f'id: "{rule}", sev: "{sev}"' in src
+    # DS-0031 fires once per secret ENV line: 1 + 1 + 2 = the 4 scan.sh reports
+    assert src.count('id: "DS-0031"') == 1 and "ENV_LINES.forEach" in src
+    # the three defects no rule covers stay rule-less in the sim
+    for key in ("copy:", "chmod:", "pip:"):
+        assert key in src[src.index("var MANUAL"):src.index("var PRESETS")]
+
+
+def test_image_layers_replays_the_real_secret_and_files():
+    insecure = _w13("Dockerfile.insecure")
+    src = _sim_js("image-layers")
+    for secret in ("sk_live_supersecret_DO_NOT_DO_THIS", "AKIAEXAMPLEdeadbeefdeadbeef"):
+        assert f"={secret}" in insecure and secret in src
+    # docker truncates CREATED BY to 44 chars + an ellipsis; the sim's
+    # truncated rows must be exact prefixes of the --no-trunc ones
+    rows = re.findall(r'\["([^"]*…)",\s*"([^"]*)",\s*"[^"]*"\]', src)
+    assert len(rows) >= 4
+    for short, full in rows:
+        assert full.startswith(short[:-1]) and len(short) == 45, (short, full)
+    # every file `ls -la /app` lists was really in the build context (COPY . .)
+    for name in re.findall(r'root root +\d+ Oct 22 [0-9:]+ ([\w.-]+)"', src):
+        assert os.path.exists(os.path.join(_W13, name)), f"{name} is not in the lab folder"
+    hardened = _w13("Dockerfile.hardened")
+    assert "USER 65532:65532" in hardened and 'user: "65532:65532"' in src
+
+
 # --- the allowlist covers every student-facing document ---------------------
 #
 # Until 2026-07-29 PUBLIC_FILES held only worksheet.md and README.md. Six of the
