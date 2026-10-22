@@ -492,6 +492,69 @@ def test_the_week14_sims_carry_the_labs_exact_lists(slug):
     assert f'"{secret}"' in src
     assert "Hello! I'm HelpBot. How can I help you today?" in src
     assert "I can't help with that request." in src
+def test_week15_slides_embed_every_diagram_and_sim():
+    """Week 15's deck carries four diagrams and three sims. An alt text holding a
+    ']' (e.g. "USERS[token]") silently stops ![alt](img/x.svg) from being an
+    image and leaves raw markdown on the slide. That happened while this deck was
+    being built, so pin the whole set through the real /learn render path."""
+    doc = C.render_document("week15-devsecops-pipeline", "slides", "software-security")
+    assert doc is not None
+    out = doc["html"]
+    imgs = re.findall(r'<img\b[^>]*src="([^"]+)"', out)
+    assert [os.path.basename(i) for i in imgs] == [
+        "pipeline-at-a-glance.svg", "fail-closed.svg",
+        "break-the-build-board.svg", "lab-at-a-glance.svg"], imgs
+    assert re.findall(r'<iframe src="/sim/([^"]+)"', out) == [
+        "gate-check", "fail-open", "red-team-pr"]
+    assert "](img/" not in out, "an image line fell through as raw markdown"
+
+
+def _load_week15_app(name):
+    """Import one of Week 15's two real lab services under a private module name."""
+    import importlib.util
+    path = os.path.join(C.CONTENT_ROOT, "week15-devsecops-pipeline", f"{name}.py")
+    spec = importlib.util.spec_from_file_location(f"_w15_{name}", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+@pytest.mark.parametrize("xff", [None, "203.0.113.9"])
+def test_the_fail_open_sim_replays_what_the_real_week15_services_return(xff, caplog):
+    """fail-open.js shows, for each Authorization header, the status, body and
+    security-log line of insecure_service.py (:8090) and secure_service.py
+    (:8091). Those are not re-derived in JS: they sit in an OUTCOMES table, and
+    this runs both real lab apps over the same inputs and holds the table to
+    them, so a change to either lab file that the sim doesn't follow turns CI red.
+    The X-Forwarded-For case pins the spoofable src_ip the sim teaches."""
+    import json
+    import logging
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    src = open(os.path.join(here, "static", "sim", "fail-open.js"), encoding="utf-8").read()
+    block = src[src.index("// BEGIN OUTCOMES"):src.index("// END OUTCOMES")]
+    table = json.loads(block[block.index("{"):block.rindex("}") + 1])
+    assert set(table) == {"insecure", "secure"}
+
+    for svc in ("insecure", "secure"):
+        mod = _load_week15_app(f"{svc}_service")
+        client = mod.app.test_client()
+        assert set(table[svc]) == {"none", "garbage", "alice-token", "bob-token"}
+        for key, want in table[svc].items():
+            headers = {} if key == "none" else {"Authorization": key}
+            if xff:
+                headers["X-Forwarded-For"] = xff
+            caplog.clear()
+            with caplog.at_level(logging.INFO, logger="security"):
+                resp = client.get("/admin", headers=headers)
+            assert resp.status_code == want["status"], (svc, key)
+            body = {k: ("<SECRET>" if v == mod.SECRET else v) for k, v in resp.get_json().items()}
+            assert body == want["body"], (svc, key)
+            sec = [(r.levelname, r.getMessage()) for r in caplog.records if r.name == "security"]
+            if want["log"] is None:
+                assert sec == [], f"{svc} {key}: the sim says nothing is logged, the service logged {sec}"
+            else:
+                level, msg = want["log"]
+                assert sec == [(level, msg.replace("{ip}", xff or "127.0.0.1"))], (svc, key, sec)
 
 
 # --- the allowlist covers every student-facing document ---------------------

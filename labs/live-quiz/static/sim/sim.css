@@ -832,3 +832,63 @@ input.jwt-forge-in{font-size:.95rem;padding:.4rem .5rem}
 .rag-inject-hit{background:var(--orange);color:#fff;border-radius:3px;padding:0 2px;font-weight:700}
 .rag-inject-legend{display:flex;flex-wrap:wrap;gap:.5rem;font-size:.75rem;margin:.4rem 0}
 .rag-inject-legend span,.rag-inject-legend mark{padding:.1rem .35rem}
+/* ---- fail-open (Week 15): one request, both real services side by side ---- */
+.fo-sel{width:100%;font:inherit;padding:.4rem .5rem;border:1px solid var(--line);
+        border-radius:6px;background:var(--bg);color:var(--fg)}
+.fo-check{display:block;margin:.55rem 0 .3rem;font-size:.84rem;color:var(--fg)}
+.fo-panes{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+@media (max-width:760px){.fo-panes{grid-template-columns:1fr}}
+.fo-pane h3{margin-top:0}
+.fo-status{margin:.2rem 0;font-weight:700;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1rem}
+.fo-leak{color:var(--orange)}
+.fo-allow{color:var(--blue)}
+.fo-deny{color:var(--blue)}
+.fo-body{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;white-space:pre-wrap;word-break:break-word;
+         background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.45rem .55rem;margin:.3rem 0 .4rem}
+.fo-sub{margin:.55rem 0 .2rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.fo-trace{margin:.1rem 0;padding-left:1.3rem;font-size:.8rem}
+.fo-step{margin:.2rem 0}
+.fo-step code{display:block;color:var(--fg)}
+.fo-why{display:block;color:var(--mut);font-size:.76rem}
+.fo-hot code{color:var(--orange);font-weight:700}
+.fo-skip{opacity:.55}
+.fo-skip code{text-decoration:line-through}
+.fo-log{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.72rem;background:var(--bg);
+        border:1px solid var(--line);border-radius:6px;padding:.45rem .55rem;margin:.2rem 0}
+.fo-logline{white-space:pre-wrap;word-break:break-all;margin:.1rem 0;color:var(--mut)}
+.fo-alert{color:var(--orange);font-weight:700}
+.fo-info{color:var(--blue);font-weight:700}
+.fo-quiet{color:var(--fg)}
+.fo-note{font-size:.82rem;color:var(--mut);margin:.5rem 0 0;max-width:80ch}
+
+/* ---- red-team-pr (Week 15): the Actions run, job by job and step by step ---- */
+.rt-controls{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media (max-width:760px){.rt-controls{grid-template-columns:1fr}}
+.rt-group{border:1px solid var(--line);border-radius:6px;padding:.5rem .6rem;margin:0}
+.rt-group legend{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);padding:0 .3rem}
+.rt-radio{display:block;margin:.3rem 0;font-size:.82rem;color:var(--fg)}
+.rt-lbl{margin:.4rem 0 .15rem;font-size:.8rem}
+.rt-sel{width:100%;font:inherit;padding:.35rem .5rem;border:1px solid var(--line);
+        border-radius:6px;background:var(--bg);color:var(--fg);margin-bottom:.2rem}
+.rt-jobs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1rem}
+@media (max-width:900px){.rt-jobs{grid-template-columns:1fr}}
+.rt-job{border-top-width:4px}
+.rt-red{border-top-color:var(--orange)}
+.rt-green{border-top-color:var(--blue)}
+.rt-jobhead{display:flex;align-items:center;gap:.45rem;font-size:.92rem;margin-bottom:.4rem}
+.rt-steps{list-style:none;margin:0;padding:0}
+.rt-step{display:grid;grid-template-columns:1.2rem 1fr;column-gap:.35rem;padding:.25rem 0;
+         border-top:1px solid var(--line);font-size:.8rem}
+.rt-stepname{font-weight:600}
+.rt-stepnote{grid-column:2;color:var(--mut);font-size:.72rem;font-family:ui-monospace,Menlo,Consolas,monospace}
+.rt-icon{font-weight:700;text-align:center}
+.rt-success{color:var(--blue)}
+.rt-failure{color:var(--orange)}
+.rt-skipped{color:var(--mut)}
+.rt-s-skipped .rt-stepname{color:var(--mut);font-weight:400}
+.rt-log{grid-column:1 / -1;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.7rem;white-space:pre-wrap;
+        word-break:break-word;background:var(--bg);border:1px solid var(--orange);border-radius:6px;
+        padding:.4rem .5rem;margin:.3rem 0 .1rem;color:var(--fg)}
+.rt-why{margin:.4rem 0 0;font-size:.84rem;max-width:90ch}
+.rt-why li{margin:.3rem 0}
+.rt-sarif{font-size:.8rem;color:var(--mut);margin:.6rem 0 0;padding-top:.4rem;border-top:1px solid var(--line);max-width:90ch}
