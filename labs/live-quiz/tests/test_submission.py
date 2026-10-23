@@ -229,7 +229,7 @@ def test_lateness_is_computed_not_stored(conn, uploads):
 
 
 def _handed_in_then_lost_the_session(conn, aid, uploads, sid="65310001"):
-    """She opened the worksheet and uploaded before the deadline; her code is now spent."""
+    """The student opened the worksheet and uploaded before the deadline; the code is now spent."""
     sub, _ = open_sub(conn, aid, sid)
     S.store_file(conn, sub, display_name="evidence.pdf", data=b"x", now=T0, upload_dir=uploads)
     return sub
@@ -244,8 +244,8 @@ def _deadline_passed(conn, code, now=LATE):
 
 
 def test_a_student_can_still_read_feedback_after_the_deadline(conn, uploads):
-    # After the deadline a code opens only to read released marks: she handed in, lost her
-    # session, and the teacher re-issued her a code. It opens read-only and is burned.
+    # After the deadline a code opens only to read released marks: the student handed in, lost
+    # the session, and the teacher re-issued a code. It opens read-only and is burned.
     aid = make(conn)
     sub = _handed_in_then_lost_the_session(conn, aid, uploads)
     conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
@@ -264,15 +264,15 @@ def test_a_closed_worksheet_with_nothing_handed_in_does_not_open(conn):
     code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
     _deadline_passed(conn, code)
     assert conn.execute("SELECT COUNT(*) n FROM submissions").fetchone()["n"] == 0
-    # released marks change nothing: she has none to read
+    # released marks change nothing: there are none of theirs to read
     conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
     conn.commit()
     _deadline_passed(conn, code)
 
 
 def test_a_closed_worksheet_opened_but_never_handed_in_does_not_open(conn):
-    # She opened it before the deadline (so a submission row exists) but uploaded nothing, then
-    # lost her session and got a re-issued code. Released marks are not hers to read.
+    # Opened before the deadline (so a submission row exists) but nothing uploaded, then the
+    # session was lost and a code re-issued. Released marks are not theirs to read.
     aid = make(conn)
     open_sub(conn, aid)
     conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
@@ -304,8 +304,8 @@ def test_two_redemptions_of_one_code_at_once_let_only_one_in(conn, monkeypatch):
 
 
 def test_a_closed_worksheet_whose_marks_are_not_released_does_not_burn_the_code(conn, uploads):
-    # 6631503045, 23 Oct: she had handed in Week 6, and its code predates single-use codes, so it
-    # was still unspent. Typing it a month after Week 6 closed used to burn it for nothing.
+    # Seen 23 Oct 2026: a student had handed in Week 6, and its code predates single-use codes, so
+    # it was still unspent. Typing it a month after Week 6 closed used to burn it for nothing.
     aid = make(conn)
     _handed_in_then_lost_the_session(conn, aid, uploads)
     code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]

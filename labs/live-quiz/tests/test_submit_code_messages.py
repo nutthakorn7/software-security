@@ -3,8 +3,8 @@
 Codes are single-use (see submission.redeem), and every refusal used to say the same
 "That code isn't valid." — for a typo, for a code the student had already used, and nothing at
 all for a closed worksheet, which opened read-only and burned the code. Two students emailed
-that the system was broken: 6631503039 (21 Oct) had re-typed a code she had already used, and
-6631503045 (23 Oct) burned her Week 6 code a month after Week 6 closed.
+that the system was broken (21 and 23 Oct 2026): one had re-typed a code they had already used,
+and the other burned their Week 6 code a month after Week 6 closed.
 
 So a code that does not open says which of the three it is, and a code for a closed worksheet is
 left unused, because the teacher has reopened deadlines before. The messages never name the
@@ -146,7 +146,7 @@ def test_the_same_code_works_once_the_teacher_reopens_the_worksheet(appmod, work
 
 
 def test_a_used_code_for_a_closed_worksheet_still_says_used(appmod, worksheet, clock):  # noqa: F811
-    # "Used" is the true reason here; the closed message would tell her the code is still unused.
+    # "Used" is the true reason here; the closed message would say the code is still unused.
     _, codes = worksheet
     code = codes[STUDENT_A]
     _enter(appmod.app.test_client(), code)
@@ -178,7 +178,7 @@ def test_a_fresh_code_opens_its_worksheet_and_is_burned_exactly_once(appmod, wor
 
 def test_after_the_deadline_a_code_still_opens_released_feedback_read_only(appmod, worksheet, clock):  # noqa: F811
     # The one thing a code is still for after the deadline: a student who handed in, then lost
-    # her session (new device), gets a re-issued code to read her marks.
+    # the session (new device), gets a re-issued code to read their marks.
     aid, codes = worksheet
     laptop = appmod.app.test_client()
     _enter(laptop, codes[STUDENT_A])
@@ -225,7 +225,7 @@ def test_a_submit_code_typed_into_quiz_on_a_shared_pc_does_not_open_the_last_stu
     switched = pc.post("/submit/work/switch", data={"csrf_token": _csrf(html),
                                                      "submission_id": alice_sub})
     assert switched.status_code == 404, "Bob must not be able to open Alice's worksheet"
-    assert pc.get(f"/work/file/{alice_file}").status_code == 404, "...or download her file"
+    assert pc.get(f"/work/file/{alice_file}").status_code == 404, "...or download Alice's file"
 
 
 @pytest.mark.parametrize("path", ENTRY_PAGES)
