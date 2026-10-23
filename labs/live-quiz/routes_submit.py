@@ -375,11 +375,11 @@ def entry():
         session["attempt_id"] = att["id"]
         return redirect(url_for("assess.quiz_take"))
     if kind != "submit":
-        return _entry_page(error="That code isn't valid.", code=raw), 200
+        return _entry_page(error=S.CODE_NOT_VALID, code=raw), 200
     # redeem() used to be unable to fail here (find_kind() just confirmed the
-    # row exists) — now it can, if the code was already burned by an earlier
-    # redemption (see submission.py's redeem() for why that's the fix, not
-    # a bug). That failure must reach the page as a plain refusal, not a 500.
+    # row exists) — now it can: the code was already used, or its worksheet
+    # has closed (see submission.py's redeem()). That failure must reach the
+    # page as its own message, not a 500.
     try:
         sub = S.redeem(_db(), raw, _now())
     except S.SubmitError as exc:
