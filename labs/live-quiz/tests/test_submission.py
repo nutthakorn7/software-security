@@ -270,6 +270,39 @@ def test_a_closed_worksheet_with_nothing_handed_in_does_not_open(conn):
     _deadline_passed(conn, code)
 
 
+def test_a_closed_worksheet_opened_but_never_handed_in_does_not_open(conn):
+    # She opened it before the deadline (so a submission row exists) but uploaded nothing, then
+    # lost her session and got a re-issued code. Released marks are not hers to read.
+    aid = make(conn)
+    open_sub(conn, aid)
+    conn.execute("UPDATE assignments SET released = 1 WHERE id = ?", (aid,))
+    conn.commit()
+    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
+    _deadline_passed(conn, code)
+
+
+def test_two_redemptions_of_one_code_at_once_let_only_one_in(conn, monkeypatch):
+    # redeem() reads the code, then burns it. If a second redemption burns it in between (two
+    # tabs, a double-tapped button, or a classmate with a photo of the slip), the one that lost
+    # must be refused, not handed the same submission.
+    aid = make(conn)
+    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
+    real = S.get_assignment
+
+    def the_other_redemption_wins(c, assignment_id):
+        c.execute("UPDATE submit_codes SET redeemed_at = ? WHERE code = ?", ("2026-08-15T08:00:01", code))
+        c.commit()
+        return real(c, assignment_id)
+
+    monkeypatch.setattr(S, "get_assignment", the_other_redemption_wins)
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, T0)
+    assert str(exc.value) == S.CODE_ALREADY_USED
+    assert conn.execute("SELECT COUNT(*) n FROM submissions").fetchone()["n"] == 0
+    assert conn.execute("SELECT redeemed_at FROM submit_codes WHERE code = ?",
+                        (code,)).fetchone()["redeemed_at"] == "2026-08-15T08:00:01"
+
+
 def test_a_closed_worksheet_whose_marks_are_not_released_does_not_burn_the_code(conn, uploads):
     # 6631503045, 23 Oct: she had handed in Week 6, and its code predates single-use codes, so it
     # was still unspent. Typing it a month after Week 6 closed used to burn it for nothing.

@@ -226,3 +226,45 @@ def test_a_submit_code_typed_into_quiz_on_a_shared_pc_does_not_open_the_last_stu
                                                      "submission_id": alice_sub})
     assert switched.status_code == 404, "Bob must not be able to open Alice's worksheet"
     assert pc.get(f"/work/file/{alice_file}").status_code == 404, "...or download her file"
+
+
+@pytest.mark.parametrize("path", ENTRY_PAGES)
+def test_a_worksheet_opened_from_any_entry_page_survives_closing_the_browser(
+        appmod, worksheet, path):  # noqa: F811
+    # The code is spent on the first redemption, so the session it starts is the only way back:
+    # it must be a lasting cookie (remember_submission makes it permanent), not one the browser
+    # drops on close. /quiz used to skip that.
+    _, codes = worksheet
+    r = _enter(appmod.app.test_client(), codes[STUDENT_A], path)
+    assert r.status_code in (302, 303)
+    assert "Expires=" in r.headers.get("Set-Cookie", ""), f"{path}: session cookie dies with the browser"
+
+
+def test_a_session_the_old_quiz_path_mixed_up_no_longer_reaches_the_other_students_work(
+        appmod, teacher, clock):  # noqa: F811
+    # Browsers signed in through the old /quiz path still carry Alice's worksheet in Bob's list
+    # (submission_ids=[Alice's, Bob's], submission_id=Bob's), for up to 180 days. Deploying the
+    # /quiz fix alone would leave those open; only the on-screen student's worksheets count.
+    conn = appmod.get_db()
+    tid = conn.execute("SELECT id FROM teachers WHERE username='teach1'").fetchone()["id"]
+    w10 = S.create_assignment(conn, teacher_id=tid, title="W10", due_at=DUE, now=BEFORE)
+    w11 = S.create_assignment(conn, teacher_id=tid, title="W11", due_at=DUE, now=BEFORE)
+    pc = appmod.app.test_client()
+    _enter(pc, S.issue_codes(conn, w10, [STUDENT_A], BEFORE)[STUDENT_A])
+    _upload(pc, "alice-ten.pdf")
+    _enter(pc, S.issue_codes(conn, w11, [STUDENT_B], BEFORE)[STUDENT_B])
+    alice_sub, bob_sub = (conn.execute(
+        "SELECT id FROM submissions WHERE student_id = ?", (s,)).fetchone()["id"]
+        for s in (STUDENT_A, STUDENT_B))
+    alice_file = conn.execute("SELECT id FROM submission_files WHERE submission_id = ?",
+                              (alice_sub,)).fetchone()["id"]
+    with pc.session_transaction() as s:
+        s["submission_ids"] = [alice_sub, bob_sub]
+        s["submission_id"] = bob_sub
+
+    page = pc.get("/submit/work").get_data(as_text=True)
+    assert STUDENT_B in page and "Your worksheets" not in page, "W10 is not Bob's to switch to"
+    html = pc.get("/submit/work").get_data(as_text=True)
+    assert pc.post("/submit/work/switch", data={"csrf_token": _csrf(html),
+                                                "submission_id": alice_sub}).status_code == 404
+    assert pc.get(f"/work/file/{alice_file}").status_code == 404

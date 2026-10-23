@@ -231,15 +231,20 @@ def redeem(conn, code, now):
     has_feedback = bool(a["released"] and sub is not None and sub["submitted_at"])
     if not _is_open(a, now) and not has_feedback:
         raise SubmitError(CODE_DEADLINE_PASSED)
+
+    # Burn first, and only if nobody else has: the SELECT above is not a lock,
+    # so two redemptions of one code at once must not both get in.
+    if conn.execute("UPDATE submit_codes SET redeemed_at = ?"
+                    " WHERE code = ? AND redeemed_at IS NULL",
+                    (now, row["code"])).rowcount != 1:
+        conn.rollback()
+        raise SubmitError(CODE_ALREADY_USED)
     if sub is None:
         cur = conn.execute(
             "INSERT INTO submissions (assignment_id, student_id, created_at)"
             " VALUES (?,?,?)", (row["assignment_id"], row["student_id"], now))
         sub = conn.execute("SELECT * FROM submissions WHERE id = ?",
                            (cur.lastrowid,)).fetchone()
-
-    conn.execute("UPDATE submit_codes SET redeemed_at = ? WHERE code = ?",
-                 (now, row["code"]))
     conn.commit()
     return sub
 

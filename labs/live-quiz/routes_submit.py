@@ -293,12 +293,23 @@ def owned_submission_ids():
     remember each one it opened: with W10-12 due on the same day a student opens all three,
     and remembering only the latest stranded the earlier ones with no code left to get back in.
     Sessions from before the list existed carry just `submission_id`; that still counts.
+
+    Only the worksheets of the student on screen count. remember_submission() keeps the list to
+    one student, but /quiz used to bypass it, and a session it mixed up (Bob on screen, Alice's
+    worksheet still listed) lives for 180 days — this is what closes those too.
     """
     ids = list(session.get("submission_ids") or [])
     cur = session.get("submission_id")
-    if cur is not None and cur not in ids:
+    if cur is None:
+        return []
+    if cur not in ids:
         ids.append(cur)
-    return ids
+    owner = {}
+    for sid in ids:
+        row = _db().execute("SELECT student_id FROM submissions WHERE id = ?", (sid,)).fetchone()
+        if row is not None:
+            owner[sid] = row["student_id"]
+    return [sid for sid in ids if sid in owner and owner[sid] == owner.get(cur)]
 
 
 def remember_submission(sub):
