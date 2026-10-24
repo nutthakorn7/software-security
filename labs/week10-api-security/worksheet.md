@@ -10,7 +10,7 @@
 
 | Name | Student ID | Date | Group |
 |------|-----------|------|-------|
-|      |           |      |       |
+| Nararat Kritphet | 6631503110 | 10/10/2026 |       |
 
 ## Part 2 — Lecture Questions
 
@@ -38,6 +38,7 @@ docker compose up         # INSECURE API on :8080, SECURE API on :8081
 ### Task 0 — Onboarding (15 min)
 Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localhost:8081/`. Note which port is insecure. Record the three seeded users.
 **Deliverable:** both root responses + the user table.
+![Task0]
 
 ![One REST API with three flaws — reading another user's orders by id, smuggling an admin field into user creation, and an unthrottled login — each shown at the handler where it occurs, next to its one-line fix.](img/api-flaws.svg)
 
@@ -49,6 +50,25 @@ Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localh
 3. On the secure API observe the ladder: `curl -i http://localhost:8081/api/users/3/orders` (401), `curl -i -H "X-User-Id: 1" http://localhost:8081/api/users/3/orders` (403), `curl -i -H "X-User-Id: 1" http://localhost:8081/api/users/1/orders` (200).
 **Deliverable:** the leaked order JSON + the 401/403/200 transcript + mitigation note.
 
+### Task 1 
+
+**OWASP Category:** API1:2023 — Broken Object Level Authorization (BOLA)
+
+**Finding:** The insecure API allows users to retrieve another user's orders by changing the user ID in the request URL. The endpoint does not properly verify whether the requester is authorized to access the requested user's data.
+
+**Evidence:**
+- `GET /api/users/3/orders` on port `8080` returned `200 OK` without authentication and exposed Carol's orders, including `FLAG{bola_demo}`.
+- `GET /api/users/2/orders` on port `8080` also returned `200 OK` and exposed Bob's order.
+- The secure API on port `8081` returned `401 Unauthorized` when no user identity was provided.
+- When Alice (`X-User-Id: 1`) requested Carol's orders, the secure API returned `403 Forbidden`.
+- When Alice requested her own orders, the secure API returned `200 OK`.
+
+**Impact:** An attacker could access other users' order information by modifying the user ID in the URL. Depending on the data exposed, this could lead to unauthorized disclosure of sensitive information.
+
+**Mitigation:** Enforce object-level authorization on every request. Derive the authenticated user's identity from a trusted authentication mechanism, then verify that the user owns the requested resource or has an explicitly authorized administrative role. Do not rely solely on a user ID supplied by the client. Add automated tests for unauthorized cross-user access.
+![Task1](img/wk10-1.1.png)
+![Task1](img/wk10-1.2.png)
+
 ### Task 2 — Mass assignment: self-promote to admin (30 min)
 **Goal:** Smuggle `is_admin` + `balance` into user creation — API3:2023.
 **Steps:**
@@ -56,6 +76,22 @@ Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localh
 2. Confirm the response echoes `"is_admin": true, "balance": 1000000`.
 3. Repeat against `:8081` and confirm the smuggled fields are forced to `is_admin:false, balance:0`.
 **Deliverable:** both responses side by side + mitigation note (allow-list in `solution_api.py`).
+
+### Task 2 
+
+**OWASP Category:** API3:2023 — Broken Object Property Level Authorization
+
+**Finding:** The insecure API accepts sensitive properties supplied by the client during user creation. By including `is_admin` and `balance` in the request body, a user can assign themselves administrative privileges and an unauthorized account balance.
+
+**Evidence:**
+- The POST request to `http://localhost:8080/api/users` returned `201 CREATED` with `"is_admin": true`, `"balance": 1000000`, and `FLAG{massassign_demo}`.
+- The same request to `http://localhost:8081/api/users` returned `201 CREATED`, but the response contained `"is_admin": false` and `"balance": 0`.
+
+**Impact:** An attacker could gain unauthorized privileges or manipulate sensitive account properties if the application accepts client-controlled values without appropriate validation and authorization.
+
+**Mitigation:** Use an explicit allow-list of fields permitted during user creation. In `solution_api.py`, accept only expected user-controlled fields, such as `username` and `password`, and assign sensitive properties such as `is_admin` and `balance` on the server side. Validate and authorize all sensitive property changes separately.
+
+![Task2](img/wk10-3.png)
 
 ### Task 3 — Unrestricted resource consumption: brute-force login (25 min)
 **Goal:** Show `/api/login` has no throttle — API4:2023.
@@ -65,9 +101,20 @@ Confirm both APIs respond: `curl http://localhost:8080/` and `curl http://localh
 3. Confirm the 6th/7th attempt returns `429`.
 **Deliverable:** the `401 401 401 401 401 429 429` sequence + mitigation note.
 
+### Task 3
+
+**Vulnerability:** The insecure API login endpoint does not limit repeated login attempts, allowing an attacker to perform brute-force password guessing. In the test, the login attempt using `alice123` succeeded after several unsuccessful attempts.
+
+**Secure Implementation:** The secure API limits repeated login attempts. After five unsuccessful attempts, subsequent requests return HTTP `429 Too Many Requests`, demonstrating rate limiting.
+
+**Mitigation:** Implement server-side rate limiting for login requests using a defined time window. Monitor repeated failed attempts and consider progressive delays or temporary account lockouts. Return HTTP `429 Too Many Requests` when the limit is exceeded.
+
+![Task3](img/wk10-3.png)
+
 ### Task 4 — Bonus: crAPI Raid (optional, 20 min)
 Against your own OWASP crAPI instance (`git clone https://github.com/OWASP/crAPI.git`), capture one BOLA or mass-assignment flag.
 **Deliverable:** flag + endpoint + which API Top 10 id it maps to.
+
 
 ### Task 5 — Defend / fix it (20 min)
 **Goal:** Explain the fixes using the secure reference `solution_api.py`.
