@@ -36,6 +36,7 @@ MARKS
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import os
@@ -247,6 +248,45 @@ def redeem(conn, code, now):
                            (cur.lastrowid,)).fetchone()
     conn.commit()
     return sub
+
+
+# Deadlines are STORED in UTC, like every other timestamp here (app._now() is naive
+# UTC), but people type and read them in course-local time: the cohort is in Thailand
+# (ICT = UTC+7, no DST). In Oct 2026 "23:59" Thai time was typed into this UTC field
+# for W10-15, which kept the portal open until 06:59 the next morning, and every page
+# showed the raw value with no zone. So the form takes ICT, every page shows ICT, and
+# only storage and comparison use UTC.
+COURSE_TZ = datetime.timezone(datetime.timedelta(hours=7), "ICT")
+
+
+def due_from_local(text):
+    """'2026-11-07T23:59' Thai time -> '2026-11-07T16:59:00' UTC, as stored. Blank -> None.
+
+    An explicit offset is refused, not honoured: this field is Thai time, and quietly
+    accepting '+00:00' is how the two conventions got mixed in the first place."""
+    s = (text or "").strip()
+    if not s:
+        return None
+    try:
+        local = datetime.datetime.fromisoformat(s.replace(" ", "T", 1))
+    except ValueError:
+        raise ValueError(f"“{s}” isn't a date and time in Thai time like 2026-11-07T23:59.") from None
+    if local.tzinfo is not None:
+        raise ValueError("Give the deadline in Thai time with no offset, like 2026-11-07T23:59.")
+    return (local.replace(tzinfo=COURSE_TZ).astimezone(datetime.timezone.utc)
+            .replace(tzinfo=None).isoformat(timespec="seconds"))
+
+
+def due_label(due_at) -> str:
+    """A stored UTC deadline as people read it: '2026-11-07 23:59 ICT'."""
+    if not due_at:
+        return ""
+    try:
+        t = datetime.datetime.fromisoformat(due_at)
+    except ValueError:
+        return str(due_at)
+    return (t.replace(tzinfo=datetime.timezone.utc).astimezone(COURSE_TZ)
+            .strftime("%Y-%m-%d %H:%M ICT"))
 
 
 def _is_open(assignment, now) -> bool:
