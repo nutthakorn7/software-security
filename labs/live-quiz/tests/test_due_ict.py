@@ -38,7 +38,11 @@ def test_a_blank_deadline_means_no_deadline(typed):
 
 
 @pytest.mark.parametrize("typed", ["next friday", "2026-13-01T10:00", "23:59",
-                                   "2026-11-07T23:59+00:00", "2026-11-07T16:59Z"])
+                                   "2026-11-07T23:59+00:00", "2026-11-07T16:59Z",
+                                   "2026-11-07",            # date only = midnight, a day early
+                                   "20261107T2359", "2026-W45-6T23:59",
+                                   "2026-11-07T23:59:00.5", "2026-11-07T24:00",
+                                   "0001-01-01T00:00"])     # underflows on conversion
 def test_a_deadline_that_is_not_a_plain_thai_time_is_refused(typed):
     # An explicit offset is refused rather than honoured: the field is Thai time,
     # and silently accepting "+00:00" is how the two conventions got mixed before.
@@ -51,6 +55,16 @@ def test_a_deadline_that_is_not_a_plain_thai_time_is_refused(typed):
 def test_a_stored_utc_deadline_is_shown_in_thai_time_with_its_zone():
     assert S.due_label("2026-11-07T16:59:00") == "2026-11-07 23:59 ICT"
     assert S.due_label("2026-11-06T20:00:00") == "2026-11-07 03:00 ICT"
+
+
+def test_a_deadline_with_seconds_shows_them_and_an_offset_is_respected():
+    assert S.due_label("2026-11-07T16:59:37") == "2026-11-07 23:59:37 ICT"
+    assert S.due_label("2026-11-07T23:59:00+07:00") == "2026-11-07 23:59 ICT"
+
+
+def test_a_value_that_cannot_be_shown_falls_back_to_the_raw_text():
+    assert S.due_label("9999-12-31T23:59:00") == "9999-12-31T23:59:00"
+    assert S.due_label("not a date") == "not a date"
 
 
 def test_no_deadline_shows_nothing():

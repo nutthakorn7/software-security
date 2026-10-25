@@ -259,6 +259,12 @@ def redeem(conn, code, now):
 COURSE_TZ = datetime.timezone(datetime.timedelta(hours=7), "ICT")
 
 
+# A date AND a time, nothing else. fromisoformat alone also takes "2026-11-07" (midnight,
+# a day early for anyone meaning "by the 7th"), compact and ISO-week forms, and offsets;
+# and Python 3.13+ takes "24:00" where 3.12 does not, so the hour range is spelled out.
+_DUE_INPUT = re.compile(r"\d{4}-\d{2}-\d{2}[T ]([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?")
+
+
 def due_from_local(text):
     """'2026-11-07T23:59' Thai time -> '2026-11-07T16:59:00' UTC, as stored. Blank -> None.
 
@@ -267,14 +273,15 @@ def due_from_local(text):
     s = (text or "").strip()
     if not s:
         return None
+    if not _DUE_INPUT.fullmatch(s):
+        raise ValueError(f"“{s}” isn't a date and time in Thai time like 2026-11-07T23:59"
+                         " (with no offset).")
     try:
         local = datetime.datetime.fromisoformat(s.replace(" ", "T", 1))
-    except ValueError:
-        raise ValueError(f"“{s}” isn't a date and time in Thai time like 2026-11-07T23:59.") from None
-    if local.tzinfo is not None:
-        raise ValueError("Give the deadline in Thai time with no offset, like 2026-11-07T23:59.")
-    return (local.replace(tzinfo=COURSE_TZ).astimezone(datetime.timezone.utc)
-            .replace(tzinfo=None).isoformat(timespec="seconds"))
+        utc = local.replace(tzinfo=COURSE_TZ).astimezone(datetime.timezone.utc)
+    except (ValueError, OverflowError):
+        raise ValueError(f"“{s}” isn't a real date and time.") from None
+    return utc.replace(tzinfo=None).isoformat(timespec="seconds")
 
 
 def due_label(due_at) -> str:
@@ -283,10 +290,12 @@ def due_label(due_at) -> str:
         return ""
     try:
         t = datetime.datetime.fromisoformat(due_at)
-    except ValueError:
+        if t.tzinfo is None:            # the stored convention: naive UTC
+            t = t.replace(tzinfo=datetime.timezone.utc)
+        local = t.astimezone(COURSE_TZ)
+    except (ValueError, OverflowError):
         return str(due_at)
-    return (t.replace(tzinfo=datetime.timezone.utc).astimezone(COURSE_TZ)
-            .strftime("%Y-%m-%d %H:%M ICT"))
+    return local.strftime("%Y-%m-%d %H:%M:%S ICT" if local.second else "%Y-%m-%d %H:%M ICT")
 
 
 def _is_open(assignment, now) -> bool:
