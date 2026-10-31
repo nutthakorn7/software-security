@@ -368,7 +368,7 @@ components are the project (15%) and this capstone CTF. Two consequences to sett
 **Make-up sittings.** `instructor/exams/` holds a parallel **Form B for the written papers only**
 (W8 and W18); there is no Form B for a practical. The rotation pool is `instructor/exams/item-bank.md`.
 Absence / make-up / late policy for an exam sitting: ⬚ (institutional). The general late rule
-(−10%/day, up to 3 days) is `syllabus.md` §6.
+(KOSEN: −10% per started day, 0 after 10 days) is `syllabus.md` §6.
 
 ## 6. Academic-integrity controls actually used
 

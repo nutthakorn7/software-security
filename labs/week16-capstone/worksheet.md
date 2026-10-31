@@ -96,6 +96,8 @@ Answer as a team (2–4 sentences each).
 | CI pipeline | 15 | Security gate fails closed on HIGH/CRITICAL; run linked |
 | Demo & Q&A | 15 | Clear 10-min demo, handles 5-min Q&A; CWE/OWASP mapping throughout |
 
+**Due:** before the start of next week's class (exact time on learn.zcr.ai/submit). **Late:** −10% per started day; 0 after 10 days.
+
 ---
 
 ## Evidence & Integrity (required)
