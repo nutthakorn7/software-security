@@ -94,7 +94,10 @@ machine before Week 1. Nothing on the website will work without this step.**
 ## Rules for every submission
 - **Name + Student ID** on every file; teamwork only where stated (labs/quizzes/exams are individual).
 - **AI-tool disclosure:** state how you used any AI tool (search, code, translate) — a section is built into the worksheet/report.
-- **Late (KOSEN):** −10% of the item's score per started day late, reaching 0 after 10 days; the portal stops accepting work after day 10 (see `syllabus.md` §6). Submit what you have. MFU students follow [syllabus-mfu.md](syllabus-mfu.md).
+- **Late (KOSEN):** −10% of the item's score per started day late, reaching 0 after 10 days; the portal stops accepting work after day 10 (see `syllabus.md` §6). Submit what you have.
+  - **Handed in on time = final at the deadline.** After the deadline you can't change, replace or add to it, so one stray re-upload can never turn an on-time hand-in late.
+  - **Late work: your last upload sets how late it is.** Adding a file on day 5 makes the whole hand-in 5 days late. Each started 24 h after the deadline counts as a day, so 1 minute late is already −10%; after day 10 the worksheet closes.
+- **Late (MFU):** follow [syllabus-mfu.md](syllabus-mfu.md).
 
 ---
 
