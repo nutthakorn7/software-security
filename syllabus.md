@@ -197,7 +197,7 @@ No new content and nothing graded. Review your assessment feedback, work through
 
 **Worksheet versions.** Each student completes the weekly worksheets in an assigned version — **Conventional** or **AIR-Sec**. Follow the version you are assigned. Both versions use the same component weights and the same course rubric below.
 
-**Course rubric.** Every graded component is marked against these six criteria:
+**Course rubric (subject sheet).** The course-level evaluation rubric: these six criteria describe what *very good*, *good* and *fail* look like across the course. Each worksheet and the term project keep their own point rubrics, which assess these criteria.
 
 | Criterion | Very good (ideal) | Good (standard) | Fail (unacceptable) |
 |---|---|---|---|

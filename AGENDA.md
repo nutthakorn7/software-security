@@ -43,8 +43,10 @@ tasks included.
 
 Each worksheet's Part 3 now says which tasks are **in class** and which are **homework**. The rule:
 the tasks the subject sheet's *Method* line for that week says happen in class, plus the defend/fix
-task, stay in class; project-target tasks, extensions and write-ups go home. **No task's minutes and
-no rubric changed** — only where each task is done.
+task, stay in class; project-target tasks, extensions and write-ups go home. **Week 1 is the
+exception:** its Method line is modelling only (sandbox, trust boundaries, the card exercise), so its
+rank-and-fix Task 8 is homework. **No task's minutes and no rubric changed** — only where each task
+is done.
 
 | Wk | Worksheet budget | In class | Before class | Homework |
 |----|:---:|---|---|---|
