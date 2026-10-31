@@ -4,7 +4,7 @@
 |---|---|
 | **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 17 · ⬚ |
-| **Contact time** | 150 min, one continuous block (`AGENDA.md`, *Week 7 & 17 — Review*): review quiz 25 + Security Jeopardy: Champions 40 + mock final CTF 75 (ungraded; finished at home) + debrief 10 |
+| **Contact time** | 150 min, one continuous block (`AGENDA.md`, *Week 7 & 17 — Review*): review quiz 30 + Security Jeopardy: Champions 35 + mock final CTF 75 (ungraded; finished at home) + debrief 10 |
 | **Lab folder** | `labs/week17-review-final-prep` |
 | **Slides** | `slides/week17.md` |
 | **Type** | Review — **no new content**. Consolidates Weeks 10–16 (+ first-half callbacks) |
@@ -66,37 +66,37 @@ Timings are AGENDA.md's review-week agenda (*Week 7 & 17 — Review (150 min)*).
 
 | Time | Block | What happens |
 |---|---|---|
-| 0:00–0:25 | **Cumulative review quiz** | Quiz 2 (`quizzes/quiz2.md`) — 25 pts; the paper states 30 min, see §5.1 |
-| 0:25–1:05 | **Security Jeopardy: Champions** | Team quiz-show across the modern stack + first-half callbacks |
+| 0:00–0:30 | **Cumulative review quiz** | Quiz 2 (`quizzes/quiz2.md`) — 25 pts, 30 min |
+| 0:30–1:05 | **Security Jeopardy: Champions** | Team quiz-show across the modern stack + first-half callbacks |
 | 1:05–2:20 | **Mock final CTF** | `labs/week17-review-final-prep/mock-ctf.md`, in the Week 19 team format — the first 75 min in class; it is ungraded practice, so teams finish the remaining challenges at home |
 | 2:20–2:30 | **Debrief** | Common mistakes (§6) + final logistics (§7) |
 
-*(The presenter notes in `slides/week17.md` still budget the longer review block: a 30-min quiz, ~75 min of Jeopardy, a 15-min break, ~150 min of mock CTF and a 30-min debrief. AGENDA.md now gives 25 / 40 / 75 in class / 10 with no break, and `mock-ctf.md` says ~165 min of challenges, about 75 of them in class and the rest at home. Follow AGENDA; the slide notes are documentation drift. The old plan's overrun lever — drop challenge 8, the optional web callback — no longer applies: whatever is not reached in class is finished at home.)*
+*(The presenter notes in `slides/week17.md` still budget the longer review block: a 30-min quiz, ~75 min of Jeopardy, a 15-min break, ~150 min of mock CTF and a 30-min debrief. AGENDA.md now gives 30 / 35 / 75 in class / 10 with no break, and `mock-ctf.md` says ~165 min of challenges, about 75 of them in class and the rest at home. Follow AGENDA; the slide notes are documentation drift. The old plan's overrun lever — drop challenge 8, the optional web callback — no longer applies: whatever is not reached in class is finished at home.)*
 
-### 5.1 Cumulative review quiz — 0:00–0:25
+### 5.1 Cumulative review quiz — 0:00–0:30
 
 | Field | Value |
 |---|---|
 | Instrument | `quizzes/quiz2.md` — "Quiz 2 — Modern Stack (Weeks 10–15)" |
-| Weight | 25 pts. Time: AGENDA's slot is 25 min; the paper states 30 min (see below) |
+| Weight | 25 pts, 30 min |
 | Blueprint | Part A multiple choice 10 × 1 pt · Part B short answer 3 × 3 pts · Part C applied 2 × 3 pts |
 | Covers | API security · Memory safety & exploitation · Supply chain · Cloud/container · AI/LLM · DevSecOps |
 | Conditions | Closed book unless the instructor states otherwise — `quiz2.md` itself carries no book-condition text; the convention comes from `quiz1.md` (Week 7 quiz, line 6), so this is the instructor's call to make and announce today |
 | Delivery | Google Form (SUBMISSION.md; Forms are built with `instructor/make_quiz_forms.gs`), individual, one attempt, shuffled, locked to the school account. `quiz2.md` prints as the paper fallback |
 | Where it counts | The 10% weekly-quizzes / participation component |
 
-**Slot vs paper — open.** AGENDA.md slots the review quiz at 25 min (0:00–0:25), but `quiz2.md` still states "**Time:** 30 min · **Total:** 25 pts", so the slot and the paper disagree. This plan follows AGENDA's slot. Whether to trim the paper's stated time to 25 min or take 5 min from another block is ⬚ (instructor's decision).
+**Quiz time — decided.** The quiz keeps the 30 min that `quiz2.md` states (owner, 2026-10-31); Security Jeopardy gives up 5 min to make room, so the class stays 150 min.
 
 Weeks 7 and 17 deliberately have **no** `quizzes/weekly/weekNN.md` 6-question quiz — the cumulative quiz *is* this week's retrieval practice (`quizzes/README.md`). Note that Quiz 2 covers Weeks 10–**15**; the Week 16 capstone carries no quiz content.
 
 **Cohort rotation.** `quiz2.md` is a static file reused every cohort, which is a leak risk. Swap two or three Part A MCQs and/or the Part B/C alternates from the review-quiz item bank into a cohort copy, keeping the total at 25 pts (10 × 1 + 3 × 3 + 2 × 3).
 
-### 5.2 Security Jeopardy: Champions — 0:25–1:05
+### 5.2 Security Jeopardy: Champions — 0:30–1:05
 
 - **Categories** — the six named in the lab README and `slides/week17.md`, one per modern-stack week under review:
   *API · Memory · Supply Chain · Cloud · AI/LLM · DevSecOps*, with first-half callbacks (injection, auth) folded into the squares since the final is cumulative.
 - **Board** — 6 categories (named on the slide) × 5 point values, following the same structure documented in `slides/week07.md`'s presenter note for the equivalent Week 7 round, plus a **Final Jeopardy wager** at the end (`slides/week17.md` presenter note: seed from the item bank, prepare beforehand). Prepare it before the session; nothing ships in the repo.
-- **Fit** — the `slides/week17.md` presenter note budgets the round at ~75 min; AGENDA gives the block 40 min and no breakdown. Whether the full board and the wager fit in 40 min, and what gives if they do not, is ⬚ — no source says.
+- **Fit** — the `slides/week17.md` presenter note budgets the round at ~75 min; AGENDA gives the block 35 min and no breakdown. Whether the full board and the wager fit in 35 min, and what gives if they do not, is ⬚ — no source says.
 - **Seed** — draw the questions from the final item bank (`instructor/exams/item-bank.md`), per the `slides/week17.md` note.
 - **Teams** — run by Houses (non-graded engagement layer, per course specification §7).
 - **Rules** — the team picks a square and answers; keep it fast.
@@ -236,7 +236,7 @@ There is **no worksheet** for Week 17: the lab folder holds `README.md` and `moc
 ## 9. Materials
 
 - Lab: `labs/week17-review-final-prep/` — `README.md`, `mock-ctf.md`
-- Quiz: `quizzes/quiz2.md` (25 pts; the paper states 30 min against AGENDA's 25-min slot — §5.1) · quiz mechanics: `quizzes/README.md`
+- Quiz: `quizzes/quiz2.md` (25 pts, 30 min) · quiz mechanics: `quizzes/README.md`
 - Slides: `slides/week17.md`
 - Mock-CTF targets: `labs/week10-api-security` (`docker compose up`), `labs/week11-memory-safety-exploitation` (toolbox container — `labs/toolbox`), `labs/week12-supply-chain` (`bash sca_scan.sh` / `bash sign.sh`), `labs/week13-cloud-container` (`bash scan.sh`), `labs/week14-ai-llm-security` (`docker compose up`), plus a web-half callback (`labs/week04-injection` / `labs/week05-xss-client-side` / `labs/week06-authn-authz`)
 - Solution files the mock self-checks against: `solution_api.py` (W10), `exploit_skeleton.py` and `safe.rs` (W11), `sign.sh` and `sca_scan.sh` (W12), `harden.md` (W13), `guarded_chatbot.py` (W14), and the week04–06 solutions
@@ -255,7 +255,7 @@ There is **no worksheet** for Week 17: the lab folder holds `README.md` and `moc
 | **Two Trivy pulls + a Cosign network call.** Challenge 5 (`sca_scan.sh`/`cosign verify`) and challenge 6 (`bash scan.sh` → `aquasec/trivy:latest`) both hit the network; `cosign verify` reaches the registry and Rekor | Pre-pull `aquasec/trivy:latest` the day before. There is no break before the mock any more, so when teams run the scans is ⬚ — no source says. A team offline can still do challenge 6 by code review of `Dockerfile.insecure` against `harden.md` and describe the mitigation — which is what the Week 18 partial-credit answer rewards |
 | **Trivy won't flag the IAM policy — students think it's clean.** `trivy config` does not parse standalone IAM JSON, and only 3 of the 6 `Dockerfile.insecure` defects map to Trivy rules (`scan.sh` L18–21) | Brief this before the block: the IAM `*:*` and the manual-review defects (`COPY . .`, `chmod -R 777`, unpinned `pip install`) are found by **reading** the file against `harden.md`, not by the scanner. Frames misconception #9 |
 | **Host-port 8080 clash between W10 and the web callback.** `labs/week10-api-security` publishes `8080:5000`, and challenge 8's callback targets (`week04`/`05`/`06`) each also publish `8080:5000`. A team that leaves the API up and then `docker compose up`s a web-half target gets a bind failure | Run one 8080 target at a time (the API and the callback are independent challenges), or override the published port in the second compose file. `:8081` (secure API) and `:8082/:8083` (Week 14) do not clash |
-| **The Jeopardy board does not exist until someone makes it.** Nothing ships in the repo; without it the 40-min Jeopardy block has no content | Build the 6 × 5 board plus the Final-Jeopardy wager beforehand from `instructor/exams/item-bank.md`. Fallback: run the "Map of the modern stack" cold-call recap from `slides/week17.md` and extend the mock-CTF block |
+| **The Jeopardy board does not exist until someone makes it.** Nothing ships in the repo; without it the 35-min Jeopardy block has no content | Build the 6 × 5 board plus the Final-Jeopardy wager beforehand from `instructor/exams/item-bank.md`. Fallback: run the "Map of the modern stack" cold-call recap from `slides/week17.md` and extend the mock-CTF block |
 | **The CTFd scoreboard may not be up.** AGENDA.md hedges it as "if running", so points from Jeopardy and the mock may have nowhere to land | Tally on the whiteboard and enter CTFd Awards afterwards (`instructor/CTFd-SETUP.md` §6: 300/200/100, first-blood +100, most creative +50). Nothing today is graded on those points |
 | **A team cannot sit the Form quiz** — Quiz 2 runs as a Google Form locked to the school account (SUBMISSION.md) | Print `quizzes/quiz2.md`; it carries name/ID/date fields and marks up to the same 25 |
 | **Quiz-item leakage between cohorts.** `quiz2.md` is a static file reused each term | Swap two or three Part A MCQs and/or the Part B/C alternates from the review-quiz item bank into a cohort copy, holding the total at 10 × 1 + 3 × 3 + 2 × 3 = 25 |
@@ -266,7 +266,7 @@ There is **no worksheet** for Week 17: the lab folder holds `README.md` and `moc
 
 - Attendance / completion: ⬚
 - Time actually taken per block (vs. plan): ⬚
-- Did Quiz 2 fit the 25-min slot (the paper states 30)? Did the Jeopardy board fit 40 min? ⬚
+- Did Quiz 2 fit its 30 min? Did the Jeopardy board fit 35 min? ⬚
 - Where the class got stuck, and what unblocked them: ⬚
 - Mock-CTF challenges still unsolved by more than a third of the teams at the end of the in-class block: ⬚
 - How the mock's in-class / at-home split worked — how many teams finished the remaining challenges at home: ⬚

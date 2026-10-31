@@ -4,7 +4,7 @@
 |---|---|
 | **Course** | Software Security 2 (02005094, KOSEN-KMITL) |
 | **Week / date** | 7 · ⬚ |
-| **Contact time** | 150 min, one continuous block (`AGENDA.md`, *Week 7 & 17 — Review*): review quiz 25 + Security Jeopardy 40 + mock CTF 75 (ungraded; finished at home) + debrief 10 |
+| **Contact time** | 150 min, one continuous block (`AGENDA.md`, *Week 7 & 17 — Review*): review quiz 30 + Security Jeopardy 35 + mock CTF 75 (ungraded; finished at home) + debrief 10 |
 | **Lab folder** | `labs/week07-review-midterm-prep` |
 | **Slides** | `slides/week07.md` |
 | **Type** | Review — **no new content**. Consolidates Weeks 1–6 |
@@ -88,33 +88,30 @@ Timings are AGENDA.md's review-week agenda (*Week 7 & 17 — Review (150 min)*).
 
 | Time | Block | What happens |
 |---|---|---|
-| 0:00–0:25 | **Cumulative review quiz** | Quiz 1 (`quizzes/quiz1.md`) — 25 pts; the paper states 30 min, see §5.1 |
-| 0:25–1:05 | **Security Jeopardy** | Team quiz-show across the six topics |
+| 0:00–0:30 | **Cumulative review quiz** | Quiz 1 (`quizzes/quiz1.md`) — 25 pts, 30 min |
+| 0:30–1:05 | **Security Jeopardy** | Team quiz-show across the six topics |
 | 1:05–2:20 | **Mock CTF** | `labs/week07-review-midterm-prep/mock-ctf.md`, in the Week 9 format — the first 75 min in class; it is ungraded practice, so students finish the remaining challenges at home |
 | 2:20–2:30 | **Debrief** | Common mistakes (§6) + midterm logistics (§7) |
 
 *(The presenter notes in `slides/week07.md` still describe the longer review block: a ~5 h session,
-a 30-min quiz, roughly 60–75 min of Jeopardy and ~150 min of mock CTF. AGENDA.md now gives 40 min
+a 30-min quiz, roughly 60–75 min of Jeopardy and ~150 min of mock CTF. AGENDA.md now gives 35 min
 of Jeopardy and 75 min of mock CTF in class, and `mock-ctf.md` keeps ~150 min of challenges with
 about 75 of them in class and the rest at home. Follow AGENDA; the slide notes are documentation
 drift.)*
 
-### 5.1 Cumulative review quiz — 0:00–0:25
+### 5.1 Cumulative review quiz — 0:00–0:30
 
 | Field | Value |
 |---|---|
 | Instrument | `quizzes/quiz1.md` — "Quiz 1 — Foundations & Web Security (Weeks 1–6)" |
-| Weight | 25 pts. Time: AGENDA's slot is 25 min; the paper states 30 min (see below) |
+| Weight | 25 pts, 30 min |
 | Blueprint | Part A multiple choice 10 × 1 pt · Part B short answer 3 × 3 pts · Part C spot-the-vulnerability 2 × 3 pts |
 | Covers | Threat modeling · SDLC/tooling/fuzzing · Cryptography · Injection · XSS · Auth & access control |
 | Conditions | Closed book unless the instructor states otherwise |
 | Delivery | Google Form (SUBMISSION.md; Forms are built with `instructor/make_quiz_forms.gs`), individual, one attempt, shuffled, locked to the school account. `quiz1.md` prints as the paper fallback |
 | Where it counts | The 10% weekly-quizzes / participation component |
 
-**Slot vs paper — open.** AGENDA.md slots the review quiz at 25 min (0:00–0:25), but `quiz1.md`
-still states "**Time:** 30 min · **Total:** 25 pts", so the slot and the paper disagree. This plan
-follows AGENDA's slot. Whether to trim the paper's stated time to 25 min or take 5 min from another
-block is ⬚ (instructor's decision).
+**Quiz time — decided.** The quiz keeps the 30 min that `quiz1.md` states (owner, 2026-10-31); Security Jeopardy gives up 5 min to make room, so the class stays 150 min.
 
 Weeks 7 and 17 deliberately have **no** `quizzes/weekly/weekNN.md` 6-question quiz — the cumulative
 quiz *is* this week's retrieval practice.
@@ -123,14 +120,14 @@ quiz *is* this week's retrieval practice.
 or three MCQs and/or the Part B/C alternates from the review-quiz item bank into a cohort copy,
 keeping the total at 25 pts (10 × 1 + 3 × 3 + 2 × 3).
 
-### 5.2 Security Jeopardy — 0:25–1:05
+### 5.2 Security Jeopardy — 0:30–1:05
 
 - **Categories** — exactly the six in the lab README, one per week under review:
   *Threat Modeling · Tooling · Crypto · Injection · XSS · Auth & Access*.
 - **Board** — 6 categories × 5 point values, plus a **Final Jeopardy wager** at the end
   (`slides/week07.md` presenter note). Prepare it before the session; nothing ships in the repo.
 - **Fit** — the presenter note sizes that board for a ~60–75-min round; AGENDA gives the block
-  40 min and no breakdown. Whether the full board and the wager fit in 40 min, and what gives if
+  35 min and no breakdown. Whether the full board and the wager fit in 35 min, and what gives if
   they do not, is ⬚ — no source says.
 - **Teams** — run by Houses (non-graded engagement layer, per course specification §7).
 - **Rules** — the team picks a square and answers; a wrong answer *loses* the points. Keep it fast.
@@ -327,7 +324,7 @@ the course mark, course specification §4).
 ## 9. Materials
 
 - Lab: `labs/week07-review-midterm-prep/` — `README.md`, `mock-ctf.md`
-- Quiz: `quizzes/quiz1.md` (25 pts; the paper states 30 min against AGENDA's 25-min slot — §5.1) · quiz mechanics: `quizzes/README.md`
+- Quiz: `quizzes/quiz1.md` (25 pts, 30 min) · quiz mechanics: `quizzes/README.md`
 - Slides: `slides/week07.md`
 - Mock-CTF targets: `labs/week03-cryptography`, `labs/week04-injection`,
   `labs/week05-xss-client-side`, `labs/week06-authn-authz` (`docker compose up` in each)
@@ -350,7 +347,7 @@ the course mark, course specification §4).
 | **Four `pip install` runs on the room network.** Each compose file installs at container start: `pycryptodome argon2-cffi` (W3), `flask` (W4), `flask` (W5), `flask pyjwt` (W6). In a teaching week that is one round-trip; today it is four per student, and a weak network takes down the whole mock CTF rather than one task | Pre-pull `python:3.12-slim` and bring all four targets up once the day before; keep the offline image copy (`docker save` / `docker load`) ready. Students who completed Weeks 3–6 on the same machine already have the layers cached. There is no break before the mock any more, so when students start their containers is ⬚ — no source says, and start-up that waits for 1:05 comes out of the 75 in-class minutes |
 | **Challenge 6 has an uninstalled prerequisite.** Cracking the hash needs `hashcat` or `john` plus the `rockyou.txt` wordlist (worksheet 3 prerequisites); the Week 3 compose file installs neither, so the challenge can silently be un-completable | Verify the cracker and wordlist on a representative machine before class. A student without them should do the challenge by reasoning — state why unsalted MD5 falls to a wordlist (CWE-916/327) and what argon2id changes — which is also what the Week 9 partial-credit column rewards. Remember to strip the comment lines from `hashes.txt` first |
 | **Challenges 4 and 5 need host-side `pyjwt`.** `pip install … pyjwt` inside the Week 6 container does not help the forging snippets, which run `python3` with `import jwt` on the *host* (worksheet 6 prerequisites) | Have students install `pyjwt` on the host before the session; failing that, pair them for the JWT challenges and require them to write the forged-token reasoning themselves |
-| **The Jeopardy board does not exist until someone makes it.** Nothing ships in the repo; if it is not prepared, the 40-min Jeopardy block has no content | Build the 6 × 5 board plus the Final Jeopardy wager beforehand from the item banks in `instructor/`. Fallback if it is unprepared: run the "Map of the half" cold-call recap from `slides/week07.md` and extend the mock-CTF block |
+| **The Jeopardy board does not exist until someone makes it.** Nothing ships in the repo; if it is not prepared, the 35-min Jeopardy block has no content | Build the 6 × 5 board plus the Final Jeopardy wager beforehand from the item banks in `instructor/`. Fallback if it is unprepared: run the "Map of the half" cold-call recap from `slides/week07.md` and extend the mock-CTF block |
 | **The CTFd scoreboard may not be up.** AGENDA.md hedges it as "if running", so points from Jeopardy and the mock may have nowhere to land | Tally on the whiteboard during the session and enter CTFd Awards afterwards (`instructor/CTFd-SETUP.md` §6). Nothing today is graded on those points, so a missing scoreboard costs energy, not marks |
 | **A student cannot sit the Form quiz** — the review quizzes run as a Google Form locked to the school account (SUBMISSION.md) | Print `quizzes/quiz1.md`; it carries name/ID/date fields and marks up to the same 25 |
 | **Pairs on the mock hide an individual gap.** `mock-ctf.md` allows pairs; Week 9 does not | Require each student to name, in the debrief, one challenge they could not have landed alone — and put that name on the instructor's Week 8/9 support list |
@@ -362,7 +359,7 @@ the course mark, course specification §4).
 
 - Attendance / completion: ⬚
 - Time actually taken per block (vs. plan): ⬚
-- Did Quiz 1 fit the 25-min slot (the paper states 30)? Did the Jeopardy board fit 40 min? ⬚
+- Did Quiz 1 fit its 30 min? Did the Jeopardy board fit 35 min? ⬚
 - Where the class got stuck, and what unblocked them: ⬚
 - Mock-CTF challenges still unsolved by more than a third of the room at the end of the in-class block: ⬚
 - How the mock's in-class / at-home split worked — how many students finished the remaining challenges at home: ⬚
