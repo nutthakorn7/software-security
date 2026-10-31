@@ -39,6 +39,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import json
+import math
 import os
 import re
 import secrets
@@ -211,7 +212,8 @@ def redeem(conn, code, now):
     (assignment_id, student_id), never by the code string.
 
     After the deadline a code opens the worksheet only to read released marks
-    on work that was handed in (read-only: can_upload() is False by then).
+    on work that was handed in (read-only: can_upload() is False by then),
+    or, in a course that takes late work, to hand in late (see accepts_work()).
     Any other past-deadline code is refused BEFORE anything is written, so it
     stays unused: there is nothing to do on a closed worksheet, and the
     teacher has reopened deadlines before (the W1-6 resubmission window).
@@ -230,7 +232,7 @@ def redeem(conn, code, now):
         (row["assignment_id"], row["student_id"])).fetchone()
     a = get_assignment(conn, row["assignment_id"])
     has_feedback = bool(a["released"] and sub is not None and sub["submitted_at"])
-    if not _is_open(a, now) and not has_feedback:
+    if not accepts_work(a, sub, now) and not has_feedback:
         raise SubmitError(CODE_DEADLINE_PASSED)
 
     # Burn first, and only if nobody else has: the SELECT above is not a lock,
@@ -299,13 +301,81 @@ def due_label(due_at) -> str:
 
 
 def _is_open(assignment, now) -> bool:
-    """Before (or at) the deadline. redeem() and can_upload() both ask this, so a code stops
-    opening the worksheet at the same instant the upload form disappears."""
+    """Before (or at) the deadline."""
     return not assignment["due_at"] or now <= assignment["due_at"]
 
 
+# --- late work ---------------------------------------------------------------
+# A course can take late work at a fixed cost per day: KOSEN takes 10% off the mark for each
+# started day after the deadline, until the mark reaches 0 (after 10 days), and the worksheet
+# stays open for exactly that long. The rate is the course's, set in the registry ($COURSES
+# `late_pct_per_day`), so every worksheet in a course follows one rule. A course with no rate
+# (0, the default, e.g. MFU) keeps the original behaviour: the worksheet closes at the deadline
+# and any lateness is the teacher's to judge.
+
+_DAY = datetime.timedelta(days=1)
+
+
+def late_pct_per_day(assignment) -> int:
+    """Percent of the mark lost per started day late in this assignment's course; 0 = no late work."""
+    import content as C
+    return int((C.course(assignment["course_slug"]) or {}).get("late_pct_per_day") or 0)
+
+
+def late_closes_at(assignment):
+    """When late work stops being accepted: the day the penalty reaches 100%. None = no late work."""
+    pct = late_pct_per_day(assignment)
+    if not assignment["due_at"] or pct <= 0:
+        return None
+    due = datetime.datetime.fromisoformat(assignment["due_at"])
+    return (due + math.ceil(100 / pct) * _DAY).isoformat(timespec="seconds")
+
+
+def days_late(assignment, submitted_at) -> int:
+    """Each started 24 h after the deadline counts as a day: 1 minute late is 1 day. 0 = on time."""
+    if not assignment["due_at"] or not submitted_at or submitted_at <= assignment["due_at"]:
+        return 0
+    over = (datetime.datetime.fromisoformat(submitted_at)
+            - datetime.datetime.fromisoformat(assignment["due_at"]))
+    return math.ceil(over / _DAY)
+
+
+def late_penalty_pct(assignment, submitted_at):
+    """Percent of the mark this lateness costs, capped at 100. None when the course has no rate
+    and the work is late: then the penalty is the teacher's call, not a number to invent."""
+    days = days_late(assignment, submitted_at)
+    if days == 0:
+        return 0
+    pct = late_pct_per_day(assignment)
+    return min(100, days * pct) if pct > 0 else None
+
+
+def late_window_open(assignment, now) -> bool:
+    """Past the deadline but still taking late work."""
+    closes = late_closes_at(assignment)
+    return bool(closes) and assignment["due_at"] < now <= closes
+
+
+def _handed_in_on_time(assignment, submission) -> bool:
+    return bool(submission is not None and submission["submitted_at"]
+                and submission["submitted_at"] <= assignment["due_at"])
+
+
+def accepts_work(assignment, submission, now) -> bool:
+    """Whether this student's worksheet takes uploads right now. redeem() and can_upload() both
+    ask this, so a code stops opening the worksheet at the same instant the upload form disappears.
+
+    Work handed in on time is frozen at the deadline even while late work is accepted: one stray
+    re-upload must not turn an on-time hand-in late, and deleting it afterwards would leave an
+    on-time timestamp on a submission with no files. `submitted_at` is the last upload, so a late
+    hand-in is costed from the last file added."""
+    if _is_open(assignment, now):
+        return True
+    return late_window_open(assignment, now) and not _handed_in_on_time(assignment, submission)
+
+
 def can_upload(conn, submission, now) -> bool:
-    return _is_open(get_assignment(conn, submission["assignment_id"]), now)
+    return accepts_work(get_assignment(conn, submission["assignment_id"]), submission, now)
 
 
 def is_late(conn, submission) -> bool:
@@ -450,10 +520,12 @@ def gradebook_rows(conn, assignment_id):
 
     A student who never submitted appears with `submitted=False` and no percent
     — never a 0. "Didn't hand it in" and "handed in and scored nothing" are
-    different facts, and the late penalty (SUBMISSION.md: -10%/day up to 3 days)
-    is the teacher's to apply, so `late` travels alongside rather than being
-    silently deducted here.
+    different facts. `percent` is always the raw mark: the late penalty travels
+    alongside it (`days_late`, `penalty_pct`) and is applied only in
+    `adjusted_percent`, which is None when the course has no late rate and the
+    penalty is the teacher's to decide.
     """
+    a = get_assignment(conn, assignment_id)
     codes = conn.execute(
         "SELECT student_id FROM submit_codes WHERE assignment_id = ? ORDER BY student_id",
         (assignment_id,)).fetchall()
@@ -466,9 +538,12 @@ def gradebook_rows(conn, assignment_id):
             out.append({"student_id": c["student_id"], "submission_id": None,
                         "submitted": False, "late": False, "files": 0,
                         "earned": None, "possible": None, "percent": None,
-                        "fully_graded": False})
+                        "fully_graded": False, "days_late": None,
+                        "penalty_pct": None, "adjusted_percent": None})
             continue
         earned, possible, complete = score(conn, sub["id"])
+        percent = (earned / possible * 100) if possible else None
+        penalty = late_penalty_pct(a, sub["submitted_at"])
         out.append({
             "student_id": c["student_id"],
             "submission_id": sub["id"],
@@ -477,7 +552,11 @@ def gradebook_rows(conn, assignment_id):
             "files": len(list_files(conn, sub["id"])),
             "earned": earned,
             "possible": possible,
-            "percent": (earned / possible * 100) if possible else None,
+            "percent": percent,
             "fully_graded": complete,
+            "days_late": days_late(a, sub["submitted_at"]),
+            "penalty_pct": penalty,
+            "adjusted_percent": (None if percent is None or penalty is None
+                                 else percent * (100 - penalty) / 100),
         })
     return out

@@ -148,6 +148,7 @@ def detail(assignment_id):
     return render_template("work_detail.html", a=a, rubric=S.rubric_of(a),
                            total=S.total_points(a),
                            rows=S.gradebook_rows(_db(), assignment_id),
+                           late_pct=S.late_pct_per_day(a), late_closes=S.late_closes_at(a),
                            csrf_token=_csrf())
 
 
@@ -206,6 +207,8 @@ def mark(assignment_id, submission_id):
                            rubric=S.rubric_of(a), marks=marks,
                            files=S.list_files(_db(), submission_id),
                            late=S.is_late(_db(), sub),
+                           days_late=S.days_late(a, sub["submitted_at"]),
+                           penalty=S.late_penalty_pct(a, sub["submitted_at"]),
                            score=(earned, possible, complete),
                            csrf_token=_csrf())
 
@@ -216,14 +219,19 @@ def results_csv(assignment_id):
     _owned(assignment_id)
     buf = io.StringIO()
     w = safe_csv.writer(buf)
+    # New columns go on the end, so anything reading the first eight by position still works.
     w.writerow(["student_id", "submitted", "late", "files", "earned", "possible",
-                "percent", "fully_graded"])
+                "percent", "fully_graded", "days_late", "late_penalty_pct",
+                "adjusted_percent"])
     for r in S.gradebook_rows(_db(), assignment_id):
         w.writerow([r["student_id"], int(r["submitted"]), int(r["late"]), r["files"],
                     "" if r["earned"] is None else f"{r['earned']:.2f}",
                     "" if r["possible"] is None else f"{r['possible']:.2f}",
                     "" if r["percent"] is None else f"{r['percent']:.2f}",
-                    int(r["fully_graded"])])
+                    int(r["fully_graded"]),
+                    "" if r["days_late"] is None else r["days_late"],
+                    "" if r["penalty_pct"] is None else r["penalty_pct"],
+                    "" if r["adjusted_percent"] is None else f"{r['adjusted_percent']:.2f}"])
     return Response(buf.getvalue(), mimetype="text/csv", headers={
         "Content-Disposition": f'attachment; filename="work-{assignment_id}.csv"'})
 
@@ -457,6 +465,10 @@ def workspace():
     return render_template(
         "submit_work.html", a=a, sub=sub, files=S.list_files(_db(), sub["id"]),
         can_upload=S.can_upload(_db(), sub, now), late=S.is_late(_db(), sub),
+        late_pct=S.late_pct_per_day(a), late_closes=S.late_closes_at(a),
+        late_window=S.late_window_open(a, now),
+        days_late=S.days_late(a, sub["submitted_at"]),
+        penalty=S.late_penalty_pct(a, sub["submitted_at"]),
         rubric=S.rubric_of(a), marks={m["criterion"]: m for m in marks},
         released=bool(a["released"]),
         score=(earned, possible, complete) if a["released"] else None,
