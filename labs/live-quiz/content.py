@@ -200,9 +200,10 @@ def _load_courses() -> list[dict]:
 
     $COURSES is a JSON list of {slug, title, root, arena_url?, late_pct_per_day?}.
     `root` is the directory holding the weekNN-* dirs (i.e. a course repo's `labs/`).
-    `late_pct_per_day` (whole percent, 0-100) makes the course take late worksheets
-    at that cost per started day until the mark reaches 0 (KOSEN: 10); absent or 0
-    closes worksheets at the deadline, as before. See submission.py "late work".
+    `late_pct_per_day` (whole percent, 0-100) is what each started day late costs
+    (KOSEN: 10). It is applied only to assignments given a late window (`late_days`),
+    and only to work out the penalty; absent or 0 leaves the penalty to the teacher.
+    See submission.py late_pct_per_day().
     """
     raw = os.environ.get("COURSES", "").strip()
     if not raw:

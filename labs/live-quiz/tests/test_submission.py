@@ -472,12 +472,82 @@ def test_partial_grading_is_flagged_in_the_export(conn, uploads):
     assert row["fully_graded"] is False
 
 
-# --- late work (a course with a per-day late rate) --------------------------
-# KOSEN: −10% per started day after the deadline, down to 0, and the worksheet stays open
-# exactly until the mark would reach 0. DUE + 10 days = CLOSES.
+# --- late window ------------------------------------------------------------
+# A course whose rule is "-10% per day late, down to 0" needs the portal to take
+# late work at all; before late_days existed the upload form vanished at due_at.
 
-CLOSES = "2026-08-30T23:59:00"
+def test_a_late_window_keeps_uploads_open_and_flags_them_late(conn, uploads):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    assert S.can_upload(conn, sub, LATE)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x", now=LATE, upload_dir=uploads)
+    sub = conn.execute("SELECT * FROM submissions WHERE id=?", (sub["id"],)).fetchone()
+    assert S.is_late(conn, sub)
+    assert S.days_late(conn, sub) == 1
 
+
+def test_a_late_window_closes_after_its_days(conn, uploads):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    assert S.closes_at(S.get_assignment(conn, aid)) == "2026-08-30T23:59:00"
+    assert S.can_upload(conn, sub, "2026-08-30T23:59:00")
+    assert not S.can_upload(conn, sub, "2026-08-30T23:59:01")
+    with pytest.raises(S.SubmitError, match="deadline"):
+        S.store_file(conn, sub, display_name="a.pdf", data=b"x",
+                     now="2026-08-31T00:00:00", upload_dir=uploads)
+
+
+def test_no_late_window_still_closes_at_the_deadline(conn):
+    a = S.get_assignment(conn, make(conn))
+    assert S.late_days_of(a) == 0
+    assert S.closes_at(a) == DUE
+
+
+@pytest.mark.parametrize("submitted, expected", [
+    (DUE, 0),                        # on the deadline is on time
+    ("2026-08-20T23:59:01", 1),      # one second over is a day late
+    ("2026-08-21T23:59:00", 1),
+    ("2026-08-21T23:59:01", 2),
+    ("2026-08-15T09:00:00", 0),      # early
+])
+def test_days_late_counts_a_part_day_as_a_day(conn, submitted, expected):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    conn.execute("UPDATE submissions SET submitted_at=? WHERE id=?", (submitted, sub["id"]))
+    conn.commit()
+    sub = conn.execute("SELECT * FROM submissions WHERE id=?", (sub["id"],)).fetchone()
+    assert S.days_late(conn, sub) == expected
+
+
+def test_a_code_opens_inside_the_late_window_and_not_after_it(conn):
+    aid = make(conn, late_days=10)
+    codes = S.issue_codes(conn, aid, ["65310001", "65310002"], T0)
+    assert S.redeem(conn, codes["65310001"], LATE)["student_id"] == "65310001"
+    _deadline_passed(conn, codes["65310002"], now="2026-08-31T00:00:00")
+
+
+@pytest.mark.parametrize("bad", [-1, S.MAX_LATE_DAYS + 1])
+def test_a_late_window_out_of_range_is_refused(conn, bad):
+    with pytest.raises(ValueError, match="late"):
+        make(conn, late_days=bad)
+
+
+def test_the_gradebook_row_carries_days_late_without_deducting(conn, uploads):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x",
+                 now="2026-08-22T08:00:00", upload_dir=uploads)
+    for r in S.rubric_of(S.get_assignment(conn, aid)):
+        S.grade(conn, sub["id"], r["criterion"], r["max"], "", T0)
+    (row,) = S.gradebook_rows(conn, aid)
+    assert row["late"] is True and row["days_late"] == 2
+    assert row["percent"] == pytest.approx(100.0), "the penalty stays the teacher's call"
+
+
+# --- the late penalty and on-time work in a late window ---------------------
+# KOSEN: −10% per started day after the deadline, down to 0. The window is the assignment's
+# (late_days); the rate is the course's ($COURSES late_pct_per_day), applied only where the
+# assignment has a window.
 
 @pytest.fixture
 def kosen(monkeypatch):
@@ -490,41 +560,15 @@ def _fully_mark(conn, aid, sub):
         S.grade(conn, sub["id"], r["criterion"], r["max"], "", T0)
 
 
-def test_a_course_with_no_late_rate_still_closes_at_the_deadline(conn, uploads):
-    aid = make(conn)
-    assert S.late_closes_at(S.get_assignment(conn, aid)) is None
-    sub, _ = open_sub(conn, aid)
-    assert not S.can_upload(conn, sub, "2026-08-20T23:59:01")
-
-
-def test_late_work_is_taken_until_the_penalty_reaches_zero(conn, uploads, kosen):
-    aid = make(conn)
-    assert S.late_closes_at(S.get_assignment(conn, aid)) == CLOSES
-    sub, _ = open_sub(conn, aid)
-    assert S.can_upload(conn, sub, "2026-08-21T00:00:00")
-    assert S.can_upload(conn, sub, CLOSES)
-    assert not S.can_upload(conn, sub, "2026-08-30T23:59:01")
-    with pytest.raises(S.SubmitError, match="deadline"):
-        S.store_file(conn, sub, display_name="a.pdf", data=b"x",
-                     now="2026-08-30T23:59:01", upload_dir=uploads)
-
-
-@pytest.mark.parametrize("submitted_at,days,penalty", [
-    (DUE, 0, 0),                              # at the deadline is on time
-    ("2026-08-21T00:00:00", 1, 10),           # one minute late is a started day
-    ("2026-08-21T23:59:00", 1, 10),           # exactly 24 h late is still day 1
-    ("2026-08-21T23:59:01", 2, 20),
-    ("2026-08-29T23:59:01", 10, 100),
-    (CLOSES, 10, 100),                        # the last accepted instant is worth 0
-])
-def test_each_started_day_late_costs_ten_percent(conn, kosen, submitted_at, days, penalty):
-    a = S.get_assignment(conn, make(conn))
-    assert S.days_late(a, submitted_at) == days
-    assert S.late_penalty_pct(a, submitted_at) == penalty
+@pytest.mark.parametrize("days,penalty", [(0, 0), (1, 10), (2, 20), (10, 100), (12, 100)])
+def test_each_started_day_late_costs_the_course_rate_capped_at_100(conn, kosen, days, penalty):
+    a = S.get_assignment(conn, make(conn, late_days=10))
+    assert S.late_pct_per_day(a) == 10
+    assert S.late_penalty_pct(a, days) == penalty
 
 
 def test_the_export_keeps_the_raw_mark_and_adds_the_penalised_one(conn, uploads, kosen):
-    aid = make(conn)
+    aid = make(conn, late_days=10)
     sub, _ = open_sub(conn, aid)
     S.store_file(conn, sub, display_name="a.pdf", data=b"x",
                  now="2026-08-23T10:00:00", upload_dir=uploads)       # 3 started days late
@@ -536,53 +580,9 @@ def test_the_export_keeps_the_raw_mark_and_adds_the_penalised_one(conn, uploads,
     assert row["adjusted_percent"] == pytest.approx(70.0)
 
 
-def test_on_time_work_is_frozen_while_late_work_is_still_taken(conn, uploads, kosen):
-    # A stray re-upload must not turn an on-time hand-in late, and deleting it in the late
-    # window would leave an on-time timestamp on a submission with no files.
-    aid = make(conn)
-    sid = _handed_in_then_lost_the_session(conn, aid, uploads)["id"]
-    on_time = conn.execute("SELECT * FROM submissions WHERE id = ?", (sid,)).fetchone()
-    f = S.list_files(conn, on_time["id"])[0]
-    later = "2026-08-21T09:00:00"
-    assert not S.can_upload(conn, on_time, later)
-    with pytest.raises(S.SubmitError, match="deadline"):
-        S.store_file(conn, on_time, display_name="b.pdf", data=b"x", now=later,
-                     upload_dir=uploads)
-    with pytest.raises(S.SubmitError, match="deadline"):
-        S.delete_file(conn, on_time, f["id"], later, uploads)
-    (row,) = S.gradebook_rows(conn, aid)
-    assert row["late"] is False and row["days_late"] == 0 and row["penalty_pct"] == 0
-
-
-def test_a_late_hand_in_is_costed_from_its_last_upload(conn, uploads, kosen):
-    aid = make(conn)
-    sub, _ = open_sub(conn, aid)
-    S.store_file(conn, sub, display_name="a.pdf", data=b"x",
-                 now="2026-08-21T09:00:00", upload_dir=uploads)       # day 1
-    sub = conn.execute("SELECT * FROM submissions WHERE id = ?", (sub["id"],)).fetchone()
-    assert S.can_upload(conn, sub, "2026-08-23T09:00:00"), "a late hand-in can still be added to"
-    S.store_file(conn, sub, display_name="b.pdf", data=b"x",
-                 now="2026-08-23T09:00:00", upload_dir=uploads)       # day 3
-    (row,) = S.gradebook_rows(conn, aid)
-    assert row["days_late"] == 3 and row["penalty_pct"] == 30
-
-
-def test_a_code_opens_in_the_late_window_for_work_not_handed_in(conn, kosen):
-    aid = make(conn)
-    codes = S.issue_codes(conn, aid, ["65310001", "65310002"], T0)
-    sub = S.redeem(conn, codes["65310001"], "2026-08-22T09:00:00")
-    assert S.can_upload(conn, sub, "2026-08-22T09:00:00")
-    _deadline_passed(conn, codes["65310002"], "2026-08-30T23:59:01")   # after the window: closed
-
-
-def test_a_code_does_not_reopen_on_time_work_in_the_late_window(conn, uploads, kosen):
-    aid = make(conn)
-    _handed_in_then_lost_the_session(conn, aid, uploads)
-    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
-    _deadline_passed(conn, code, "2026-08-21T09:00:00")
-
-
-def test_no_late_rate_leaves_the_penalty_to_the_teacher(conn, uploads):
+def test_no_window_means_no_computed_penalty_even_with_a_course_rate(conn, uploads, kosen):
+    # Every MFU worksheet (and every one from before late_days) has no window. A rate on a
+    # shared course slug must not start deducting from them.
     aid = make(conn)
     sub, _ = open_sub(conn, aid)
     conn.execute("UPDATE assignments SET due_at=? WHERE id=?", ("2026-08-15T07:00:00", aid))
@@ -593,3 +593,49 @@ def test_no_late_rate_leaves_the_penalty_to_the_teacher(conn, uploads):
     (row,) = S.gradebook_rows(conn, aid)
     assert row["late"] is True and row["days_late"] == 1
     assert row["penalty_pct"] is None and row["adjusted_percent"] is None
+
+
+def test_no_course_rate_leaves_the_penalty_to_the_teacher(conn, uploads):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x", now=LATE, upload_dir=uploads)
+    (row,) = S.gradebook_rows(conn, aid)
+    assert row["days_late"] == 1
+    assert row["penalty_pct"] is None and row["adjusted_percent"] is None
+
+
+def test_on_time_work_is_final_while_late_work_is_still_taken(conn, uploads):
+    # A stray re-upload must not turn an on-time hand-in late, and deleting it in the late
+    # window would leave an on-time timestamp on a submission with no files.
+    aid = make(conn, late_days=10)
+    sid = _handed_in_then_lost_the_session(conn, aid, uploads)["id"]
+    on_time = conn.execute("SELECT * FROM submissions WHERE id = ?", (sid,)).fetchone()
+    f = S.list_files(conn, sid)[0]
+    assert not S.can_upload(conn, on_time, LATE)
+    with pytest.raises(S.SubmitError, match="deadline"):
+        S.store_file(conn, on_time, display_name="b.pdf", data=b"x", now=LATE,
+                     upload_dir=uploads)
+    with pytest.raises(S.SubmitError, match="deadline"):
+        S.delete_file(conn, on_time, f["id"], LATE, uploads)
+    (row,) = S.gradebook_rows(conn, aid)
+    assert row["late"] is False and row["days_late"] == 0
+
+
+def test_a_code_does_not_reopen_on_time_work_in_the_late_window(conn, uploads):
+    aid = make(conn, late_days=10)
+    _handed_in_then_lost_the_session(conn, aid, uploads)
+    code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
+    _deadline_passed(conn, code, LATE)
+
+
+def test_a_late_hand_in_can_be_added_to_and_is_costed_from_its_last_upload(conn, uploads, kosen):
+    aid = make(conn, late_days=10)
+    sub, _ = open_sub(conn, aid)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x",
+                 now="2026-08-21T09:00:00", upload_dir=uploads)       # day 1
+    sub = conn.execute("SELECT * FROM submissions WHERE id = ?", (sub["id"],)).fetchone()
+    assert S.can_upload(conn, sub, "2026-08-23T09:00:00")
+    S.store_file(conn, sub, display_name="b.pdf", data=b"x",
+                 now="2026-08-23T09:00:00", upload_dir=uploads)       # day 3
+    (row,) = S.gradebook_rows(conn, aid)
+    assert row["days_late"] == 3 and row["penalty_pct"] == 30

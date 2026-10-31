@@ -180,7 +180,7 @@ def test_a_late_rule_is_announced_to_the_student_and_costed_in_the_export(
     conn = appmod.get_db()
     tid = conn.execute("SELECT id FROM teachers WHERE username='teach1'").fetchone()["id"]
     wid = S.create_assignment(conn, teacher_id=tid, title="W4", now="2026-08-15T08:00:00",
-                              due_at="2026-08-20T16:59:00")          # 23:59 ICT
+                              due_at="2026-08-20T16:59:00", late_days=10)   # 23:59 ICT
     code = S.issue_codes(conn, wid, ["65310001"], "2026-08-15T08:00:00")["65310001"]
     appmod.app.config["NOW"] = lambda: "2026-08-22T09:00:00"         # 2 started days late
 
@@ -190,14 +190,14 @@ def test_a_late_rule_is_announced_to_the_student_and_costed_in_the_export(
     assert r.status_code in (302, 303), "a code still opens while late work is taken"
     page = student.get("/submit/work").get_data(as_text=True)
     assert "loses 10% of its mark for each" in page
-    assert "2026-08-30 23:59 ICT" in page, "the student is told when late work stops"
-    assert "still hand in until" in page
+    assert "2026-08-30 23:59 ICT" in page, "the student is told when late uploads stop"
+    assert "each started day late costs 10% of the mark" in page
 
     import io
     r = student.post("/submit/work", data={"csrf_token": _csrf(page),
                                            "file": (io.BytesIO(b"%PDF-1.4"), "w4.pdf")},
                      content_type="multipart/form-data")
-    assert "late by 2 days, −20%" in r.get_data(as_text=True)
+    assert "late 2 days, −20%" in r.get_data(as_text=True)
 
     sub = conn.execute("SELECT id FROM submissions WHERE assignment_id = ?", (wid,)).fetchone()
     for row in S.rubric_of(S.get_assignment(conn, wid)):
