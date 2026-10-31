@@ -13,9 +13,9 @@ explanations and demonstrations support it.
   practice, low-stakes, drop lowest 1–2). Two **cumulative review quizzes** (25 pts) run in the
   review weeks (W7 pre-midterm, W17 pre-final).
 
-> **Assumption — check against the timetable.** This plan assumes the 3 slots run as **one
-> contiguous 150-min block**. If they are split across days, the teaching-week template, the Docker
-> start-up overhead, and the 150-min exams in Weeks 9, 18 and 19 all need re-planning.
+> **Timetable: one contiguous 150-min block** (3 consecutive slots; confirmed by the owner
+> 2026-10-31). Everything below — the teaching-week template, the Docker start-up, and the 150-min
+> exams in Weeks 9, 18 and 19 — depends on it; re-plan if the timetable ever splits the slots.
 
 ---
 
@@ -78,7 +78,7 @@ Weeks with less than 125 min in class use the slack for feedback and for student
 | 4 | Teach — Injection | 10 | 15 | 125 | — | 150 | 25 |
 | 5 | Teach — XSS | 10 | 15 | 125 | — | 150 | 25 |
 | 6 | Teach — Auth & Access | 10 | 15 | 125 | — | 150 | 25 |
-| 7 | 🔁 Review (pre-midterm) | 25‡ | — | — | — | 150 | — |
+| 7 | 🔁 Review (pre-midterm) | 30‡ | — | — | — | 150 | — |
 | 8 | 📝 Midterm — Written | — | — | — | 120 | 150 | — |
 | 9 | 📝 Midterm — CTF | — | — | — | 150 | 150 | — |
 | 10 | Teach — API Security | 10 | 15 | 125 | — | 150 | 0 (+20 optional) |
@@ -88,12 +88,12 @@ Weeks with less than 125 min in class use the slack for feedback and for student
 | 14 | Teach — AI/LLM | 10 | 15 | 120 | — | 150 | 60 |
 | 15 | Teach — DevSecOps | 10 | 15 | 110 | — | 150 | 95 |
 | 16 | Capstone Studio | — | — | 150 | — | 150 | project |
-| 17 | 🔁 Review (pre-final) | 25‡ | — | — | — | 150 | — |
+| 17 | 🔁 Review (pre-final) | 30‡ | — | — | — | 150 | — |
 | 18 | 📝 Final — Written | — | — | — | 150 | 150 | — |
 | 19 | 📝 Final — CTF + Demos | — | — | — | 150 | 150 | — |
 | 20 | 🗒️ Exam feedback & reflection | — | — | — | — | 150 | — |
 
-‡Cumulative review quiz (25 pts) used to prep for the exam.
+‡Cumulative review quiz (25 pts, 30 min) used to prep for the exam.
 "Worksheet homework" counts only the Part 3 tasks marked homework; Part 2 (before class), Part 4
 and the AI-resilient parts come on top.
 
@@ -104,8 +104,8 @@ and the AI-resilient parts come on top.
 ### Week 7 & 17 — Review (150 min)
 | Time | Block |
 |------|-------|
-| 0:00–0:25 | **Cumulative review quiz** (quiz1 / quiz2 — 25 pts) |
-| 0:25–1:05 | Security Jeopardy team review |
+| 0:00–0:30 | **Cumulative review quiz** (quiz1 / quiz2 — 25 pts, 30 min as the quiz files state) |
+| 0:30–1:05 | Security Jeopardy team review |
 | 1:05–2:20 | Mock CTF in the format of the upcoming exam — the first 75 min in class. It is ungraded practice, so students finish the remaining challenges at home |
 | 2:20–2:30 | Debrief: common mistakes + exam logistics |
 
