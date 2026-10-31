@@ -1,4 +1,4 @@
-# Worksheet 16 — Capstone Studio & CTF Warm-up (4 hrs)
+# Worksheet 16 — Capstone Studio & CTF Warm-up
 
 > **Course:** Software Security (KOSEN69) · Week 16
 > **Aligned to:** All prior weeks + OWASP Top 10 (2025) — https://owasp.org/Top10/2025/ ; CWE mapping required throughout.
