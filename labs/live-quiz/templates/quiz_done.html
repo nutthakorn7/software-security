@@ -11,6 +11,22 @@
     <div class="lx-form">
       <p class="lx-eyebrow">Weekly quiz</p>
       <h1 class="lx-h1">{{ message }}</h1>
+      {#- Time ran out before every question was answered. Students used to see
+          one line here and report it as "the quiz errored as soon as I opened
+          it" — they had left mid-quiz and did not know the timer kept going.
+          Say what happened, when, and what it means for them. -#}
+      {% if time_up %}
+      <ul class="lx-rules">
+        <li>You had <b>{{ time_up.limit }}</b>. Your timer started when you pressed
+          Start at <b>{{ time_up.started }}</b> and ran out at <b>{{ time_up.ended }}</b>
+          (Thailand time). It kept running while the page was closed.</li>
+        <li>You answered <b>{{ time_up.answered }} of {{ time_up.total }}</b>
+          question{{ 's' if time_up.total != 1 }}. Those answers are saved and will be
+          marked. Questions you did not reach score 0.</li>
+        <li>You cannot take this quiz again. If something you could not control
+          stopped you — a power cut, a broken device — tell your teacher today.</li>
+      </ul>
+      {% endif %}
       {% if score %}
         <p class="lx-lead">You scored
           <b>{{ '%.1f'|format(score[0]) }} / {{ '%.1f'|format(score[1]) }}</b>

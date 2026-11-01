@@ -121,7 +121,12 @@ onto our own platform — see the override box in
 
 **Teacher:** `/assess` → publish from a question set → issue codes → mark short
 answers → export.
-**Student:** `/quiz` → enter the code from their slip → one question per page → done.
+**Student:** `/quiz` → enter the code from their slip → start page (the rules;
+no question, no clock) → **Start** → one question per page → done. The time limit
+runs from Start, not from entering the code, and keeps running if the page is
+closed; typing the same code again resumes on the open question. A student whose
+time runs out part-way is told so in plain words — when the timer started and
+ended, and how many questions they answered.
 
 ### Proctoring: settings became invariants
 

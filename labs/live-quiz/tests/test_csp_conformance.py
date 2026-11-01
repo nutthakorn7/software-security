@@ -119,7 +119,8 @@ def test_template_has_no_inline_style_attribute(name):
         f"carrying style=\"position:absolute\" computed to `static`. Use a class.")
 
 
-@pytest.mark.parametrize("name", ["host.js", "player.js", "set_form.js", "confirm.js"])
+@pytest.mark.parametrize("name", ["host.js", "player.js", "set_form.js", "confirm.js",
+                                  "quiz_take.js"])
 def test_script_emits_no_inline_style_attribute(name):
     """The subtler half: markup our own JS writes into innerHTML is still markup,
     and a style="" attribute in it is dropped exactly the same way. This is how
@@ -159,7 +160,8 @@ def test_rendered_host_page_carries_the_pin_and_no_inline_script():
 def test_static_scripts_are_cache_busted():
     """A stale host.js is the same dead projector as a blocked one, and just as
     quiet. Every one of our scripts must carry the deploy's asset version."""
-    for name in ("host.html", "player.html", "console.html", "set_form.html"):
+    for name in ("host.html", "player.html", "console.html", "set_form.html",
+                 "quiz_take.html"):
         html = _read(name)
         for src in re.findall(r'<script src="(/static/[^"]+)"', html):
             assert "?v=" in src, f"{name} loads {src} with no cache-busting token"

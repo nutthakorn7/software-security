@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{#- Between a redeemed code and the first question. The clock used to start the
+    moment the code was accepted, and nothing said so: students read a question,
+    left or pressed Back, came back later and found the quiz already over. This
+    page says the rules while no time is being counted, and the clock starts
+    only when the student presses Start (assessment.start()). It shows no
+    question — it must not, or a student could read them all off this page and
+    start the clock later.
+
+    CSRF is this project's own hidden-field mechanism, verified by
+    auth.csrf_ok(); the Django rule below does not apply to a Flask/Jinja2 app. -#}
+{% set section = 'quiz' %}
+{% block title %}Before you start — KOSEN·KMITL{% endblock %}
+{% block main %}
+<div class="lx-ground">
+  <div class="lx-wrap">
+    <form class="lx-form" method="post" action="/quiz/start"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->
+      <p class="lx-eyebrow">Weekly quiz · {{ title }}</p>
+      <h1 class="lx-h1">Before you start</h1>
+      <p class="lx-lead">Your code worked. The timer has <b>not</b> started yet —
+        read this first.</p>
+      <ul class="lx-rules">
+        <li><b>{{ total }} question{{ 's' if total != 1 }}</b>, shown one at a time.</li>
+        {% if limit %}
+        <li><b>{{ limit }}</b> for the whole quiz. The timer starts when you press
+          Start and <b>keeps running if you leave or close this page</b>.</li>
+        {% else %}
+        <li>There is no time limit.</li>
+        {% endif %}
+        <li><b>You cannot go back.</b> When you move to the next question, your
+          answer to this one is final.</li>
+        <li><b>Do not press the browser's Back button.</b> It will not take you to
+          the previous question.</li>
+        <li><b>If the page closes</b> or your device turns off: open this site
+          again, go to Weekly quiz and type the <b>same code</b>. You continue
+          from the question you were on.</li>
+      </ul>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% if error %}
+      <div class="lx-err" role="alert">{{ error }}</div>
+      {% else %}
+      <button class="lx-btn" type="submit">Start the quiz<span aria-hidden="true"> ▸</span></button>
+      <p class="lx-hint">Press Start only when you can answer every question in
+        one sitting.</p>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}
