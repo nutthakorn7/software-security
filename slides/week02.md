@@ -54,11 +54,10 @@ Requirements → Design → Code → Build → Test → Deploy → Operate
 
 ---
 
-## SAST, DAST, SCA in one line each
+## SAST vs DAST in one line
 
 - **SAST** — reads the code, finds bug patterns (no running). Many false positives.
 - **DAST** — attacks the live app from outside. Fewer FPs, misses source-level issues.
-- **SCA** — reads your dependency list (`requirements.txt`, lockfiles), matches each version against known CVEs. Never reads your own code.
 
 > Use both — they find different things.
 
@@ -86,22 +85,11 @@ AWS_SECRET_ACCESS_KEY = "hK8pQ2mN5vX9wZ3rT6yU1sA4bC7dE0fG2hJ5kL8"  # Gitleaks �
 
 ---
 
-## Secret scanning — what it looks for, and why it keeps finding things
-
-- Matches file text against known key formats and high-entropy strings; in git mode, every past commit too
-- Secrets get in through shortcuts: a key pasted in "just to test", a real config or `.env` committed, a snippet copied from a doc or chat
-- Deleting the line later does not delete it from git history: the key must be rotated
-
-<!-- Supports Part 2 Q2. Ask the room who has ever pasted a token into code "for a minute". The history point is the one students miss: a later commit that removes the line leaves the old commit, and every fork and clone of it, holding the key. ~3 min. -->
-
----
-
 ## Fuzzing — how real CVEs are found
 
 - Feed **random/mutated inputs**, watch for crashes
 - **Coverage-guided** (libFuzzer/AFL++) explores new code paths
 - Pair with sanitizers (ASan) to pinpoint the bug
-- Why it dominates: nobody writes the test cases or the rules, it runs millions of inputs unattended, and every crash comes with an input that reproduces it
 
 ```bash
 # run inside labs/toolbox — Apple clang has no libFuzzer runtime
@@ -109,7 +97,7 @@ clang -g -fsanitize=address,fuzzer harness.c -o fuzz
 mkdir -p corpus && printf 'FUZ' > corpus/seed && ./fuzz corpus
 ```
 
-<!-- Fuzzing is the highest-yield bug finder in industry (most memory CVEs come from it). Explain coverage-guided = the fuzzer "learns" inputs that reach new code — each correct byte unlocks a new path, which is why it beats blind random guessing. The seed corpus is about repeatability, not speed: seeded, the very first input is the out-of-bounds read. Unseeded runs also crash in well under a second here (8 of 8 under 250 ms on Apple Silicon, 1 Nov 2026), but about half reach the full FUZZ first and stop at the deliberate trap, which on arm64 is a bare "Trace/breakpoint trap" with no ASan report and no crash file. Deep dive + exploit comes in W11. ~5 min. -->
+<!-- Fuzzing is the highest-yield bug finder in industry (most memory CVEs come from it). Explain coverage-guided = the fuzzer "learns" inputs that reach new code — each correct byte unlocks a new path, which is why it beats blind random guessing. The seed corpus matters (seeded finds it in ~1 second; unseeded has to rediscover 3 magic bytes on its own) — the exact "how much faster" isn't a number I have a verified source for, so don't state one; the mechanism is the teachable part. Deep dive + exploit comes in W11. ~5 min. -->
 
 ---
 
@@ -135,11 +123,10 @@ fuzz-verdict
 
 ## Triage: not every finding is a bug
 
-- **True positive** (a real bug) vs **false positive** (the rule matched, but nothing is exploitable)
+- **True positive** vs **false positive**
 - Map each to a **CWE** + severity
 - Prioritize by exploitability × impact
 - Noise kills trust in tools — triage well
-- Dismiss a real finding as "FP" and the bug ships
 
 <!-- Crucial professional skill: a scanner that cries wolf gets ignored. IMPORTANT — a real `bash scan.sh` run against this week's own vulnerable-repo returns 12 findings and all 12 are genuine true positives; there is no clean false-positive example in this specimen, so don't invent one live. The real triage skill THIS repo exercises is deduplication: 5 Semgrep rules fire on the identical SQLi line, 3 fire on the identical command-injection line — teach "same root cause, one row in your table" rather than promising a false positive you won't be able to produce on demand. Every finding still gets a CWE + a TP call + a one-line justification. ~4 min. -->
 
@@ -179,7 +166,7 @@ docker run --rm -v "$PWD/vulnerable-repo:/repo" zricethezav/gitleaks:latest \
   detect -s /repo -v --no-git
 ```
 
-<!-- Explain the game before lab: speed + accuracy. Penalize wild guessing (misclassified subtracts) so they must justify each finding. Mirrors a real bug-bounty triage queue. Warn about the two gotchas up front: Gitleaks needs `--no-git` or it silently reports zero leaks; the repo root's own `.gitleaks.toml` deliberately allowlists this lab's secrets, so scan `vulnerable-repo/` specifically, not the repo root (a root scan still reports leaks, but they are curl-auth-header hits in docs/lesson-plans/, not the planted keys). ~3 min. -->
+<!-- Explain the game before lab: speed + accuracy. Penalize wild guessing (misclassified subtracts) so they must justify each finding. Mirrors a real bug-bounty triage queue. Warn about the two gotchas up front: Gitleaks needs `--no-git` or it silently reports zero leaks; the repo root's own `.gitleaks.toml` deliberately allowlists this lab's secrets, so scan `vulnerable-repo/` specifically, not the repo root. ~3 min. -->
 
 ---
 
@@ -197,7 +184,7 @@ docker run --rm -v "$PWD/vulnerable-repo:/repo" zricethezav/gitleaks:latest \
 
 > 📋 **Worksheet 2** — `labs/week02-sdlc-tooling/worksheet.md` (Part 3) · **kickoff:** `bash scan.sh` (Semgrep ×2 rulesets + Gitleaks `--no-git` on `./vulnerable-repo`)
 
-- A findings **triage table**: tool, CWE, severity, TP/FP, fix idea (every call justified; a false positive is not guaranteed)
+- A findings **triage table**: tool, CWE, severity, TP/FP, fix idea (3 TP + 1 FP, justified)
 - 1 fuzzing crash with a one-line root cause
 - Trivy SCA scan of the **NoteVault** project target
 - A security **CI gate** built from Week 15's `security-ci.yml`
