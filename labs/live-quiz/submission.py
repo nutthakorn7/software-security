@@ -84,6 +84,23 @@ CODE_ALREADY_USED = ("That code has already been used. A code opens its workshee
 CODE_DEADLINE_PASSED = ("The deadline for this worksheet has passed, so it is closed. Your code"
                         " has not been used, and it will still work if your teacher reopens the"
                         " worksheet.")
+# A re-usable code (see reusable_submit_courses()) entered again once the worksheet has closed
+# (past its deadline and any late window).
+CODE_WORKSHEET_CLOSED = ("Your worksheet is closed: its deadline has passed. Ask your teacher if"
+                         " you need it reopened.")
+
+
+def reusable_submit_courses() -> set:
+    """Course slugs whose submit codes re-open the student's SAME submission when entered again,
+    while the worksheet still takes their work. Read from $REUSABLE_SUBMIT_COURSES (comma-separated)
+    at call time; unset or empty = none, so every course keeps the single-use behaviour below.
+
+    Why it exists (owner decision 2026-11-04, KOSEN): codes reach KOSEN students by email, and a
+    student who lost their session (new device, cleared cookies, entered the code then closed the
+    tab before uploading) was locked out until a teacher unlocked them. The owner accepted the
+    trade-off redeem() describes — a re-usable code is a bearer credential for as long as the
+    worksheet is open — for these courses only; other courses stay single-use."""
+    return {s.strip() for s in os.environ.get("REUSABLE_SUBMIT_COURSES", "").split(",") if s.strip()}
 
 
 def safe_display_name(raw: str) -> str:
@@ -220,13 +237,18 @@ def redeem(conn, code, now):
     teacher has reopened deadlines before (the W1-6 resubmission window).
     Checked in this order — unknown, used, closed — so a used code is called
     used even once its worksheet has closed.
+
+    Exception, per course: in a course listed by reusable_submit_courses() a used
+    code re-opens the SAME submission instead of being refused, for as long as
+    the worksheet is open (_is_open(): before the deadline or the end of its
+    late window — the same instant can_upload() stops). See _reopen_used().
     """
     row = conn.execute("SELECT * FROM submit_codes WHERE code = ?",
                        ((code or "").strip().upper(),)).fetchone()
     if row is None:
         raise SubmitError(CODE_NOT_VALID)
     if row["redeemed_at"] is not None:
-        raise SubmitError(CODE_ALREADY_USED)
+        return _reopen_used(conn, row, now)
 
     sub = conn.execute(
         "SELECT * FROM submissions WHERE assignment_id = ? AND student_id = ?",
@@ -250,6 +272,31 @@ def redeem(conn, code, now):
         sub = conn.execute("SELECT * FROM submissions WHERE id = ?",
                            (cur.lastrowid,)).fetchone()
     conn.commit()
+    return sub
+
+
+def _reopen_used(conn, row, now):
+    """A submit code entered again after it was used. Refused exactly as before
+    (CODE_ALREADY_USED) unless its course is in reusable_submit_courses(); there it
+    re-opens the student's SAME submission — found by (assignment_id, student_id), as
+    redeem() always does — while the worksheet is open (_is_open()). Writes
+    nothing unless the submission row is missing (a teacher removed an empty one), in
+    which case it starts a fresh one, as a first redemption would."""
+    a = get_assignment(conn, row["assignment_id"])
+    if a["course_slug"] not in reusable_submit_courses():
+        raise SubmitError(CODE_ALREADY_USED)
+    sub = conn.execute(
+        "SELECT * FROM submissions WHERE assignment_id = ? AND student_id = ?",
+        (row["assignment_id"], row["student_id"])).fetchone()
+    if not _is_open(a, now):
+        raise SubmitError(CODE_WORKSHEET_CLOSED)
+    if sub is None:
+        cur = conn.execute(
+            "INSERT INTO submissions (assignment_id, student_id, created_at)"
+            " VALUES (?,?,?)", (row["assignment_id"], row["student_id"], now))
+        conn.commit()
+        sub = conn.execute("SELECT * FROM submissions WHERE id = ?",
+                           (cur.lastrowid,)).fetchone()
     return sub
 
 
