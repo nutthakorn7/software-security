@@ -79,7 +79,7 @@ over plain HTTP, which is fine for local dev but not for a public-IP host.
 the student gets back in through the browser session it started. `REUSABLE_SUBMIT_COURSES`
 (comma-separated course slugs, e.g. `software-security-kosen,cryptography,cloud-security`) lets a
 used code re-open the student's same submission in those courses while the worksheet still takes
-their work (until the deadline, or the end of its late window). The trade-off: in those
+their work (before the close; on-time work stays final in a late window). The trade-off: in those
 courses a code is a bearer credential until the worksheet closes — anyone holding it can open that
 student's worksheet. Leave it empty to keep every course single-use.
 
