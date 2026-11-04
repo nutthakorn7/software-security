@@ -639,3 +639,82 @@ def test_a_late_hand_in_can_be_added_to_and_is_costed_from_its_last_upload(conn,
                  now="2026-08-23T09:00:00", upload_dir=uploads)       # day 3
     (row,) = S.gradebook_rows(conn, aid)
     assert row["days_late"] == 3 and row["penalty_pct"] == 30
+
+
+# --- re-usable submit codes, per course (owner decision 2026-11-04, KOSEN) ---------
+# In a course listed in $REUSABLE_SUBMIT_COURSES a used code re-opens the SAME submission while
+# the worksheet still takes the student's work; every other course keeps single-use codes.
+
+def _files(conn, sub_id):
+    return conn.execute("SELECT COUNT(*) FROM submission_files WHERE submission_id = ?",
+                        (sub_id,)).fetchone()[0]
+
+
+def test_a_listed_course_reopens_the_same_submission(conn, uploads, kosen, monkeypatch):
+    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", "kosen")
+    aid = make(conn, late_days=10)
+    sub, code = open_sub(conn, aid)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x", now=T0, upload_dir=uploads)
+    again = S.redeem(conn, code, "2026-08-16T09:00:00")       # new device, before the deadline
+    assert again["id"] == sub["id"]
+    assert _files(conn, again["id"]) == 1, "the work handed in is still there"
+
+
+def test_a_listed_course_lets_the_student_upload_after_reopening(conn, uploads, kosen, monkeypatch):
+    # The lockout this fixes: code entered, tab closed before any upload, session gone.
+    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", "kosen")
+    aid = make(conn)
+    sub, code = open_sub(conn, aid)
+    again = S.redeem(conn, code, "2026-08-16T09:00:00")
+    assert S.can_upload(conn, again, "2026-08-16T09:00:00")
+    S.store_file(conn, again, display_name="a.pdf", data=b"x",
+                 now="2026-08-16T09:00:00", upload_dir=uploads)
+    assert _files(conn, sub["id"]) == 1
+
+
+def test_an_unlisted_course_still_burns_the_code(conn, kosen, monkeypatch):
+    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", "cryptography,cloud-security")
+    aid = make(conn)
+    _, code = open_sub(conn, aid)
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, T0)
+    assert str(exc.value) == S.CODE_ALREADY_USED
+
+
+def test_no_setting_means_every_course_is_single_use(conn, kosen, monkeypatch):
+    monkeypatch.delenv("REUSABLE_SUBMIT_COURSES", raising=False)
+    aid = make(conn)
+    _, code = open_sub(conn, aid)
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, T0)
+    assert str(exc.value) == S.CODE_ALREADY_USED
+
+
+def test_a_listed_course_refuses_once_the_worksheet_has_closed(conn, kosen, monkeypatch):
+    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", " kosen , other ")    # spaces are tolerated
+    aid = make(conn)                                            # no late window: closes at DUE
+    _, code = open_sub(conn, aid)
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, LATE)
+    assert str(exc.value) == S.CODE_WORKSHEET_CLOSED
+
+
+def test_a_listed_course_keeps_on_time_work_final_in_the_late_window(conn, uploads, kosen,
+                                                                       monkeypatch):
+    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", "kosen")
+    aid = make(conn, late_days=10)
+    sub, code = open_sub(conn, aid)
+    S.store_file(conn, sub, display_name="a.pdf", data=b"x", now=T0, upload_dir=uploads)
+    with pytest.raises(S.SubmitError) as exc:
+        S.redeem(conn, code, LATE)          # late window open, but the on-time hand-in is final
+    assert str(exc.value) == S.CODE_WORKSHEET_CLOSED
+
+
+def test_a_listed_course_starts_afresh_if_the_old_submission_was_removed(conn, kosen, monkeypatch):
+    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", "kosen")
+    aid = make(conn)
+    sub, code = open_sub(conn, aid)
+    conn.execute("DELETE FROM submissions WHERE id = ?", (sub["id"],))
+    conn.commit()
+    again = S.redeem(conn, code, T0)
+    assert again["assignment_id"] == aid and again["student_id"] == "65310001"
