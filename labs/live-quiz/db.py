@@ -51,6 +51,15 @@ _ADDED_COLUMNS = (
     # uploads, flagged late. NULL is the meaning for every row written before it
     # existed: close at due_at, exactly as those assignments always did.
     ("assignments", "late_days", "INTEGER"),
+    # (table, column, type) — the quiz clock used to start at code redemption,
+    # so a student who read one question, left, and came back found the quiz
+    # already over. 1 = redeemed, start page showing, clock not running. NULL
+    # is the meaning for every row written before it existed (the clock runs
+    # from started_at, exactly as before), so nothing is backfilled — and the
+    # backfill below must stay course_slug-only: this migration runs on every
+    # boot, and a restart must not change the state of a student who is
+    # sitting on the start page.
+    ("attempts", "awaiting_start", "INTEGER"),
 )
 
 

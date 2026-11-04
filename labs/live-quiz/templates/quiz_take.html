@@ -4,9 +4,24 @@
 {% block main %}
 <div class="lx-ground">
   <div class="lx-wrap">
-    <form class="lx-form" method="post" action="/quiz/take"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->
+    {#- autocomplete="off": after Back, Chrome refetched this page (the server
+        correctly sent the OPEN question) and then restored the previous page's
+        form state into it — so the option at the position the student picked
+        on the last question arrived already ticked on one they had never
+        answered, and one click on Next recorded it. -#}
+    <form class="lx-form" method="post" action="/quiz/take" autocomplete="off"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->
       <p class="lx-eyebrow">Question {{ q.index }} of {{ q.total }}
         {%- if time_left is not none %} · {{ (time_left // 60) | int }}m {{ (time_left % 60) | int }}s left{% endif %}</p>
+      {#- On every question, not only the start page: the students who lost a
+          quiz were the ones who left mid-way and came back, and by then the
+          start page was long gone. -#}
+      <p class="lx-quiznote">You can't go back · if you lose this page, re-enter
+        your code{% if time_left is not none %} — the timer keeps running{% endif %}</p>
+      {#- Shown by quiz_take.js when the browser's Back button is pressed. Focus
+          moves here, so tabindex makes it focusable. -#}
+      <p class="lx-err" id="quiz-back-warning" role="alert" tabindex="-1" hidden>The Back
+        button doesn't work during the quiz. This is still your current question —
+        answer it below.</p>
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <input type="hidden" name="question_id" value="{{ q.question_id }}">
       <h1 class="lx-stem">{{ q.stem }}</h1>
@@ -35,4 +50,5 @@
     </form>
   </div>
 </div>
+<script src="/static/quiz_take.js?v={{ asset_v }}"></script>
 {% endblock %}

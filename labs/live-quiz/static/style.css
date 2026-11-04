@@ -1759,6 +1759,23 @@ body.lx-page {
 @media (min-width: 768px) { .lx-stem { font-size: 26px; line-height: 34px; } }
 .lx-hint--tight { margin: 0 0 var(--lx-sp-2); }
 
+/* The graded quiz's rules: listed on the start page before the clock runs, and
+   on the time-up page to say what happened. .lx-quiznote repeats the two that
+   matter most on every question — students who lost a quiz were the ones who
+   left mid-way, long after the start page. Tokens only, so the dark-mode remap
+   covers both without a rule of its own. */
+.lx-rules {
+  margin: 0 0 var(--lx-sp-5); padding: 0 0 0 var(--lx-sp-5);
+  display: flex; flex-direction: column; gap: var(--lx-sp-2);
+  font: 400 16px/24px var(--sans); color: var(--lx-ink-1);
+}
+.lx-quiznote {
+  margin: 0 0 var(--lx-sp-4); padding: var(--lx-sp-2) var(--lx-sp-3);
+  border: 1px solid var(--lx-stroke); border-left: 4px solid var(--kmitl-orange);
+  border-radius: var(--lx-r-in); background: var(--lx-surface);
+  font: 600 14px/20px var(--sans); color: var(--lx-ink-1);
+}
+
 /* Contents. Closed at rest: open would push a long document down on every
    visit, and the summary already says what it is and how big. */
 .lx-toc {

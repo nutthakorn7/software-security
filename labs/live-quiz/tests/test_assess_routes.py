@@ -26,6 +26,14 @@ def _csrf(html):
     return m.group(1)
 
 
+def _press_start(c):
+    """A redeemed code lands on the start page; no question is shown and the
+    clock does not run until Start is pressed. The start page itself is tested
+    in test_quiz_start.py — this is just the click every walk needs."""
+    page = c.get("/quiz/start").get_data(as_text=True)
+    return c.post("/quiz/start", data={"csrf_token": _csrf(page)})
+
+
 @pytest.fixture
 def appmod(tmp_path, monkeypatch):
     """A freshly-reloaded app on its own throwaway DB — the pattern the rest of
@@ -116,6 +124,7 @@ def test_a_student_walks_the_whole_quiz(client, published):
     r = client.post("/quiz", data={"csrf_token": _csrf(html),
                                    "code": codes["65310001"]})
     assert r.status_code == 302
+    _press_start(client)
 
     seen = 0
     for _ in range(10):
@@ -140,6 +149,7 @@ def test_correct_answer_is_not_in_the_rendered_page(client, appmod, published):
     aid, codes = published
     html = client.get("/quiz").get_data(as_text=True)
     client.post("/quiz", data={"csrf_token": _csrf(html), "code": codes["65310001"]})
+    _press_start(client)
 
     # Question order is shuffled per student, so the short answer can come first.
     # Walk forward until an MCQ appears rather than assuming position 1 is one.
@@ -200,6 +210,7 @@ def test_an_already_submitted_quiz_code_keeps_its_real_message_not_a_rescue(clie
     code = codes["65310001"]
     html = client.get("/quiz").get_data(as_text=True)
     client.post("/quiz", data={"csrf_token": _csrf(html), "code": code})
+    _press_start(client)
     for _ in range(10):
         page = client.get("/quiz/take").get_data(as_text=True)
         if "Thank you" in page:
@@ -234,6 +245,7 @@ def test_a_terminal_quiz_code_that_also_collides_with_submit_is_refused_generica
     code = codes["65310001"]
     html = client.get("/quiz").get_data(as_text=True)
     client.post("/quiz", data={"csrf_token": _csrf(html), "code": code})
+    _press_start(client)
     for _ in range(10):
         page = client.get("/quiz/take").get_data(as_text=True)
         if "Thank you" in page:
@@ -305,6 +317,7 @@ def test_a_second_student_gets_their_own_attempt(client, appmod, published):
             s.clear()
         html = client.get("/quiz").get_data(as_text=True)
         client.post("/quiz", data={"csrf_token": _csrf(html), "code": codes[sid]})
+        _press_start(client)
         assert client.get("/quiz/take").status_code == 200
     conn = appmod.get_db()
     n = conn.execute("SELECT COUNT(*) c FROM attempts WHERE assessment_id=?",
@@ -327,6 +340,7 @@ def test_results_csv_carries_fully_graded_so_a_partial_isnt_imported_as_final(
     aid, codes = published
     html = student.get("/quiz").get_data(as_text=True)
     student.post("/quiz", data={"csrf_token": _csrf(html), "code": codes["65310001"]})
+    _press_start(student)
     for _ in range(6):
         page = student.get("/quiz/take").get_data(as_text=True)
         if "Thank you" in page:
@@ -350,6 +364,7 @@ def test_q6_csv_is_the_shape_verify_q6_consumes(teacher, student, published):
     aid, codes = published
     html = student.get("/quiz").get_data(as_text=True)
     student.post("/quiz", data={"csrf_token": _csrf(html), "code": codes["65310001"]})
+    _press_start(student)
     for _ in range(6):
         page = student.get("/quiz/take").get_data(as_text=True)
         if "Thank you" in page:
@@ -376,6 +391,7 @@ def test_q6_csv_neutralizes_formula_injection_in_student_answer(teacher, student
     aid, codes = published
     html = student.get("/quiz").get_data(as_text=True)
     student.post("/quiz", data={"csrf_token": _csrf(html), "code": codes["65310001"]})
+    _press_start(student)
     for _ in range(6):
         page = student.get("/quiz/take").get_data(as_text=True)
         if "Thank you" in page:
@@ -422,6 +438,7 @@ def test_a_double_click_does_not_end_a_graded_attempt(client, published):
     _, codes = published
     html = client.get("/quiz").get_data(as_text=True)
     client.post("/quiz", data={"csrf_token": _csrf(html), "code": codes["65310001"]})
+    _press_start(client)
 
     page = client.get("/quiz/take").get_data(as_text=True)
     qid = re.search(r'name="question_id" value="(\d+)"', page).group(1)

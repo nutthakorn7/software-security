@@ -75,6 +75,14 @@ sets persist; losing it means every teacher has to re-register and re-paste thei
 `COOKIE_SECURE=1` once the deployment is actually served over TLS — session cookies otherwise flow
 over plain HTTP, which is fine for local dev but not for a public-IP host.
 
+**Submit codes are single-use by default.** A worksheet code opens its worksheet once; after that
+the student gets back in through the browser session it started. `REUSABLE_SUBMIT_COURSES`
+(comma-separated course slugs, e.g. `software-security-kosen,cryptography,cloud-security`) lets a
+used code re-open the student's same submission in those courses while the worksheet still takes
+their work (before the close; on-time work stays final in a late window). The trade-off: in those
+courses a code is a bearer credential until the worksheet closes — anyone holding it can open that
+student's worksheet. Leave it empty to keep every course single-use.
+
 ## Accessibility & resilience notes
 
 - **Answers never rely on colour alone** — every option carries a distinct shape (triangle /
@@ -121,7 +129,12 @@ onto our own platform — see the override box in
 
 **Teacher:** `/assess` → publish from a question set → issue codes → mark short
 answers → export.
-**Student:** `/quiz` → enter the code from their slip → one question per page → done.
+**Student:** `/quiz` → enter the code from their slip → start page (the rules;
+no question, no clock) → **Start** → one question per page → done. The time limit
+runs from Start, not from entering the code, and keeps running if the page is
+closed; typing the same code again resumes on the open question. A student whose
+time runs out part-way is told so in plain words — when the timer started and
+ended, and how many questions they answered.
 
 ### Proctoring: settings became invariants
 

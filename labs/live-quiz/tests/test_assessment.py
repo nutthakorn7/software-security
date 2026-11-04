@@ -58,8 +58,11 @@ def publish(conn, **kw):
 
 
 def start(conn, aid, sid="65310001", seed=1, now=T1):
+    """Redeem a code and press Start at the same moment — what every test below
+    assumes. The gap between the two has tests of its own (test_quiz_start.py)."""
     codes = A.issue_codes(conn, aid, [sid], T0)
-    return A.redeem(conn, codes[sid], now, rng=random.Random(seed)), codes[sid]
+    att = A.redeem(conn, codes[sid], now, rng=random.Random(seed))
+    return A.start(conn, att, now), codes[sid]
 
 
 def answer_all(conn, att, *, correct=True, short_text="FLAG{x}", now=T1):
@@ -375,6 +378,7 @@ def test_a_student_who_never_sat_it_is_not_a_zero(conn):
     aid = publish(conn)
     A.issue_codes(conn, aid, ["65310001", "65310002"], T0)
     att = A.redeem(conn, A.issue_codes(conn, aid, ["65310001"], T0)["65310001"], T1)
+    att = A.start(conn, att, T1)
     A.submit(conn, answer_all(conn, att), T2)
 
     rows = {r["student_id"]: r for r in A.gradebook_rows(conn, aid)}

@@ -111,6 +111,13 @@ CREATE TABLE IF NOT EXISTS attempts (
   cursor        INTEGER NOT NULL DEFAULT 0,
   started_at    TEXT NOT NULL,   -- the time limit is measured from here, server-side
   submitted_at  TEXT,
+  -- 1 while the student is on the start page: the code is redeemed but the
+  -- clock is not running, and started_at is only a placeholder (the redemption
+  -- time) until assessment.start() overwrites it. NULL means the clock runs
+  -- from started_at — which is what every row written before this column
+  -- existed always meant, so old rows need no backfill. Nullable rather than
+  -- NOT NULL DEFAULT 0 because db.migrate() adds it with a plain ADD COLUMN.
+  awaiting_start INTEGER,
   UNIQUE (assessment_id, student_id)   -- one attempt per student, structurally
 );
 CREATE INDEX IF NOT EXISTS idx_attempts_assessment ON attempts(assessment_id);

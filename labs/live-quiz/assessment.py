@@ -30,6 +30,15 @@ TIME
     Every timestamp is ISO-8601 UTC and is passed in by the caller rather than
     read from the clock here, so the whole module is testable without freezing
     time and a replayed sequence produces identical results.
+
+    The time limit runs from start(), not from redeem(). Redeeming a code only
+    puts the student on a start page that says what the rules are; no question
+    is shown and no time is counted until they press Start. It used to run from
+    redemption, and students who read a question, left and came back later
+    found a quiz that had ended without them — 17 of 92 MFU attempts, every one
+    a time-up. Deferring the clock opens no new hole: the start page shows no
+    question, and start() re-checks the window, so pressing Start later is the
+    same as redeeming later.
 """
 
 from __future__ import annotations
@@ -174,12 +183,26 @@ class StaleAnswer(AttemptError):
     """
 
 
+class NotStarted(StaleAnswer):
+    """The code is redeemed but the student hasn't pressed Start yet.
+
+    A StaleAnswer, so every caller that already treats those as recoverable
+    sends the student back to the start page instead of submitting an attempt
+    that has not begun.
+    """
+
+
+def awaiting_start(attempt):
+    return bool(attempt["awaiting_start"])
+
+
 def redeem(conn, code, now, rng=None):
     """Exchange a one-time code for an attempt. Returns the attempt row.
 
-    Re-entering the same code returns the SAME in-progress attempt (a dropped
-    connection or a closed tab must not cost a student their quiz), but never
-    reopens a submitted one.
+    A new attempt comes back awaiting start(): the permutations are frozen now,
+    the clock is not running yet. Re-entering the same code returns the SAME
+    attempt, in whatever state it is in (a dropped connection or a closed tab
+    must not cost a student their quiz), but never reopens a submitted one.
     """
     row = conn.execute("SELECT * FROM attempt_codes WHERE code = ?",
                        ((code or "").strip().upper(),)).fetchone()
@@ -214,9 +237,12 @@ def redeem(conn, code, now, rng=None):
             rng.shuffle(perm)
         opts[str(q["position"])] = perm
 
+    # started_at is NOT NULL, so it holds the redemption time as a placeholder;
+    # start() overwrites it. Nothing measures from it while awaiting_start = 1.
     cur = conn.execute(
         "INSERT INTO attempts (assessment_id, student_id, code, order_json,"
-        " options_json, cursor, started_at) VALUES (?,?,?,?,?,0,?)",
+        " options_json, cursor, started_at, awaiting_start)"
+        " VALUES (?,?,?,?,?,0,?,1)",
         (a["id"], row["student_id"], row["code"], json.dumps(order),
          json.dumps(opts), now))
     conn.execute("UPDATE attempt_codes SET redeemed_at = ? WHERE code = ?",
@@ -225,16 +251,45 @@ def redeem(conn, code, now, rng=None):
     return conn.execute("SELECT * FROM attempts WHERE id = ?", (cur.lastrowid,)).fetchone()
 
 
+def start(conn, attempt, now):
+    """The student pressed Start: the clock begins now. Returns the attempt row.
+
+    Idempotent — a double-click, or Back to the start page and Start again,
+    returns the attempt unchanged and never resets a clock that is already
+    running. The window is checked again because time has passed since
+    redeem(): without it, a code redeemed before closes_at could be started
+    the next day, after everyone else had compared answers.
+    """
+    if attempt["submitted_at"]:
+        raise AttemptError("You've already submitted this quiz.")
+    if not awaiting_start(attempt):
+        return attempt
+    a = get_assessment(conn, attempt["assessment_id"])
+    if a["closes_at"] and now > a["closes_at"]:
+        raise AttemptError("This quiz has closed.")
+    # The WHERE repeats the guard so two Start requests racing each other
+    # cannot both write: the second one matches no row.
+    conn.execute(
+        "UPDATE attempts SET started_at = ?, awaiting_start = NULL"
+        " WHERE id = ? AND awaiting_start = 1 AND submitted_at IS NULL",
+        (now, attempt["id"]))
+    conn.commit()
+    return get_attempt(conn, attempt["id"])
+
+
 def get_attempt(conn, attempt_id):
     return conn.execute("SELECT * FROM attempts WHERE id = ?", (attempt_id,)).fetchone()
 
 
 def time_left(conn, attempt, now):
     """Seconds remaining, or None if untimed. Server-side; a browser countdown
-    is decoration."""
+    is decoration. Before start() the whole limit is left — None would mean
+    "untimed", which is a different fact."""
     a = get_assessment(conn, attempt["assessment_id"])
     if not a["time_limit_sec"]:
         return None
+    if awaiting_start(attempt):
+        return a["time_limit_sec"]
     from datetime import datetime
     started = datetime.fromisoformat(attempt["started_at"])
     elapsed = (datetime.fromisoformat(now) - started).total_seconds()
@@ -246,6 +301,13 @@ def expired(conn, attempt, now):
     return left is not None and left <= 0
 
 
+def progress(attempt):
+    """(answered, total). The cursor only moves when an answer is stored, so it
+    IS the count of answered questions."""
+    total = len(json.loads(attempt["order_json"]))
+    return min(attempt["cursor"], total), total
+
+
 def question_for_student(conn, attempt, now=None):
     """The current question, as this student sees it. Returns None when done.
 
@@ -254,10 +316,15 @@ def question_for_student(conn, attempt, now=None):
     Options come back already permuted, each tagged with the CANONICAL index the
     answer will be stored under — so the shuffle is presentation-only and never
     reaches the grading path.
+
+    Raises NotStarted before start(): returning None there would read as
+    "finished", and callers submit a finished attempt.
     """
     order = json.loads(attempt["order_json"])
     if attempt["submitted_at"] or attempt["cursor"] >= len(order):
         return None
+    if awaiting_start(attempt):
+        raise NotStarted("Press Start to begin the quiz.")
     if now is not None and expired(conn, attempt, now):
         return None
 
@@ -291,6 +358,8 @@ def answer(conn, attempt, question_id, *, choice=None, text=None, now):
     """
     if attempt["submitted_at"]:
         raise AttemptError("You've already submitted this quiz.")
+    if awaiting_start(attempt):
+        raise NotStarted("Press Start to begin the quiz.")
     if expired(conn, attempt, now):
         raise AttemptError("Time is up.")
 

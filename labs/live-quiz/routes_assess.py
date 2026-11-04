@@ -258,6 +258,73 @@ def _current_attempt():
     return A.get_attempt(_db(), aid)
 
 
+@bp.after_request
+def _quiz_pages_are_not_cached(resp):
+    # The browser must never show a question from its own history: Back used to
+    # put an earlier question on screen, the student answered it, and the server
+    # threw the answer away. no-store makes every Back, Forward and reopen ask
+    # /quiz/take again, and that route renders whichever question is open. It
+    # also keeps the "submitted" page off a shared computer's disk.
+    if request.endpoint in ("assess.quiz_start", "assess.quiz_take"):
+        resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
+def _duration(seconds):
+    """600 -> '10 minutes'. Said in words on pages students read under time
+    pressure; '600s' or '10m 0s' makes them do the arithmetic."""
+    seconds = int(seconds)
+    mins, secs = divmod(seconds, 60)
+    parts = []
+    if mins:
+        parts.append(f"{mins} minute{'s' if mins != 1 else ''}")
+    if secs or not mins:
+        parts.append(f"{secs} second{'s' if secs != 1 else ''}")
+    return " ".join(parts)
+
+
+def _thai_clock(ts, plus_seconds=0):
+    """A stored naive-UTC timestamp as a wall-clock time in Thailand: '09:12'."""
+    import datetime
+    import submission as S
+    t = (datetime.datetime.fromisoformat(ts).replace(tzinfo=datetime.timezone.utc)
+         + datetime.timedelta(seconds=plus_seconds))
+    return t.astimezone(S.COURSE_TZ).strftime("%H:%M")
+
+
+def _done_page(att, now):
+    """Submit (if it isn't already) and show the student how it ended.
+
+    Two endings look identical from the outside and must not read the same: a
+    student who answered everything, and one whose time ran out part-way. The
+    second used to get "Submitted. Thank you." if they re-entered their code,
+    or a bare "Time is up" if they pressed an answer on a page left open — and
+    they reported both as "the quiz errors as soon as I open it". A submitted
+    attempt with unanswered questions can only have been closed by the clock
+    (every other path either advances the cursor or leaves the attempt open),
+    so the cursor is the test.
+    """
+    att = A.submit(_db(), att, now)
+    a = A.get_assessment(_db(), att["assessment_id"])
+    answered, total = A.progress(att)
+    score = None
+    if a["released"]:
+        score = A.score(_db(), att["id"])
+    time_up = None
+    if answered < total and a["time_limit_sec"]:
+        time_up = {
+            "limit": _duration(a["time_limit_sec"]),
+            "started": _thai_clock(att["started_at"]),
+            "ended": _thai_clock(att["started_at"], a["time_limit_sec"]),
+            "answered": answered, "total": total,
+        }
+    return render_template(
+        "quiz_done.html",
+        message=("Your time ran out, so your quiz was submitted" if time_up
+                 else "Submitted. Thank you."),
+        time_up=time_up, released=bool(a["released"]), score=score)
+
+
 @bp.route("/quiz", methods=["GET", "POST"])
 def quiz_entry():
     if request.method == "GET":
@@ -309,6 +376,39 @@ def quiz_entry():
     return redirect(url_for("assess.quiz_take"))
 
 
+@bp.route("/quiz/start", methods=["GET", "POST"])
+def quiz_start():
+    """The rules, before the clock runs. Shows no question.
+
+    Reached from /quiz/take, which every code-entry route (/quiz, /code,
+    /submit) already redirects to — so the gate lives in one place, there,
+    rather than in three entry routes that could drift apart.
+    """
+    att = _current_attempt()
+    if att is None:
+        return redirect(url_for("assess.quiz_entry"))
+    if att["submitted_at"] or not A.awaiting_start(att):
+        # Already running or finished: Back to this page, or Start pressed
+        # twice. /quiz/take shows the open question or the ending.
+        return redirect(url_for("assess.quiz_take"))
+
+    error = None
+    if request.method == "POST":
+        _check_csrf()
+        try:
+            A.start(_db(), att, _now())
+            return redirect(url_for("assess.quiz_take"))
+        except A.AttemptError as exc:
+            error = str(exc)
+
+    a = A.get_assessment(_db(), att["assessment_id"])
+    _, total = A.progress(att)
+    return render_template(
+        "quiz_start.html", csrf_token=_csrf(), error=error, title=a["title"],
+        total=total,
+        limit=_duration(a["time_limit_sec"]) if a["time_limit_sec"] else None)
+
+
 @bp.route("/quiz/take", methods=["GET", "POST"])
 def quiz_take():
     att = _current_attempt()
@@ -331,6 +431,8 @@ def quiz_take():
             # unanswered, under the message "Time is up." Reproduced against a
             # real attempt before this fix, which is the only way it shows up —
             # nothing errors, the student simply loses the rest of their quiz.
+            # (NotStarted is a StaleAnswer too: the GET below sends a student
+            # who hasn't pressed Start back to the start page.)
             return redirect(url_for("assess.quiz_take"))
         except A.AttemptError:
             # Time-up is the expected way a timed quiz ends — close it out and
@@ -338,24 +440,20 @@ def quiz_take():
             #
             # The exception's own text used to become the page's <h1>. That
             # string is written for a developer reading a log, and this is the
-            # last thing a student sees at the end of a graded attempt; whatever
-            # went wrong, the true and useful thing to tell them is the same.
-            A.submit(_db(), att, _now())
-            return render_template("quiz_done.html",
-                                   message="Time is up — your quiz was submitted.",
-                                   released=False, score=None)
+            # last thing a student sees at the end of a graded attempt.
+            # _done_page says what happened in the student's terms instead.
+            return _done_page(att, _now())
         return redirect(url_for("assess.quiz_take"))
+
+    if A.awaiting_start(att) and not att["submitted_at"]:
+        # Checked BEFORE question_for_student, whose None means "finished" and
+        # gets the attempt submitted: an unstarted attempt must never reach it.
+        return redirect(url_for("assess.quiz_start"))
 
     now = _now()
     q = A.question_for_student(_db(), att, now=now)
     if q is None:
-        att = A.submit(_db(), att, now)
-        a = A.get_assessment(_db(), att["assessment_id"])
-        earned, possible, complete = A.score(_db(), att["id"])
-        return render_template(
-            "quiz_done.html", message="Submitted. Thank you.",
-            released=bool(a["released"]),
-            score=(earned, possible, complete) if a["released"] else None)
+        return _done_page(att, now)
 
     return render_template("quiz_take.html", q=q, csrf_token=_csrf(),
                            time_left=A.time_left(_db(), att, now))

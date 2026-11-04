@@ -79,7 +79,11 @@ def test_a_valid_quiz_code_redirects_into_the_quiz(client, quiz_code):
                     follow_redirects=False)
     assert r.status_code in (302, 303)
     assert "/quiz/take" in r.headers["Location"]
-    assert client.get("/quiz/take").status_code == 200   # session really set
+    # session really set: /quiz/take knows this attempt and sends it on to the
+    # start page (the clock hasn't started), rather than back to code entry.
+    r = client.get("/quiz/take")
+    assert r.status_code == 302 and "/quiz/start" in r.headers["Location"]
+    assert client.get("/quiz/start").status_code == 200
 
 
 def test_a_valid_submit_code_redirects_into_the_workspace(client, submit_code):
