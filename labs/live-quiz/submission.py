@@ -389,14 +389,20 @@ def accepts_work(assignment, submission, now) -> bool:
     ask this, so a code stops opening the worksheet at the same instant the upload form
     disappears.
 
-    Work handed in on time is final at the deadline, even while the late window is open: one
-    stray re-upload must not turn an on-time hand-in late, and deleting it afterwards would
-    leave an on-time timestamp on a submission with no files. `submitted_at` is the last
-    upload, so a late hand-in is costed from the last file added."""
+    In a course that charges per day late (late_pct_per_day), work handed in on time is final
+    at the deadline, even while the late window is open: one stray re-upload must not turn an
+    on-time hand-in late, and deleting it afterwards would leave an on-time timestamp on a
+    submission with no files. `submitted_at` is the last upload, so a late hand-in is costed
+    from the last file added.
+
+    A course with a late window but no rate is not locked (owner decision 2026-11-08):
+    Cryptography tells its students that replacing a file after the deadline makes the
+    hand-in late, so there a replacement is still taken, and counts as late."""
     if not _is_open(assignment, now):
         return False
     due = assignment["due_at"]
-    return not due or now <= due or not _handed_in_on_time(assignment, submission)
+    on_time_is_final = late_pct_per_day(assignment) and _handed_in_on_time(assignment, submission)
+    return not due or now <= due or not on_time_is_final
 
 
 def can_upload(conn, submission, now) -> bool:

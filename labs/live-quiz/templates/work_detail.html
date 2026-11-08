@@ -24,8 +24,9 @@
         one browser (the student returns to it there until the deadline). If they lose that
         browser, run Issue codes again with <b>only their ID</b> for a new code. After the
         deadline a code opens only released marks on handed-in work{% if late_days %}, or,
-        until late uploads close, lets a student who did not hand in on time hand in late
-        (on-time work is final at the deadline){% endif %}; any other code is refused and
+        until late uploads close, {% if late_pct %}lets a student who did not hand in on time
+        hand in late (on-time work is final at the deadline){% else %}lets a student hand in or
+        replace their work, which then counts as late{% endif %}{% endif %}; any other code is refused and
         stays unused, so it works again if you reopen the worksheet.
         <b>A code is that student's identity</b> — hand them out individually.</p>
       <form method="post" action="/work/{{ a.id }}/codes"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->

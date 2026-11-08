@@ -604,7 +604,7 @@ def test_no_course_rate_leaves_the_penalty_to_the_teacher(conn, uploads):
     assert row["penalty_pct"] is None and row["adjusted_percent"] is None
 
 
-def test_on_time_work_is_final_while_late_work_is_still_taken(conn, uploads):
+def test_on_time_work_is_final_while_late_work_is_still_taken(conn, uploads, kosen):
     # A stray re-upload must not turn an on-time hand-in late, and deleting it in the late
     # window would leave an on-time timestamp on a submission with no files.
     aid = make(conn, late_days=10)
@@ -621,11 +621,23 @@ def test_on_time_work_is_final_while_late_work_is_still_taken(conn, uploads):
     assert row["late"] is False and row["days_late"] == 0
 
 
-def test_a_code_does_not_reopen_on_time_work_in_the_late_window(conn, uploads):
+def test_a_code_does_not_reopen_on_time_work_in_the_late_window(conn, uploads, kosen):
     aid = make(conn, late_days=10)
     _handed_in_then_lost_the_session(conn, aid, uploads)
     code = S.issue_codes(conn, aid, ["65310001"], T0)["65310001"]
     _deadline_passed(conn, code, LATE)
+
+
+def test_a_course_with_no_late_rate_can_replace_on_time_work_as_late(conn, uploads):
+    # Cryptography's published rule: replacing a file after the deadline makes the hand-in
+    # late. It has a late window but no per-day rate, so the on-time lock must not apply.
+    aid = make(conn, late_days=10)
+    sid = _handed_in_then_lost_the_session(conn, aid, uploads)["id"]
+    on_time = conn.execute("SELECT * FROM submissions WHERE id = ?", (sid,)).fetchone()
+    assert S.can_upload(conn, on_time, LATE)
+    S.store_file(conn, on_time, display_name="b.pdf", data=b"x", now=LATE, upload_dir=uploads)
+    (row,) = S.gradebook_rows(conn, aid)
+    assert row["late"] is True and row["days_late"] == 1
 
 
 def test_a_late_hand_in_can_be_added_to_and_is_costed_from_its_last_upload(conn, uploads, kosen):
@@ -716,11 +728,11 @@ def test_a_listed_course_reopens_in_the_late_window(conn, uploads, this_course, 
     assert again["id"] == sub["id"] and S.can_upload(conn, again, LATE)
 
 
-def test_a_listed_course_keeps_on_time_work_final_in_the_late_window(conn, uploads, this_course,
+def test_a_listed_course_keeps_on_time_work_final_in_the_late_window(conn, uploads, kosen,
                                                                        monkeypatch):
     # #172's on-time lock holds for a re-used code too: handed in before the deadline, the
     # work is final in the late window, so the code does not re-open it for changes.
-    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", this_course)
+    monkeypatch.setenv("REUSABLE_SUBMIT_COURSES", "kosen")
     aid = make(conn, late_days=10)
     sub, code = open_sub(conn, aid)
     S.store_file(conn, sub, display_name="a.pdf", data=b"x", now=T0, upload_dir=uploads)
