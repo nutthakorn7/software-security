@@ -78,11 +78,11 @@ stack-frame
 
 ```bash
 clang -g -fsanitize=address,fuzzer fuzz_harness.c -o fuzz && ./fuzz   # libFuzzer
-afl-fuzz -i seeds -o out -- ./vuln @@                                  # AFL++
 ```
 
 - Coverage-guided mutation finds crashes fast
 - Pair with sanitizers (ASan) for root cause
+- The toolbox has libFuzzer, not AFL++ — one fuzzer is plenty for this lab
 
 ![Coverage-guided fuzzing as a feedback loop. The top row runs seed corpus → mutate (flip/splice bytes) → run target → "what happened?", which asks two questions. First: did the input reach NEW code? If yes it's kept and added to the corpus, and a dashed arrow feeds back to mutate — this is the coverage-guided loop that lets the fuzzer learn its way to deep bugs instead of guessing blindly. Second: did it crash? If yes, AddressSanitizer turns a silent memory corruption into a precise report naming the faulting line, and the crashing input is minimized and saved as crash-<hash>. Two notes: coverage guidance reaches bugs a random generator never would, and ASan turns a mystery segfault into an actionable root cause. This is round 1 of the lab — finding the crash, not exploiting it.](img/fuzz-loop.svg)
 
