@@ -4,8 +4,8 @@ Most labs run as their own containers (`docker compose up`). A few weeks need a 
 dev/attacker shell** with tools that don't run cleanly on a Windows/macOS host:
 
 - **Week 2 (fuzzing intro)** and **Week 11 (memory safety):** `clang` + **libFuzzer** + ASan
-  (+ `gdb` in Week 11). Apple clang ships no libFuzzer runtime, and `gdb` is painful on macOS,
-  so use this container.
+  (+ `gdb`, `rustc`, `pwntools` in Week 11). Apple clang ships no libFuzzer runtime, `gdb` is
+  painful on macOS, and Rust/pwntools aren't assumed to be on your host, so use this container.
 - **Weeks 4 / 10 (optional recon):** `nmap`, `sqlmap`.
 
 This replaces the full Kali VM for those weeks. (A VM is still a fine optional fallback if your
@@ -39,4 +39,5 @@ container `whoami` prints `root` and `date` prints UTC, which identifies nobody.
 
 On Windows, run these from WSL (Ubuntu) rather than Git Bash.
 
-Includes: clang 19 + libFuzzer/ASan, gdb, nmap, sqlmap, python3, git, curl.
+Includes: clang 19 + libFuzzer/ASan, gdb, rustc (stable, via rustup) + cargo, Python 3 with
+pwntools pre-installed, nmap, sqlmap, git, curl.
