@@ -407,9 +407,9 @@ def test_trivy_blindspot_prints_only_real_dockerfile_lines():
                  "WORKDIR /app", "EXPOSE 5000", 'CMD ["python", "app.py"]'):
         assert line in strings, f"sim no longer prints {line!r}"
         assert line in ins_lines, f"{line!r} is not in Dockerfile.insecure any more"
-    for line in ("COPY requirements.txt .", "COPY app.py .", "USER 65532:65532",
+    for line in ("COPY requirements-hardened.txt .", "COPY app.py .", "USER 65532:65532",
                  "RUN python -m venv /venv \\",
-                 "&& /venv/bin/pip install --no-cache-dir -r requirements.txt"):
+                 "&& /venv/bin/pip install --no-cache-dir --require-hashes -r requirements-hardened.txt"):
         assert any(line in s for s in strings), f"sim no longer prints {line!r}"
         assert line in hard_lines, f"{line!r} is not in Dockerfile.hardened any more"
     # the digest the sim pins is the one Dockerfile.hardened pins
