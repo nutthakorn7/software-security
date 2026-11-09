@@ -146,8 +146,8 @@ clang -g -fsanitize=address,fuzzer fuzz_harness.c -o fuzz && ./fuzz   # libFuzze
 
 > 📋 **Worksheet 11** — `labs/week11-memory-safety-exploitation/worksheet.md` (Part 3) · **kickoff:** in the **toolbox container** (`labs/toolbox` — Apple clang has no libFuzzer runtime): `clang -g -fsanitize=address,fuzzer fuzz_harness.c -o fuzz && ./fuzz`
 
-- Fuzzing crash + exploit script
-- Annotated Ghidra/gdb analysis
+- Fuzzing crash + ret2win exploit (offset + `win()` address via `objdump`/`gdb`)
+- Hardened-build mitigation note — which one fired, and why
 - Memory-safe (Rust) rewrite + why the bug is now impossible
 - **+ Audit the AI / EiPE / Prompt Problem** (see worksheet)
 
