@@ -191,8 +191,12 @@ function chunks(items, count) {
 }
 
 async function build(week) {
+  if (!Number.isInteger(week) || week < 10 || week > 15) {
+    throw new Error('This exporter accepts only the fixed KOSEN Week 10–15 range');
+  }
   const ww = String(week).padStart(2, '0');
-  const md = fs.readFileSync(path.join(SLIDES, `week${ww}.md`), 'utf8');
+  // `week` is validated above and the caller enumerates literal weeks only.
+  const md = fs.readFileSync(path.join(SLIDES, `week${ww}.md`), 'utf8'); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
   const blocks = parseDeck(md);
   if (process.env.DEBUG_DECK) console.log(`Week ${week}: parsed ${blocks.length} blocks`);
   const pptx = new pptxgen();
@@ -294,7 +298,7 @@ async function build(week) {
     if (block.notes) blockSlides.forEach(s => s.addNotes(block.notes));
   }
   fs.mkdirSync(OUT, { recursive: true });
-  const dest = path.join(OUT, `week${ww}.pptx`);
+  const dest = path.join(OUT, `week${ww}.pptx`); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
   await pptx.writeFile({ fileName: dest });
   console.log(`${dest} | ${page} slides | ${blocks.length} source blocks`);
 }
