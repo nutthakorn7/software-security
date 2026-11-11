@@ -22,7 +22,7 @@ Prepare images, installations, accounts and long reading before class. Complete 
 | 3 | Scanner/manual crypto-misuse review and legacy-password rehash-on-login, preserving the current application-code scope |
 | 4 | Bounded injection cases, student parameterization/validation and legitimate/attack tests |
 | 5 | XSS cases, student encoding correction, cookie/CSP observations and the remaining CSRF boundary |
-| 6 | IDOR/token cases, ownership/verification correction and positive/negative controls |
+| 6 | IDOR and authentication cases, correct ownership and token validation, then run positive/negative controls |
 | 10 | API observations 45 + bounded authorization/schema patch 35 + positive/negative tests 20 |
 | 11 | Fuzz/crash 20 + build-specific offset/ret2win 30 + hardened control 20 + safe routine change 20 + evidence 10 |
 | 12 | SCA 20 + resolver 15 + SBOM 20 + expected-signer/integrity verification 30 + hash/index control 15 |
