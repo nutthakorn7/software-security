@@ -357,10 +357,9 @@ def test_404_outside_any_blueprint_is_still_styled(client):
 # ── the badge system must not lie about what is graded ─────────────────────
 
 def test_worksheets_are_marked_graded():
-    """syllabus.md:163 — "Weekly lab worksheets — 13 graded | 30%" — makes the
-    worksheets the LARGEST single component of the final grade.
+    """The weekly worksheet category is 30% in KOSEN; Week 16 is formative.
 
-    GRADED_BADGES originally held only {EXAM, CTF}, so all 13 of them rendered in
+    GRADED_BADGES originally held only {EXAM, CTF}, so graded labs rendered in
     the greyed "read anything, any time" style: the feature whose entire purpose
     is to stop a student walking into graded work unawares was telling them the
     biggest graded component was optional reading. A confident wrong answer is

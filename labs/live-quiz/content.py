@@ -672,9 +672,8 @@ PRIMARY_BADGE = {
 # Which of those carry a mark.
 #
 # LAB IS IN THIS SET, and leaving it out was the worst defect in the badge system
-# it was added to fix. syllabus.md:163 — "Weekly lab worksheets — 13 graded | 30%"
-# — makes the worksheets the SINGLE LARGEST component of the final grade, and all
-# 13 of them render from `primary == "worksheet"` → badge LAB. With LAB excluded,
+# it was added to fix. The weekly worksheet category is 30% in KOSEN; its
+# 12 graded worksheets need LAB even when the primary page is a slide. With LAB excluded,
 # the 30% component was drawn in the same greyed style as "read anything, any
 # time", i.e. the feature whose entire purpose is to stop a student walking into
 # graded work unawares was telling them the largest graded component was optional
