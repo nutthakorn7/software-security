@@ -1,6 +1,6 @@
 # Weekly Quiz — Week 6 (Authentication & Access Control)
 
-**~5 min · in-class · 4 questions · low-stakes** (drop lowest). No devices / locked browser.
+**10 min in class · 4 questions · low-stakes** (drop the lowest regular weekly quiz). Use your individual one-time code at `learn.zcr.ai/quiz`; start when the instructor says to begin.
 
 **Name:** ____________  **Student ID:** ________
 
