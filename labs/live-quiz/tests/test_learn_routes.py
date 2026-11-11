@@ -381,6 +381,29 @@ def test_mock_ctf_weeks_are_not_marked_graded():
             assert not w["graded"], f"{w['slug']} is a mock, not an assessment"
 
 
+def test_formative_project_worksheet_opens_studio_without_a_lab_mark(tmp_path, monkeypatch):
+    week = tmp_path / "week16-capstone"
+    week.mkdir()
+    (week / "README.md").write_text("# Week 16 — Formative capstone studio\n")
+    (week / "worksheet.md").write_text(
+        "# Week 16 — Formative project checkpoint\n\n"
+        "**Assessment:** Formative — no separate worksheet marks.\n"
+    )
+    (week / "scrimmage.md").write_text("# Week 16 — Optional practice scrimmage\n")
+    graded = tmp_path / "week03-cryptography"
+    graded.mkdir()
+    (graded / "worksheet.md").write_text("# Week 3 — Graded worksheet\n")
+    monkeypatch.setattr(C, "COURSES", [{"slug": "kosen", "root": str(tmp_path), "unit": "week"}])
+
+    weeks = {w["slug"]: w for w in C.list_weeks("kosen")}
+    assert weeks["week16-capstone"]["primary"] == "readme"
+    assert weeks["week16-capstone"]["title"] == "Week 16 — Formative capstone studio"
+    assert weeks["week16-capstone"]["badge"] == "CAPSTONE"
+    assert not weeks["week16-capstone"]["graded"]
+    assert weeks["week03-cryptography"]["badge"] == "LAB"
+    assert weeks["week03-cryptography"]["graded"]
+
+
 def test_graded_is_stated_as_a_word_not_only_a_colour(client):
     """Colour alone dies in greyscale, in a failed stylesheet, in a screen reader
     and for a colour-blind reader — and this is the one signal on the page with a
