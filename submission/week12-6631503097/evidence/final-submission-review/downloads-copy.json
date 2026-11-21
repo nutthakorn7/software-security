@@ -1,0 +1,12 @@
+{
+  "source": "/private/tmp/software-security-wk12/submission/week12-6631503097/Wk12_6631503097.pdf",
+  "destination": "/Users/wannasan/Downloads/Wk12_6631503097.pdf",
+  "bytes": 17391749,
+  "sha256_source": "fa9dc19cb3acd03b1049380707390dd29f9167dc514b4174978b18798d8c1492",
+  "sha256_downloads": "fa9dc19cb3acd03b1049380707390dd29f9167dc514b4174978b18798d8c1492",
+  "match": true,
+  "method": "shutil.copy2",
+  "status": "Final approved report with actual PR URL",
+  "pr_url": "https://github.com/nutthakorn7/software-security/pull/161",
+  "timestamp": "2026-10-24T15:27:35.393859+00:00"
+}
