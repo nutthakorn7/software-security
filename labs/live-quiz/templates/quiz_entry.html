@@ -9,7 +9,7 @@
     <form class="lx-form" method="post" action="/quiz"> <!-- nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -->
       <p class="lx-eyebrow">Weekly quiz</p>
       <h1 class="lx-h1">Enter your code</h1>
-      <p class="lx-lead">Use the code on your slip or table. It works once, for you only.</p>
+      <p class="lx-lead">Use the code on your slip or table, or in your email. It works once, for you only.</p>
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       {% if error %}<div class="lx-err" id="form-error" role="alert">{{ error }}</div>{% endif %}
       <div class="lx-field"><label class="lx-label" for="code">Access code</label>
