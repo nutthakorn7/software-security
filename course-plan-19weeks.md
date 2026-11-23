@@ -90,7 +90,7 @@ AI-resilient structure (see [AGENDA.md](AGENDA.md) for time-boxing):
 
 ## 📝 Weeks 8–9 — MIDTERM
 - **Week 8 — Written/concept exam:** threat modeling, CWE/OWASP mapping, "spot the vuln in this code," **applied SQL injection (a full 30-pt section: payload + reasoning, no fix credit — that's Section D)**, secure-design short answers.
-- **Week 9 — Hands-on CTF practical:** individually solve graded challenges covering injection, XSS, auth/IDOR, and crypto in the sandbox. Flags = points.
+- **Week 9 — Individual practical (closed-book paper exam):** four stations (threat model and scanner triage, password-record migration, injection fix, JWT and object ownership) answered by hand on printed code and test output; 165-minute slot = 10 + 145 + 10; 4 × 25 = 100 points. No flags and no computers.
 - *Covers Weeks 1–6.*
 
 ---

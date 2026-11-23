@@ -267,7 +267,7 @@ Flags are **per-student** in Week 9 (SUBMISSION.md: a flag is traceable to the p
 to, and a duplicate implicates both parties). The platform issues the flag to the student who spawned
 the instance — all 7 challenges now have a hosted, per-student instance. A local `docker compose up`
 serves only public demo flags and is practice, not a valid submission
-(`docs/lesson-plans/week09-midterm-practical.md` §3). Submission route: flags + payload + mitigation
+(`docs/lesson-plans/week09-midterm-practical-hosted-ctf-archive.md` §3). Submission route: flags + payload + mitigation
 via the CTF Form / Classroom.
 
 ### 7.3 What today's mock does *not* cover — say this explicitly
