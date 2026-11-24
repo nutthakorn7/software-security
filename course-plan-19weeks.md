@@ -89,7 +89,7 @@ AI-resilient structure (see [AGENDA.md](AGENDA.md) for time-boxing):
 - **Deliverable:** each student submits a one-page "cheat sheet" (allowed into the exam if you choose open-note).
 
 ## 📝 Weeks 8–9 — MIDTERM
-- **Week 8 — Written/concept exam:** threat modeling, CWE/OWASP mapping, "spot the vuln in this code," **applied SQL injection (a full 30-pt section: payload + reasoning, no fix credit — that's Section D)**, secure-design short answers.
+- **Week 8 — Written exam (closed-book paper exam):** ten questions, Basic B1–B5 (trust boundaries/STRIDE, SAST/secret-scan/SCA triage, hashing vs. encryption vs. encoding, CWE classification, authN/authZ + least privilege) and Technical T1–T5 (SQL injection fix, command-injection-safe design, XSS output encoding, JWT verification + ownership checks, legacy-hash migration), 10 points each = 100. 165-minute slot = 10 + 145 + 10.
 - **Week 9 — Individual practical (closed-book paper exam):** four stations (threat model and scanner triage, password-record migration, injection fix, JWT and object ownership) answered by hand on printed code and test output; 165-minute slot = 10 + 145 + 10; 4 × 25 = 100 points. No flags and no computers.
 - *Covers Weeks 1–6.*
 
